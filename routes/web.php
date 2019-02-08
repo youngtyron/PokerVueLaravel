@@ -18,3 +18,8 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/game', 'GameController@index')->name('game');
+
+Route::group(['prefix' => 'api'], function()
+{
+  Route::get('/loadgame', 'GameController@loadgame');
+});

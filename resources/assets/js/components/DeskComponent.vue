@@ -5,10 +5,11 @@
                 <ul class="list-group">
                   <li class="list-group-item" v-for="player in players">
                     <p>{{player.name}}</p>
-                      <img v-for="card in player.hand" class="mini-card" :src="card.url" alt="card">
-                      <img class="mini-card" src="/cards/back.jpg" />
+                    <p v-if="player.me"><img v-for="card in player.hand" class="mini-card" :src="card.url" /></p>
+                    <p v-else><img v-for="card in player.hand" class="mini-card" src="/cards/back.jpg" /></p>
                   </li>
                 </ul>
+                <p></p>
               </div>
         </div>
     </div>
@@ -18,16 +19,23 @@
     export default {
         data(){
           return {
-            players: [{name: 'Bill', hand: []}, {name: 'Lucas', hand: []}, {name: 'Steve', hand: []}, {name: 'Monica', hand: []}, {name: 'Kim', hand: []}],
             deck: [],
+            players: [],
           }
         },
         mounted() {
-            this.prepareDeck()
-            this.dealPreflop()
-
+          this.loadGame()
         },
         methods: {
+          loadGame: function(){
+            axios.get('/api/loadgame').then((response)=> {
+              this.players = response.data.players
+              if (response.data.game == 'blind-bets'){
+                this.prepareDeck()
+                this.dealPreflop()
+              }
+            });
+          },
           randCard(){
             var rand = Math.floor(Math.random() * this.deck.length);
             var card = this.deck[rand];
@@ -42,12 +50,11 @@
               this.deck.push({suit: 'diamonds', rank: ranks[i], url: '/cards/diamonds-' + String(ranks[i]) + '.png'});
               this.deck.push({suit: 'clubs', rank: ranks[i], url: '/cards/clubs-' + String(ranks[i]) + '.png'});
             }
-            console.log(this.deck)
           },
           dealPreflop(){
             for (var i=0; i<this.players.length; i++){
-              this.players[i]['hand'].push(this.randCard())
-              this.players[i]['hand'].push(this.randCard())
+              this.players[i].hand.push(this.randCard())
+              this.players[i].hand.push(this.randCard())
             }
           },
         }

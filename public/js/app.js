@@ -53758,20 +53758,31 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      players: [{ name: 'Bill', hand: [] }, { name: 'Lucas', hand: [] }, { name: 'Steve', hand: [] }, { name: 'Monica', hand: [] }, { name: 'Kim', hand: [] }],
-      deck: []
+      deck: [],
+      players: []
     };
   },
   mounted: function mounted() {
-    this.prepareDeck();
-    this.dealPreflop();
+    this.loadGame();
   },
 
   methods: {
+    loadGame: function loadGame() {
+      var _this = this;
+
+      axios.get('/api/loadgame').then(function (response) {
+        _this.players = response.data.players;
+        if (response.data.game == 'blind-bets') {
+          _this.prepareDeck();
+          _this.dealPreflop();
+        }
+      });
+    },
     randCard: function randCard() {
       var rand = Math.floor(Math.random() * this.deck.length);
       var card = this.deck[rand];
@@ -53786,12 +53797,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         this.deck.push({ suit: 'diamonds', rank: ranks[i], url: '/cards/diamonds-' + String(ranks[i]) + '.png' });
         this.deck.push({ suit: 'clubs', rank: ranks[i], url: '/cards/clubs-' + String(ranks[i]) + '.png' });
       }
-      console.log(this.deck);
     },
     dealPreflop: function dealPreflop() {
       for (var i = 0; i < this.players.length; i++) {
-        this.players[i]['hand'].push(this.randCard());
-        this.players[i]['hand'].push(this.randCard());
+        this.players[i].hand.push(this.randCard());
+        this.players[i].hand.push(this.randCard());
       }
     }
   }
@@ -53812,29 +53822,36 @@ var render = function() {
           "ul",
           { staticClass: "list-group" },
           _vm._l(_vm.players, function(player) {
-            return _c(
-              "li",
-              { staticClass: "list-group-item" },
-              [
-                _c("p", [_vm._v(_vm._s(player.name))]),
-                _vm._v(" "),
-                _vm._l(player.hand, function(card) {
-                  return _c("img", {
-                    staticClass: "mini-card",
-                    attrs: { src: card.url, alt: "card" }
-                  })
-                }),
-                _vm._v(" "),
-                _c("img", {
-                  staticClass: "mini-card",
-                  attrs: { src: "/cards/back.jpg" }
-                })
-              ],
-              2
-            )
+            return _c("li", { staticClass: "list-group-item" }, [
+              _c("p", [_vm._v(_vm._s(player.name))]),
+              _vm._v(" "),
+              player.me
+                ? _c(
+                    "p",
+                    _vm._l(player.hand, function(card) {
+                      return _c("img", {
+                        staticClass: "mini-card",
+                        attrs: { src: card.url }
+                      })
+                    }),
+                    0
+                  )
+                : _c(
+                    "p",
+                    _vm._l(player.hand, function(card) {
+                      return _c("img", {
+                        staticClass: "mini-card",
+                        attrs: { src: "/cards/back.jpg" }
+                      })
+                    }),
+                    0
+                  )
+            ])
           }),
           0
-        )
+        ),
+        _vm._v(" "),
+        _c("p")
       ])
     ])
   ])
