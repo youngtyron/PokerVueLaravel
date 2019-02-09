@@ -19,16 +19,35 @@ class GameController extends Controller
           $exemplar = array('id' => $player->user->id,
                             'name'=>$player->user->name,
                             'me'=>true,
-                            'hand'=>array());
+                            'hand'=>array(),
+                            'money'=>$player->money);
         }
         else{
           $exemplar = array('id' => $player->user->id,
                             'name'=>$player->user->name,
-                            'hand'=>array());
+                            'hand'=>array(),
+                            'money'=>$player->money);
         }
         array_push($arr, $exemplar);
       }
-      $gameArr = array('game' => $game->phase, 'players'=>$arr);
+      $gameArr = array('game' => array('phase' => $game->round->phase,
+                                       'bank' => $game->round->bank,
+                                       'id'=>$game->id),
+                       'players'=>$arr);
       return $gameArr;
+    }
+    public function bet(Request $request){
+      $player = $request->user()->player;
+      $game = $player->game;
+      $player->money = $player->money - $request->input('bet');
+      $player->save();
+      $game->round->bank = $game->round->bank + $request->input('bet');
+      $game->round->save();
+      return array('game' => array('phase' => $game->round->phase,
+                                   'bank' => $game->round->bank,
+                                   'id'=>$game->id),
+                   'player'=>array('id' => $player->user->id,
+                                   'name'=>$player->user->name,
+                                   'money'=>$player->money));
     }
 }

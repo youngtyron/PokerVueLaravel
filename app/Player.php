@@ -9,15 +9,13 @@ class Player extends Model
   protected $guarded = [];
   public $timestamps = false;
 
-  public function user()
-  {
+  public function user(){
      return $this->belongsTo('App\User');
   }
-  public function game()
-  {
+  public function game(){
     return $this->belongsTo('App\Game');
   }
-  // public function hand(){
-  //   return 'hand';
-  // }
+  public function hand(){
+    return $this->hasOne('App\Hand');
+  }
 }

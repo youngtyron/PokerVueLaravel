@@ -2,11 +2,24 @@
     <div class="container-fluid">
         <div class="row">
               <div class="col-md-12">
+
+                <h1 @click="changeTest">{{test}}</h1>
+
+                <span v-if="game.bank">Bank: {{game.bank}}</span>
+                <span v-else>Bank is empty</span>
                 <ul class="list-group">
                   <li class="list-group-item" v-for="player in players">
-                    <p>{{player.name}}</p>
-                    <p v-if="player.me"><img v-for="card in player.hand" class="mini-card" :src="card.url" /></p>
-                    <p v-else><img v-for="card in player.hand" class="mini-card" src="/cards/back.jpg" /></p>
+                    <div class="player" v-if="player.me">
+                      <p>{{player.name}}</p>
+                      <p>Money:{{player.money}}</p>
+                      <p><img v-for="card in player.hand" class="mini-card" :src="card.url" /></p>
+                      <button type="button" class="btn btn-danger" @click="makeBet">Bet</button>
+                    </div>
+                    <div class="player" v-else>
+                      <p>{{player.name}}</p>
+                      <p>Money:{{player.money}}</p>
+                      <p><img v-for="card in player.hand" class="mini-card" src="/cards/back.jpg" /></p>
+                    </div>
                   </li>
                 </ul>
                 <p></p>
@@ -19,21 +32,52 @@
     export default {
         data(){
           return {
+            test: 'hello',
+
+
             deck: [],
             players: [],
+            game: [],
+            bank: '',
+          }
+        },
+        computed: {
+          channel(){
+            return window.Echo.private('game.' + this.game.id);
           }
         },
         mounted() {
           this.loadGame()
+          // this.channel
+          //   .listen('Game', ({data})=>{
+          //     console.log('listening game')
+          //   })
+          // })
         },
         methods: {
+          changeTest(){
+              this.test = 'bye bye'
+          },
+
+
           loadGame: function(){
             axios.get('/api/loadgame').then((response)=> {
               this.players = response.data.players
-              if (response.data.game == 'blind-bets'){
+              this.game = response.data.game
+              this.bank = response.data.game.bank
+              if (this.game.phase == 'blind-bets'){
+                console.log('blind-bets')
+              }
+              else if (this.game.phase == 'preflop'){
                 this.prepareDeck()
                 this.dealPreflop()
               }
+            });
+          },
+          makeBet: function(){
+            axios.post('/bet', {bet: 100})
+              .then((response)=> {
+              this.game = response.data.game
             });
           },
           randCard(){

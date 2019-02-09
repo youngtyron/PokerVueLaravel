@@ -22,4 +22,11 @@ Route::get('/game', 'GameController@index')->name('game');
 Route::group(['prefix' => 'api'], function()
 {
   Route::get('/loadgame', 'GameController@loadgame');
+  // Route::post('/bet', 'GameController@bet');
 });
+
+Route::get('/test', function () {
+  return 'Hello World';
+});
+
+Route::post('/bet', 'GameController@bet');
