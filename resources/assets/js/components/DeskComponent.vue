@@ -6,7 +6,7 @@
                 <span v-else>Bank is empty</span>
                 <ul class="list-group">
                   <li class="list-group-item" v-for="player in players" :id='player.id'>
-                    <div class="player" v-if="player.me">
+                    <div class="player" v-if="player.id == gamer">
                       <p v-if="player.button">BUTTON</p>
                       <p v-if="player.small_blind">SMALL BLIND</p>
                       <p v-if="player.big_blind">BIG BLIND</p>
@@ -14,11 +14,11 @@
                       <p>Money:{{player.money}}</p>
                       <p><img v-if="player.first_card" class="mini-card" :src="player.first_card" />
                          <img v-if="player.second_card" class="mini-card" :src="player.second_card" /></p>
-                         <button type="button" class="btn btn-outline-dark" @click="makeBet(5)">5</button>
-                         <button type="button" class="btn btn-outline-dark" @click="makeBet(10)">10</button>
-                         <button type="button" class="btn btn-outline-dark" @click="makeBet(25)">25</button>
-                         <button type="button" class="btn btn-outline-dark" @click="makeBet(50)">50</button>
-                         <button type="button" class="btn btn-outline-dark" @click="makeBet(100)">100</button>
+                         <button type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(5)">5</button>
+                         <button type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(10)">10</button>
+                         <button type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(25)">25</button>
+                         <button type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(50)">50</button>
+                         <button type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(100)">100</button>
                     </div>
                     <div class="player" v-else>
                       <p v-if="player.button">BUTTON</p>
@@ -39,50 +39,49 @@
 
 <script>
     export default {
+        props: ['match', 'gamer'],
         data(){
           return {
             deck: [],
             players: [],
             game: [],
-            bank: '',
           }
         },
         computed: {
-          channel(){
-            return window.Echo.private('game.' + this.game.id);
+          deskCommonChannel(){
+            return window.Echo.private('desk-common.' + this.match);
           }
         },
         mounted() {
-          this.loadGame()
-          // this.channel
-          //   .listen('Game', ({data})=>{
-          //     console.log('listening game')
-          //   })
-          // })
+          this.loadGame();
+          this.deskCommonChannel
+            .listen('DeskCommonEvent', ({data})=>{
+              this.game = data.game
+              this.players = data.players
+            });
         },
         methods: {
           loadGame: function(){
-            axios.get('/api/loadgame').then((response)=> {
+            axios.get('/loadgame').then((response)=> {
               this.players = response.data.players
               this.game = response.data.game
-              this.bank = response.data.game.bank
               if (this.game.phase == 'blind-bets'){
-
               }
               else if (this.game.phase == 'preflop'){
                 console.log('preflop')
                 this.dealPreflop()
               }
-            });
+            },
+          (error) => { console.log(error) });
           },
           makeBet: function(tokens){
-            axios.post('/bet', {bet: tokens})
+            console.log('put on token')
+            axios.post('/bet', {bet: tokens, match: this.match})
               .then((response)=> {
-              this.game = response.data.game
             });
           },
           dealPreflop(){
-            axios.get('/api/dealpreflop').then((response)=> {
+            axios.get('/dealpreflop').then((response)=> {
               this.players = response.data
             });
           },

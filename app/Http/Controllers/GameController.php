@@ -3,43 +3,22 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Events\DeskCommonEvent;
 
 class GameController extends Controller
 {
-    public function index(){
-      return view('desk');
+    public function index(Request $request){
+      return view('desk', ['match_id'=>$request->user()->player->game->id, 'gamer_id'=>$request->user()->player->id]);
     }
     public function loadgame(Request $request){
       $player = $request->user()->player;
       $game = $player->game;
-      $players = $game->players;
-      // $seatArray = $game->round->playersArrangement();
       $game->round->playersArrangement();
-      $arr = array();
-      foreach ($players as $player) {
-        if($player->user_id == $request->user()->id){
-          $exemplar = array('id' => $player->user->id,
-                            'name'=>$player->user->name,
-                            'me'=>true,
-                            'hand'=>array(),
-                            'money'=>$player->money);
-        }
-        else{
-          $exemplar = array('id' => $player->user->id,
-                            'name'=>$player->user->name,
-                            'hand'=>array(),
-                            'money'=>$player->money);
-        }
-        if ($player->id == $game->round->button_id){$exemplar += ['button'=>true];};
-        if ($player->id == $game->round->small_blind_id){$exemplar += ['small_blind'=>true];};
-        if ($player->id == $game->round->big_blind_id){$exemplar += ['big_blind'=>true];};
-
-        array_push($arr, $exemplar);
-      }
+      $playersArr = $game->playersArray();
       $gameArr = array('game' => array('phase' => $game->round->phase,
                                        'bank' => $game->round->bank,
                                        'id'=>$game->id),
-                       'players'=>$arr);
+                       'players'=>$playersArr);
       return $gameArr;
     }
     public function bet(Request $request){
@@ -49,12 +28,13 @@ class GameController extends Controller
       $player->save();
       $game->round->bank = $game->round->bank + $request->input('bet');
       $game->round->save();
-      return array('game' => array('phase' => $game->round->phase,
+      $data =  array('game' => array('phase' => $game->round->phase,
                                    'bank' => $game->round->bank,
                                    'id'=>$game->id),
-                   'player'=>array('id' => $player->user->id,
-                                   'name'=>$player->user->name,
-                                   'money'=>$player->money));
+                    'players'=>$game->playersArray(),
+                    'match_id'=>$game->id);
+       event(new DeskCommonEvent($data));
+       return $data;
     }
     public function dealPreflop(Request $request){
       $player = $request->user()->player;

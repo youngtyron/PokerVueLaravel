@@ -14,7 +14,7 @@
 // Broadcast::channel('App.User.{id}', function ($user, $id) {
 //     return (int) $user->id === (int) $id;
 // });
-// 
-// Broadcast::channel('game.{game_id}', function ($user, $game_id) {
-//     return true;
-// });
+//
+Broadcast::channel('desk-common.{match}', function ($match, $user) {
+    return true;
+});

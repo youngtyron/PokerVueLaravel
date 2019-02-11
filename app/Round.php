@@ -80,12 +80,9 @@ class Round extends Model
       $this->small_blind_id = $small_blind->id;
       $this->big_blind_id = $big_blind->id;
       $this->button_id = $button->id;
+      $this->current_player_id = $small_blind->id;
       $this->save();
     }
-    // $seatArray = array('button'=>$this->button_id,
-    //                    'small'=>"'".$this->small_blind_id."'",
-    //                    'big'=>"'".$this->big_blind_id."'");
-    // return $seatArray;
     return true;
   }
 }

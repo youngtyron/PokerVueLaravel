@@ -53783,54 +53783,55 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['match', 'gamer'],
   data: function data() {
     return {
       deck: [],
       players: [],
-      game: [],
-      bank: ''
+      game: []
     };
   },
 
   computed: {
-    channel: function channel() {
-      return window.Echo.private('game.' + this.game.id);
+    deskCommonChannel: function deskCommonChannel() {
+      return window.Echo.private('desk-common.' + this.match);
     }
   },
   mounted: function mounted() {
+    var _this = this;
+
     this.loadGame();
-    // this.channel
-    //   .listen('Game', ({data})=>{
-    //     console.log('listening game')
-    //   })
-    // })
+    this.deskCommonChannel.listen('DeskCommonEvent', function (_ref) {
+      var data = _ref.data;
+
+      _this.game = data.game;
+      _this.players = data.players;
+    });
   },
 
   methods: {
     loadGame: function loadGame() {
-      var _this = this;
+      var _this2 = this;
 
-      axios.get('/api/loadgame').then(function (response) {
-        _this.players = response.data.players;
-        _this.game = response.data.game;
-        _this.bank = response.data.game.bank;
-        if (_this.game.phase == 'blind-bets') {} else if (_this.game.phase == 'preflop') {
+      axios.get('/loadgame').then(function (response) {
+        _this2.players = response.data.players;
+        _this2.game = response.data.game;
+        if (_this2.game.phase == 'blind-bets') {} else if (_this2.game.phase == 'preflop') {
           console.log('preflop');
-          _this.dealPreflop();
+          _this2.dealPreflop();
         }
+      }, function (error) {
+        console.log(error);
       });
     },
     makeBet: function makeBet(tokens) {
-      var _this2 = this;
-
-      axios.post('/bet', { bet: tokens }).then(function (response) {
-        _this2.game = response.data.game;
-      });
+      console.log('put on token');
+      axios.post('/bet', { bet: tokens, match: this.match }).then(function (response) {});
     },
     dealPreflop: function dealPreflop() {
       var _this3 = this;
 
-      axios.get('/api/dealpreflop').then(function (response) {
+      axios.get('/dealpreflop').then(function (response) {
         _this3.players = response.data;
       });
     }
@@ -53860,7 +53861,7 @@ var render = function() {
               "li",
               { staticClass: "list-group-item", attrs: { id: player.id } },
               [
-                player.me
+                player.id == _vm.gamer
                   ? _c("div", { staticClass: "player" }, [
                       player.button ? _c("p", [_vm._v("BUTTON")]) : _vm._e(),
                       _vm._v(" "),
@@ -53895,7 +53896,8 @@ var render = function() {
                       _c(
                         "button",
                         {
-                          staticClass: "btn btn-outline-dark",
+                          staticClass: "btn btn-info",
+                          staticStyle: { "backgroung-color": "red!important" },
                           attrs: { type: "button" },
                           on: {
                             click: function($event) {
@@ -53909,7 +53911,8 @@ var render = function() {
                       _c(
                         "button",
                         {
-                          staticClass: "btn btn-outline-dark",
+                          staticClass: "btn btn-info",
+                          staticStyle: { "backgroung-color": "red!important" },
                           attrs: { type: "button" },
                           on: {
                             click: function($event) {
@@ -53923,7 +53926,8 @@ var render = function() {
                       _c(
                         "button",
                         {
-                          staticClass: "btn btn-outline-dark",
+                          staticClass: "btn btn-info",
+                          staticStyle: { "backgroung-color": "red!important" },
                           attrs: { type: "button" },
                           on: {
                             click: function($event) {
@@ -53937,7 +53941,8 @@ var render = function() {
                       _c(
                         "button",
                         {
-                          staticClass: "btn btn-outline-dark",
+                          staticClass: "btn btn-info",
+                          staticStyle: { "backgroung-color": "red!important" },
                           attrs: { type: "button" },
                           on: {
                             click: function($event) {
@@ -53951,7 +53956,8 @@ var render = function() {
                       _c(
                         "button",
                         {
-                          staticClass: "btn btn-outline-dark",
+                          staticClass: "btn btn-info",
+                          staticStyle: { "backgroung-color": "red!important" },
                           attrs: { type: "button" },
                           on: {
                             click: function($event) {

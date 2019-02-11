@@ -19,16 +19,11 @@ Auth::routes();
 
 Route::get('/game', 'GameController@index')->name('game');
 
-Route::group(['prefix' => 'api'], function()
-{
-  Route::get('/loadgame', 'GameController@loadgame');
-  Route::get('/dealpreflop', 'GameController@dealPreflop');
 
-  // Route::post('/bet', 'GameController@bet');
-});
-
-Route::get('/test', function () {
-  return 'Hello World';
-});
+Route::get('/loadgame', 'GameController@loadgame');
+Route::get('/dealpreflop', 'GameController@dealPreflop');
 
 Route::post('/bet', 'GameController@bet');
+// Route::post('/bet', function(Illuminate\Http\Request $request){
+//   App\Events\DeskCommonEvent::dispatch($request->all());
+// });
