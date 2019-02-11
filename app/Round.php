@@ -15,10 +15,10 @@ class Round extends Model
   public function generateDeck(){
     $deck = array();
     for ($r = 1; $r<14; $r++){
-      array_push($deck, 'spades'.$r);
-      array_push($deck, 'hearts'.$r);
-      array_push($deck, 'diamonds'.$r);
-      array_push($deck, 'clubs'.$r);
+      array_push($deck, 'spades-'.$r);
+      array_push($deck, 'hearts-'.$r);
+      array_push($deck, 'diamonds-'.$r);
+      array_push($deck, 'clubs-'.$r);
     }
     if ($this->phase == 'preflop'){
       //
@@ -56,6 +56,36 @@ class Round extends Model
         $hand->save();
       };
     };
+    return true;
+  }
+  public function playersArrangement(){
+    if ($this->phase == 'blind-bets' and !$this->button_id){
+      $players = $this->game->players;
+      $button = $players[array_rand($players->toArray(), 1)];
+      $button_index = array_search($button, $players->all());
+      if ($button_index+1 == count($players)){
+        $small_blind_index = 0;
+      }
+      else{
+        $small_blind_index = $button_index + 1;
+      }
+      if ($small_blind_index+1 == count($players)){
+        $big_blind_index = 0;
+      }
+      else{
+        $big_blind_index = $small_blind_index + 1;
+      }
+      $small_blind = $players[$small_blind_index];
+      $big_blind = $players[$big_blind_index];
+      $this->small_blind_id = $small_blind->id;
+      $this->big_blind_id = $big_blind->id;
+      $this->button_id = $button->id;
+      $this->save();
+    }
+    // $seatArray = array('button'=>$this->button_id,
+    //                    'small'=>"'".$this->small_blind_id."'",
+    //                    'big'=>"'".$this->big_blind_id."'");
+    // return $seatArray;
     return true;
   }
 }

@@ -13,6 +13,8 @@ class GameController extends Controller
       $player = $request->user()->player;
       $game = $player->game;
       $players = $game->players;
+      // $seatArray = $game->round->playersArrangement();
+      $game->round->playersArrangement();
       $arr = array();
       foreach ($players as $player) {
         if($player->user_id == $request->user()->id){
@@ -28,6 +30,10 @@ class GameController extends Controller
                             'hand'=>array(),
                             'money'=>$player->money);
         }
+        if ($player->id == $game->round->button_id){$exemplar += ['button'=>true];};
+        if ($player->id == $game->round->small_blind_id){$exemplar += ['small_blind'=>true];};
+        if ($player->id == $game->round->big_blind_id){$exemplar += ['big_blind'=>true];};
+
         array_push($arr, $exemplar);
       }
       $gameArr = array('game' => array('phase' => $game->round->phase,
@@ -49,5 +55,31 @@ class GameController extends Controller
                    'player'=>array('id' => $player->user->id,
                                    'name'=>$player->user->name,
                                    'money'=>$player->money));
+    }
+    public function dealPreflop(Request $request){
+      $player = $request->user()->player;
+      $game = $player->game;
+      $game->round->dealPreflop();
+      $players = $game->players;
+      $arr = array();
+      foreach ($players as $player) {
+        if($player->user_id == $request->user()->id){
+          $exemplar = array('id' => $player->user->id,
+                            'name'=>$player->user->name,
+                            'me'=>true,
+                            'first_card'=>'/cards/'.$player->hand->first_card.'.png',
+                            'second_card'=>'/cards/'.$player->hand->second_card.'.png',
+                            'money'=>$player->money);
+        }
+        else{
+          $exemplar = array('id' => $player->user->id,
+                            'name'=>$player->user->name,
+                            'first_card'=>'/cards/'.$player->hand->first_card.'.png',
+                            'second_card'=>'/cards/'.$player->hand->second_card.'.png',
+                            'money'=>$player->money);
+        }
+        array_push($arr, $exemplar);
+      }
+      return $arr;
     }
 }

@@ -53772,12 +53772,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      test: 'hello',
-
       deck: [],
       players: [],
       game: [],
@@ -53800,11 +53807,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   },
 
   methods: {
-    changeTest: function changeTest() {
-      this.test = 'bye bye';
-    },
-
-
     loadGame: function loadGame() {
       var _this = this;
 
@@ -53812,41 +53814,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         _this.players = response.data.players;
         _this.game = response.data.game;
         _this.bank = response.data.game.bank;
-        if (_this.game.phase == 'blind-bets') {
-          console.log('blind-bets');
-        } else if (_this.game.phase == 'preflop') {
-          _this.prepareDeck();
+        if (_this.game.phase == 'blind-bets') {} else if (_this.game.phase == 'preflop') {
+          console.log('preflop');
           _this.dealPreflop();
         }
       });
     },
-    makeBet: function makeBet() {
+    makeBet: function makeBet(tokens) {
       var _this2 = this;
 
-      axios.post('/bet', { bet: 100 }).then(function (response) {
+      axios.post('/bet', { bet: tokens }).then(function (response) {
         _this2.game = response.data.game;
       });
     },
-    randCard: function randCard() {
-      var rand = Math.floor(Math.random() * this.deck.length);
-      var card = this.deck[rand];
-      this.deck.splice(this.deck.indexOf(card), 1);
-      return card;
-    },
-    prepareDeck: function prepareDeck() {
-      var ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
-      for (var i = 0; i < ranks.length; i++) {
-        this.deck.push({ suit: 'spades', rank: ranks[i], url: '/cards/spades-' + String(ranks[i]) + '.png' });
-        this.deck.push({ suit: 'hearts', rank: ranks[i], url: '/cards/hearts-' + String(ranks[i]) + '.png' });
-        this.deck.push({ suit: 'diamonds', rank: ranks[i], url: '/cards/diamonds-' + String(ranks[i]) + '.png' });
-        this.deck.push({ suit: 'clubs', rank: ranks[i], url: '/cards/clubs-' + String(ranks[i]) + '.png' });
-      }
-    },
     dealPreflop: function dealPreflop() {
-      for (var i = 0; i < this.players.length; i++) {
-        this.players[i].hand.push(this.randCard());
-        this.players[i].hand.push(this.randCard());
-      }
+      var _this3 = this;
+
+      axios.get('/api/dealpreflop').then(function (response) {
+        _this3.players = response.data;
+      });
     }
   }
 });
@@ -53862,8 +53848,6 @@ var render = function() {
   return _c("div", { staticClass: "container-fluid" }, [
     _c("div", { staticClass: "row" }, [
       _c("div", { staticClass: "col-md-12" }, [
-        _c("h1", { on: { click: _vm.changeTest } }, [_vm._v(_vm._s(_vm.test))]),
-        _vm._v(" "),
         _vm.game.bank
           ? _c("span", [_vm._v("Bank: " + _vm._s(_vm.game.bank))])
           : _c("span", [_vm._v("Bank is empty")]),
@@ -53872,51 +53856,145 @@ var render = function() {
           "ul",
           { staticClass: "list-group" },
           _vm._l(_vm.players, function(player) {
-            return _c("li", { staticClass: "list-group-item" }, [
-              player.me
-                ? _c("div", { staticClass: "player" }, [
-                    _c("p", [_vm._v(_vm._s(player.name))]),
-                    _vm._v(" "),
-                    _c("p", [_vm._v("Money:" + _vm._s(player.money))]),
-                    _vm._v(" "),
-                    _c(
-                      "p",
-                      _vm._l(player.hand, function(card) {
-                        return _c("img", {
-                          staticClass: "mini-card",
-                          attrs: { src: card.url }
-                        })
-                      }),
-                      0
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        attrs: { type: "button" },
-                        on: { click: _vm.makeBet }
-                      },
-                      [_vm._v("Bet")]
-                    )
-                  ])
-                : _c("div", { staticClass: "player" }, [
-                    _c("p", [_vm._v(_vm._s(player.name))]),
-                    _vm._v(" "),
-                    _c("p", [_vm._v("Money:" + _vm._s(player.money))]),
-                    _vm._v(" "),
-                    _c(
-                      "p",
-                      _vm._l(player.hand, function(card) {
-                        return _c("img", {
-                          staticClass: "mini-card",
-                          attrs: { src: "/cards/back.jpg" }
-                        })
-                      }),
-                      0
-                    )
-                  ])
-            ])
+            return _c(
+              "li",
+              { staticClass: "list-group-item", attrs: { id: player.id } },
+              [
+                player.me
+                  ? _c("div", { staticClass: "player" }, [
+                      player.button ? _c("p", [_vm._v("BUTTON")]) : _vm._e(),
+                      _vm._v(" "),
+                      player.small_blind
+                        ? _c("p", [_vm._v("SMALL BLIND")])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      player.big_blind
+                        ? _c("p", [_vm._v("BIG BLIND")])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c("p", [_vm._v(_vm._s(player.name))]),
+                      _vm._v(" "),
+                      _c("p", [_vm._v("Money:" + _vm._s(player.money))]),
+                      _vm._v(" "),
+                      _c("p", [
+                        player.first_card
+                          ? _c("img", {
+                              staticClass: "mini-card",
+                              attrs: { src: player.first_card }
+                            })
+                          : _vm._e(),
+                        _vm._v(" "),
+                        player.second_card
+                          ? _c("img", {
+                              staticClass: "mini-card",
+                              attrs: { src: player.second_card }
+                            })
+                          : _vm._e()
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-dark",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.makeBet(5)
+                            }
+                          }
+                        },
+                        [_vm._v("5")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-dark",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.makeBet(10)
+                            }
+                          }
+                        },
+                        [_vm._v("10")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-dark",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.makeBet(25)
+                            }
+                          }
+                        },
+                        [_vm._v("25")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-dark",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.makeBet(50)
+                            }
+                          }
+                        },
+                        [_vm._v("50")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-dark",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.makeBet(100)
+                            }
+                          }
+                        },
+                        [_vm._v("100")]
+                      )
+                    ])
+                  : _c("div", { staticClass: "player" }, [
+                      player.button ? _c("p", [_vm._v("BUTTON")]) : _vm._e(),
+                      _vm._v(" "),
+                      player.small_blind
+                        ? _c("p", [_vm._v("SMALL BLIND")])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      player.big_blind
+                        ? _c("p", [_vm._v("BIG BLIND")])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c("p", [_vm._v(_vm._s(player.name))]),
+                      _vm._v(" "),
+                      _c("p", [_vm._v("Money:" + _vm._s(player.money))]),
+                      _vm._v(" "),
+                      _c("p", [
+                        player.first_card
+                          ? _c("img", {
+                              staticClass: "mini-card",
+                              attrs: { src: "/cards/back.jpg" }
+                            })
+                          : _vm._e(),
+                        _vm._v(" "),
+                        player.second_card
+                          ? _c("img", {
+                              staticClass: "mini-card",
+                              attrs: { src: "/cards/back.jpg" }
+                            })
+                          : _vm._e()
+                      ])
+                    ])
+              ]
+            )
           }),
           0
         ),

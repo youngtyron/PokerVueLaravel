@@ -22,6 +22,8 @@ Route::get('/game', 'GameController@index')->name('game');
 Route::group(['prefix' => 'api'], function()
 {
   Route::get('/loadgame', 'GameController@loadgame');
+  Route::get('/dealpreflop', 'GameController@dealPreflop');
+
   // Route::post('/bet', 'GameController@bet');
 });
 
