@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Events\DeskCommonEvent;
+use App\Player;
 
 class GameController extends Controller
 {
@@ -18,21 +19,58 @@ class GameController extends Controller
       $gameArr = array('game' => array('phase' => $game->round->phase,
                                        'bank' => $game->round->bank,
                                        'id'=>$game->id),
-                       'players'=>$playersArr);
+                       'players'=>$playersArr,
+                       'turn'=>$game->round->current_player_id);
       return $gameArr;
     }
     public function bet(Request $request){
+      $bet = $request->input('bet');
       $player = $request->user()->player;
       $game = $player->game;
-      $player->money = $player->money - $request->input('bet');
+      $round = $game->round;
+      $players = $game->players;
+      $player->money = $player->money - $bet;
+      $player->last_bet = $bet;
       $player->save();
-      $game->round->bank = $game->round->bank + $request->input('bet');
-      $game->round->save();
-      $data =  array('game' => array('phase' => $game->round->phase,
-                                   'bank' => $game->round->bank,
+      $round->bank = $round->bank + $bet;
+      if ($bet > $round->max_bet){
+        $round->max_bet = $bet;
+      }
+      // $current_index = array_search($current, $players->all());
+
+      foreach ($players as $p) {
+        if ($p->id == $player->id){
+          $current_index = array_search($p, $players->all());
+        }
+      }
+
+      if ($current_index+1 == count($players)){
+        $new_index = 0;
+      }
+      else{
+        $new_index = $current_index+1;
+      }
+
+
+      $round->current_player_id = $players[$new_index]->id;
+      $round->betted = $game->round->betted+1;
+      $round->save();
+
+      if ($round->betted == count($players)){
+        //
+      }
+      else{
+        //
+      }
+
+      $data =  array('game' => array('phase' => $round->phase,
+                                   'bank' => $round->bank,
                                    'id'=>$game->id),
                     'players'=>$game->playersArray(),
-                    'match_id'=>$game->id);
+                    'match_id'=>$game->id,
+                    'turn'=>$game->round->current_player_id,
+
+                  );
        event(new DeskCommonEvent($data));
        return $data;
     }
@@ -61,5 +99,28 @@ class GameController extends Controller
         array_push($arr, $exemplar);
       }
       return $arr;
+    }
+    public function blinds(Request $request){
+      $player = $request->user()->player;
+      $game = $player->game;
+      $small_blind = Player::find($game->round->small_blind_id);
+      $small_blind->money = $small_blind->money - 5;
+      $small_blind->save();
+      $big_blind = Player::find($game->round->big_blind_id);
+      $big_blind->money = $big_blind->money - 10;
+      $big_blind->save();
+      $game->round->bank = 15;
+      $game->round->phase = 'preflop';
+      $game->round->save();
+      $game->round->dealPreflop();
+      $playersarr = $game->playersArray();
+      $data =  array('game' => array('phase' => $game->round->phase,
+                                   'bank' => $game->round->bank,
+                                   'id'=>$game->id),
+                    'players'=>$playersarr,
+                    'match_id'=>$game->id,
+                    'other'=>'blinds_done');
+       event(new DeskCommonEvent($data));
+       return $data;
     }
 }

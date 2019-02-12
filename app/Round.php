@@ -76,11 +76,19 @@ class Round extends Model
         $big_blind_index = $small_blind_index + 1;
       }
       $small_blind = $players[$small_blind_index];
+      // $small_blind->turn = 1;
+      // $small_blind->save();
       $big_blind = $players[$big_blind_index];
       $this->small_blind_id = $small_blind->id;
       $this->big_blind_id = $big_blind->id;
       $this->button_id = $button->id;
-      $this->current_player_id = $small_blind->id;
+      if ($big_blind_index+1 == count($players)){
+        $current_player_index = 0;
+      }
+      else{
+        $current_player_index = $big_blind_index + 1;
+      }
+      $this->current_player_id = $players[$current_player_index]->id;
       $this->save();
     }
     return true;

@@ -24,6 +24,4 @@ Route::get('/loadgame', 'GameController@loadgame');
 Route::get('/dealpreflop', 'GameController@dealPreflop');
 
 Route::post('/bet', 'GameController@bet');
-// Route::post('/bet', function(Illuminate\Http\Request $request){
-//   App\Events\DeskCommonEvent::dispatch($request->all());
-// });
+Route::post('/blinds', 'GameController@blinds');
