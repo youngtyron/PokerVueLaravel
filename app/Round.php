@@ -12,6 +12,9 @@ class Round extends Model
   public function game(){
     return $this->belongsTo('App\Game');
   }
+  public function players(){
+    return $this->game->players;
+  }
   public function generateDeck(){
     $deck = array();
     for ($r = 1; $r<14; $r++){
@@ -33,6 +36,29 @@ class Round extends Model
       //
     }
     return $deck;
+  }
+  public function whoMustCallNext(){
+    $players = $this->players();
+    $current = Player::find($this->current_player_id);
+    foreach ($players as $p) {
+      if ($p->id == $current->id){
+        $current_index = array_search($p, $players->all());
+      }
+    }
+    for($i = 1; $i<=count($players); ++$i){
+      if ($current_index+$i >= count($players)){
+        $cycle_index = $i - (count($players) - $current_index);
+      }
+      else{
+        $cycle_index = $current_index+$i;
+      }
+      if ($players[$cycle_index]->last_bet < $this->max_bet){
+        return $players[$cycle_index];
+      }
+      else {
+        return null;
+      }
+    };
   }
   public function dealPreflop(){
     $players = $this->game->players;

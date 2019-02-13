@@ -77,7 +77,12 @@
               this.players = data.players
               console.log(data)
               if (this.gamer == data.turn){
-                alert("Your turn!")
+                if (data.call){
+                  alert ("You have to call with " + data.call + " more")
+                }
+                else{
+                  alert("Your turn!")
+                }
               }
             });
         },

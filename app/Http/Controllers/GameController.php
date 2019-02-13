@@ -36,40 +36,48 @@ class GameController extends Controller
       if ($bet > $round->max_bet){
         $round->max_bet = $bet;
       }
-      // $current_index = array_search($current, $players->all());
-
-      foreach ($players as $p) {
-        if ($p->id == $player->id){
-          $current_index = array_search($p, $players->all());
+      if ($round->betted+1 >= count($players)){
+        $turn_player = $round->whoMustCallNext();
+        if (is_null($turn_player)){
+          $call = null;
+          //FLOP
+        }
+        else {
+          $call = $round->max_bet - $turn_player->last_bet;
+          $turn = $turn_player->id;
+          $round->current_player_id = $turn_player->id;
+          if ($round->betted <count($players)){
+            $round->betted = $game->round->betted+1;
+          }
         }
       }
-
-      if ($current_index+1 == count($players)){
-        $new_index = 0;
-      }
       else{
-        $new_index = $current_index+1;
+        foreach ($players as $p) {
+          if ($p->id == $player->id){
+            $current_index = array_search($p, $players->all());
+          }
+        }
+
+        if ($current_index+1 == count($players)){
+          $new_index = 0;
+        }
+        else{
+          $new_index = $current_index+1;
+        }
+
+        $round->current_player_id = $players[$new_index]->id;
+        $round->betted = $game->round->betted+1;
+        $call = null;
+        $turn = $game->round->current_player_id;
       }
-
-
-      $round->current_player_id = $players[$new_index]->id;
-      $round->betted = $game->round->betted+1;
       $round->save();
-
-      if ($round->betted == count($players)){
-        //
-      }
-      else{
-        //
-      }
-
       $data =  array('game' => array('phase' => $round->phase,
                                    'bank' => $round->bank,
                                    'id'=>$game->id),
                     'players'=>$game->playersArray(),
                     'match_id'=>$game->id,
-                    'turn'=>$game->round->current_player_id,
-
+                    'turn'=>$turn,
+                    'call'=>$call
                   );
        event(new DeskCommonEvent($data));
        return $data;
