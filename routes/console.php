@@ -28,3 +28,21 @@ Artisan::command('logs:clear', function() {
     $this->comment('Logs have been cleared!');
 
 })->describe('Clear log files');
+
+Artisan::command('logs:size', function() {
+	$fileSize = 0;
+	$path = storage_path('logs/');
+    $dir = scandir($path);
+
+    foreach($dir as $file)
+    {
+        if (($file!='.') && ($file!='..'))
+            if(is_dir($path . '/' . $file))
+                $fileSize += getFilesSize($path.'/'.$file);
+            else
+                $fileSize += filesize($path . '/' . $file);
+    }
+    $fileSize = intval($fileSize / 1024 / 1024);
+	$this->comment('Logs size is:'. $fileSize. 'MB');
+
+});

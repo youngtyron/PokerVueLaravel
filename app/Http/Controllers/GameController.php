@@ -14,13 +14,15 @@ class GameController extends Controller
     public function loadgame(Request $request){
       $player = $request->user()->player;
       $game = $player->game;
-      $game->round->playersArrangement();
+      $round = $game->round;
+      $round->playersArrangement();
       $playersArr = $game->playersArray();
-      $gameArr = array('game' => array('phase' => $game->round->phase,
-                                       'bank' => $game->round->bank,
+      $gameArr = array('game' => array('phase' => $round->phase,
+                                       'bank' => $round->bank,
                                        'id'=>$game->id),
                        'players'=>$playersArr,
-                       'turn'=>$game->round->current_player_id);
+                       'turn'=>$game->round->current_player_id,
+                       'community'=>array('first_card' => '/cards/'.$round->first_card.'.png', 'second_card'=>'/cards/'.$round->second_card.'.png', 'third_card'=>'/cards/'.$round->third_card.'.png'));
       return $gameArr;
     }
     public function bet(Request $request){
@@ -30,11 +32,11 @@ class GameController extends Controller
       $round = $game->round;
       $players = $game->players;
       $player->money = $player->money - $bet;
-      $player->last_bet = $bet;
+      $player->last_bet = $player->last_bet+$bet;
       $player->save();
       $round->bank = $round->bank + $bet;
-      if ($bet > $round->max_bet){
-        $round->max_bet = $bet;
+      if ($player->last_bet+$bet > $round->max_bet){
+        $round->max_bet = $player->last_bet+$bet;
       }
       if ($round->betted+1 >= count($players)){
         $turn_player = $round->whoMustCallNext();

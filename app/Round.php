@@ -62,6 +62,7 @@ class Round extends Model
   }
   public function dealPreflop(){
     $players = $this->game->players;
+    //Вероятно этот кусок не нужен: начало->
     $cardsonhands = array();
     foreach ($players as $player){
       if ($player->hand){
@@ -69,6 +70,7 @@ class Round extends Model
         array_push($cardsonhands, $player->hand->second_card);
       };
     };
+    //<-конец
     $preflop = array_diff($this->generateDeck(), $cardsonhands);
     foreach ($players as $player){
       if (!$player->hand or !$player->hand->first_card){
@@ -83,6 +85,28 @@ class Round extends Model
       };
     };
     return true;
+  }
+  public function dealFlop(){
+    $players = $this->game->players;
+    $cardsonhands = array();
+    foreach ($players as $player){
+      if ($player->hand){
+        array_push($cardsonhands, $player->hand->first_card);
+        array_push($cardsonhands, $player->hand->second_card);
+      };
+    };
+    $flop = array_diff($this->generateDeck(), $cardsonhands);
+    $first = $flop[array_rand($flop, 1)];
+    unset($flop[array_search($first, $flop)]);
+    $second = $flop[array_rand($flop, 1)];
+    unset($flop[array_search($second, $flop)]);
+    $third = $flop[array_rand($flop, 1)];
+    unset($flop[array_search($third, $flop)]);
+    $this->first_card = $first;
+    $this->second_card = $second;
+    $this->third_card = $third;
+    $this->save();
+    return  array('f' => $this->first_card, 's'=> $this->second_card, 't'=>$this->third_card );;
   }
   public function playersArrangement(){
     if ($this->phase == 'blind-bets' and !$this->button_id){

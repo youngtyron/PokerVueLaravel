@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
         <div class="row">
-              <div class="col-md-12">
+              <div class="col-md-6">
                 <span v-if="game.bank">Bank: {{game.bank}}</span>
                 <span v-else>Bank is empty</span>
                 <ul class="list-group">
@@ -16,19 +16,23 @@
                          <img v-if="player.second_card" class="mini-card" :src="player.second_card" /></p>
                           <div class="tokens-buttons" v-if="player.current">
                             <p>[CURRENT]</p>
-                            <button type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(5)">5</button>
-                            <button type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(10)">10</button>
-                            <button type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(25)">25</button>
-                            <button type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(50)">50</button>
-                            <button type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(100)">100</button>
+                            <button type="button" class="btn btn-info tokens-button" @click="addToken(5)">5</button>
+                            <button type="button" class="btn btn-info tokens-button" @click="addToken(10)">10</button>
+                            <button type="button" class="btn btn-info tokens-button" @click="addToken(25)">25</button>
+                            <button type="button" class="btn btn-info tokens-button" @click="addToken(50)">50</button>
+                            <button type="button" class="btn btn-info tokens-button" @click="addToken(100)">100</button>
+                            <button v-model="bets" type="button" class="btn btn-info bets-button" @click="makeBet(bets)">
+                            {{bets}}</button>
+                            <p @click="cleatBets">Clear bet</p>
                           </div>
                           <div class="tokens-buttons" v-else>
                             <p>[NOT MY TURN]</p>
-                            <button disabled type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(5)">5</button>
-                            <button disabled type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(10)">10</button>
-                            <button disabled type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(25)">25</button>
-                            <button disabled type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(50)">50</button>
-                            <button disabled type="button" style="backgroung-color: red!important;" class="btn btn-info" @click="makeBet(100)">100</button>
+                            <button disabled type="button" class="btn btn-info tokens-button">5</button>
+                            <button disabled type="button" class="btn btn-info tokens-button">10</button>
+                            <button disabled type="button" class="btn btn-info tokens-button">25</button>
+                            <button disabled type="button" class="btn btn-info tokens-button">50</button>
+                            <button disabled type="button" class="btn btn-info tokens-button">100</button>
+                            <button disabled v-model="bets" type="button" class="btn btn-info bets-button">{{bets}}</button>
                           </div>
 
                     </div>
@@ -47,6 +51,14 @@
                 </ul>
                 <button type="button" class="btn btn-primary" @click="startGame">Start game</button>
               </div>
+              <div class="col-md-6" style="backgroung-color: grey;">
+                <p>Community cards</p>
+                <img v-if="community.first_card" class="mini-card" :src="community.first_card" />
+                <img v-if="community.second_card" class="mini-card" :src="community.second_card" />
+                <img v-if="community.third_card" class="mini-card" :src="community.third_card" />
+                <img v-if="community.fourth_card" class="mini-card" :src="community.fourth_card" />
+                <img v-if="community.fifth_card" class="mini-card" :src="community.fifth_card" />
+              </div>
         </div>
     </div>
 </template>
@@ -59,6 +71,8 @@
             deck: [],
             players: [],
             game: [],
+            community: [],
+            bets: 0,
           }
         },
         computed: {
@@ -108,13 +122,19 @@
               }
               this.players = response.data.players
               this.game = response.data.game
+              this.community = response.data.community
             })
             .catch((error)=>{
               console.log(error);
             });
           },
-          makeBet: function(tokens){
-            axios.post('/bet', {bet: tokens, match: this.match})
+          addToken(token){
+            console.log(token)
+            this.bets = this.bets + token;
+          },
+          makeBet: function(bet){
+            console.log('betttt')
+            axios.post('/bet', {bet: bet, match: this.match})
               .then((response)=> {
               this.players = response.data.players
               this.game = response.data.game
@@ -125,6 +145,9 @@
               this.players = response.data
             });
           },
+          cleatBets(){
+            this.bets = 0;
+          }
         }
     }
 </script>

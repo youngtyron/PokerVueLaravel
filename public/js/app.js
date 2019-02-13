@@ -53795,6 +53795,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['match', 'gamer'],
@@ -53802,7 +53814,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     return {
       deck: [],
       players: [],
-      game: []
+      game: [],
+      community: [],
+      bets: 0
     };
   },
 
@@ -53857,14 +53871,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         }
         _this2.players = response.data.players;
         _this2.game = response.data.game;
+        _this2.community = response.data.community;
       }).catch(function (error) {
         console.log(error);
       });
     },
-    makeBet: function makeBet(tokens) {
+    addToken: function addToken(token) {
+      console.log(token);
+      this.bets = this.bets + token;
+    },
+
+    makeBet: function makeBet(bet) {
       var _this3 = this;
 
-      axios.post('/bet', { bet: tokens, match: this.match }).then(function (response) {
+      console.log('betttt');
+      axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
         _this3.players = response.data.players;
         _this3.game = response.data.game;
       });
@@ -53875,6 +53896,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       axios.get('/dealpreflop').then(function (response) {
         _this4.players = response.data;
       });
+    },
+    cleatBets: function cleatBets() {
+      this.bets = 0;
     }
   }
 });
@@ -53889,7 +53913,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container-fluid" }, [
     _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-md-12" }, [
+      _c("div", { staticClass: "col-md-6" }, [
         _vm.game.bank
           ? _c("span", [_vm._v("Bank: " + _vm._s(_vm.game.bank))])
           : _c("span", [_vm._v("Bank is empty")]),
@@ -53941,14 +53965,11 @@ var render = function() {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-info",
-                                staticStyle: {
-                                  "backgroung-color": "red!important"
-                                },
+                                staticClass: "btn btn-info tokens-button",
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.makeBet(5)
+                                    return _vm.addToken(5)
                                   }
                                 }
                               },
@@ -53958,14 +53979,11 @@ var render = function() {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-info",
-                                staticStyle: {
-                                  "backgroung-color": "red!important"
-                                },
+                                staticClass: "btn btn-info tokens-button",
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.makeBet(10)
+                                    return _vm.addToken(10)
                                   }
                                 }
                               },
@@ -53975,14 +53993,11 @@ var render = function() {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-info",
-                                staticStyle: {
-                                  "backgroung-color": "red!important"
-                                },
+                                staticClass: "btn btn-info tokens-button",
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.makeBet(25)
+                                    return _vm.addToken(25)
                                   }
                                 }
                               },
@@ -53992,14 +54007,11 @@ var render = function() {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-info",
-                                staticStyle: {
-                                  "backgroung-color": "red!important"
-                                },
+                                staticClass: "btn btn-info tokens-button",
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.makeBet(50)
+                                    return _vm.addToken(50)
                                   }
                                 }
                               },
@@ -54009,19 +54021,46 @@ var render = function() {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-info",
-                                staticStyle: {
-                                  "backgroung-color": "red!important"
-                                },
+                                staticClass: "btn btn-info tokens-button",
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.makeBet(100)
+                                    return _vm.addToken(100)
                                   }
                                 }
                               },
                               [_vm._v("100")]
-                            )
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-info bets-button",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.makeBet(_vm.bets)
+                                  }
+                                },
+                                model: {
+                                  value: _vm.bets,
+                                  callback: function($$v) {
+                                    _vm.bets = $$v
+                                  },
+                                  expression: "bets"
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                        " +
+                                    _vm._s(_vm.bets)
+                                )
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c("p", { on: { click: _vm.cleatBets } }, [
+                              _vm._v("Clear bet")
+                            ])
                           ])
                         : _c("div", { staticClass: "tokens-buttons" }, [
                             _c("p", [_vm._v("[NOT MY TURN]")]),
@@ -54029,16 +54068,8 @@ var render = function() {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-info",
-                                staticStyle: {
-                                  "backgroung-color": "red!important"
-                                },
-                                attrs: { disabled: "", type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.makeBet(5)
-                                  }
-                                }
+                                staticClass: "btn btn-info tokens-button",
+                                attrs: { disabled: "", type: "button" }
                               },
                               [_vm._v("5")]
                             ),
@@ -54046,16 +54077,8 @@ var render = function() {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-info",
-                                staticStyle: {
-                                  "backgroung-color": "red!important"
-                                },
-                                attrs: { disabled: "", type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.makeBet(10)
-                                  }
-                                }
+                                staticClass: "btn btn-info tokens-button",
+                                attrs: { disabled: "", type: "button" }
                               },
                               [_vm._v("10")]
                             ),
@@ -54063,16 +54086,8 @@ var render = function() {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-info",
-                                staticStyle: {
-                                  "backgroung-color": "red!important"
-                                },
-                                attrs: { disabled: "", type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.makeBet(25)
-                                  }
-                                }
+                                staticClass: "btn btn-info tokens-button",
+                                attrs: { disabled: "", type: "button" }
                               },
                               [_vm._v("25")]
                             ),
@@ -54080,16 +54095,8 @@ var render = function() {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-info",
-                                staticStyle: {
-                                  "backgroung-color": "red!important"
-                                },
-                                attrs: { disabled: "", type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.makeBet(50)
-                                  }
-                                }
+                                staticClass: "btn btn-info tokens-button",
+                                attrs: { disabled: "", type: "button" }
                               },
                               [_vm._v("50")]
                             ),
@@ -54097,18 +54104,26 @@ var render = function() {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-info",
-                                staticStyle: {
-                                  "backgroung-color": "red!important"
-                                },
-                                attrs: { disabled: "", type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.makeBet(100)
-                                  }
-                                }
+                                staticClass: "btn btn-info tokens-button",
+                                attrs: { disabled: "", type: "button" }
                               },
                               [_vm._v("100")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-info bets-button",
+                                attrs: { disabled: "", type: "button" },
+                                model: {
+                                  value: _vm.bets,
+                                  callback: function($$v) {
+                                    _vm.bets = $$v
+                                  },
+                                  expression: "bets"
+                                }
+                              },
+                              [_vm._v(_vm._s(_vm.bets))]
                             )
                           ])
                     ])
@@ -54162,7 +54177,53 @@ var render = function() {
           },
           [_vm._v("Start game")]
         )
-      ])
+      ]),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "col-md-6",
+          staticStyle: { "backgroung-color": "grey" }
+        },
+        [
+          _c("p", [_vm._v("Community cards")]),
+          _vm._v(" "),
+          _vm.community.first_card
+            ? _c("img", {
+                staticClass: "mini-card",
+                attrs: { src: _vm.community.first_card }
+              })
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.community.second_card
+            ? _c("img", {
+                staticClass: "mini-card",
+                attrs: { src: _vm.community.second_card }
+              })
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.community.third_card
+            ? _c("img", {
+                staticClass: "mini-card",
+                attrs: { src: _vm.community.third_card }
+              })
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.community.fourth_card
+            ? _c("img", {
+                staticClass: "mini-card",
+                attrs: { src: _vm.community.fourth_card }
+              })
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.community.fifth_card
+            ? _c("img", {
+                staticClass: "mini-card",
+                attrs: { src: _vm.community.fifth_card }
+              })
+            : _vm._e()
+        ]
+      )
     ])
   ])
 }

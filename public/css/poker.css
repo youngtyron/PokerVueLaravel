@@ -3,3 +3,19 @@
   width: 64px;
   margin-right: 10px;
 }
+.tokens-button{
+  background: #D5D315;
+  border-color: #0B0B09;
+  width: 45px;
+  height: 45px;
+  border-radius: 25px;
+  text-align: center;
+}
+.bets-button{
+  background: #D95430;
+  border-color: #399D3A;
+  width: 80px;
+  height: 45px;
+  border-radius: 45px;
+  text-align: center;
+ }
