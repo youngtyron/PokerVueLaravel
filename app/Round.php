@@ -106,7 +106,7 @@ class Round extends Model
     $this->second_card = $second;
     $this->third_card = $third;
     $this->save();
-    return  array('f' => $this->first_card, 's'=> $this->second_card, 't'=>$this->third_card );;
+    return true;
   }
   public function playersArrangement(){
     if ($this->phase == 'blind-bets' and !$this->button_id){
@@ -126,8 +126,6 @@ class Round extends Model
         $big_blind_index = $small_blind_index + 1;
       }
       $small_blind = $players[$small_blind_index];
-      // $small_blind->turn = 1;
-      // $small_blind->save();
       $big_blind = $players[$big_blind_index];
       $this->small_blind_id = $small_blind->id;
       $this->big_blind_id = $big_blind->id;
@@ -142,5 +140,14 @@ class Round extends Model
       $this->save();
     }
     return true;
+  }
+  public function communityArray(){
+    if ($this->phase == 'flop' or $this->phase == 'turn' or $this->phase == 'river'){
+      $communityarr = array('first_card' => '/cards/'.$this->first_card.'.png', 'second_card'=>'/cards/'.$this->second_card.'.png', 'third_card'=>'/cards/'.$this->third_card.'.png');
+    }
+    else{
+      $communityarr = null; 
+    }
+    return $communityarr;
   }
 }

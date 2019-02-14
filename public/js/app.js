@@ -53837,6 +53837,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       }
       _this.game = data.game;
       _this.players = data.players;
+      _this.community = data.community;
       console.log(data);
       if (_this.gamer == data.turn) {
         if (data.call) {
@@ -53861,33 +53862,35 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var _this2 = this;
 
       axios.get('/loadgame').then(function (response) {
-        console.log(response.data);
+        _this2.players = response.data.players;
+        _this2.game = response.data.game;
+        _this2.community = response.data.community;
         if (_this2.game.phase == 'blind-bets') {} else if (_this2.game.phase == 'preflop') {
           console.log('preflop');
-          _this2.dealPreflop();
+        } else if (_this2.game.phase == 'flop') {
+          console.log('flop');
         }
         if (_this2.gamer == response.data.turn) {
           alert("Your turn!");
         }
-        _this2.players = response.data.players;
-        _this2.game = response.data.game;
-        _this2.community = response.data.community;
       }).catch(function (error) {
         console.log(error);
       });
     },
     addToken: function addToken(token) {
-      console.log(token);
+      // console.log(token)
       this.bets = this.bets + token;
     },
 
     makeBet: function makeBet(bet) {
       var _this3 = this;
 
-      console.log('betttt');
+      console.log('bet');
       axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
+        console.log(response.data);
         _this3.players = response.data.players;
         _this3.game = response.data.game;
+        _this3.community = response.data.community;
       });
     },
     dealPreflop: function dealPreflop() {
@@ -54039,7 +54042,7 @@ var render = function() {
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.makeBet(_vm.bets)
+                                    return _vm.makeBet(100)
                                   }
                                 },
                                 model: {
@@ -54179,51 +54182,53 @@ var render = function() {
         )
       ]),
       _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "col-md-6",
-          staticStyle: { "backgroung-color": "grey" }
-        },
-        [
-          _c("p", [_vm._v("Community cards")]),
-          _vm._v(" "),
-          _vm.community.first_card
-            ? _c("img", {
-                staticClass: "mini-card",
-                attrs: { src: _vm.community.first_card }
-              })
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.community.second_card
-            ? _c("img", {
-                staticClass: "mini-card",
-                attrs: { src: _vm.community.second_card }
-              })
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.community.third_card
-            ? _c("img", {
-                staticClass: "mini-card",
-                attrs: { src: _vm.community.third_card }
-              })
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.community.fourth_card
-            ? _c("img", {
-                staticClass: "mini-card",
-                attrs: { src: _vm.community.fourth_card }
-              })
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.community.fifth_card
-            ? _c("img", {
-                staticClass: "mini-card",
-                attrs: { src: _vm.community.fifth_card }
-              })
-            : _vm._e()
-        ]
-      )
+      _vm.community
+        ? _c(
+            "div",
+            {
+              staticClass: "col-md-6",
+              staticStyle: { "backgroung-color": "grey" }
+            },
+            [
+              _c("p", [_vm._v("Community cards")]),
+              _vm._v(" "),
+              _vm.community.first_card
+                ? _c("img", {
+                    staticClass: "mini-card",
+                    attrs: { src: _vm.community.first_card }
+                  })
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.community.second_card
+                ? _c("img", {
+                    staticClass: "mini-card",
+                    attrs: { src: _vm.community.second_card }
+                  })
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.community.third_card
+                ? _c("img", {
+                    staticClass: "mini-card",
+                    attrs: { src: _vm.community.third_card }
+                  })
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.community.fourth_card
+                ? _c("img", {
+                    staticClass: "mini-card",
+                    attrs: { src: _vm.community.fourth_card }
+                  })
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.community.fifth_card
+                ? _c("img", {
+                    staticClass: "mini-card",
+                    attrs: { src: _vm.community.fifth_card }
+                  })
+                : _vm._e()
+            ]
+          )
+        : _vm._e()
     ])
   ])
 }

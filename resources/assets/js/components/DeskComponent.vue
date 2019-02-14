@@ -21,7 +21,7 @@
                             <button type="button" class="btn btn-info tokens-button" @click="addToken(25)">25</button>
                             <button type="button" class="btn btn-info tokens-button" @click="addToken(50)">50</button>
                             <button type="button" class="btn btn-info tokens-button" @click="addToken(100)">100</button>
-                            <button v-model="bets" type="button" class="btn btn-info bets-button" @click="makeBet(bets)">
+                            <button v-model="bets" type="button" class="btn btn-info bets-button" @click="makeBet(100)">
                             {{bets}}</button>
                             <p @click="cleatBets">Clear bet</p>
                           </div>
@@ -51,7 +51,7 @@
                 </ul>
                 <button type="button" class="btn btn-primary" @click="startGame">Start game</button>
               </div>
-              <div class="col-md-6" style="backgroung-color: grey;">
+              <div v-if="community" class="col-md-6" style="backgroung-color: grey;">
                 <p>Community cards</p>
                 <img v-if="community.first_card" class="mini-card" :src="community.first_card" />
                 <img v-if="community.second_card" class="mini-card" :src="community.second_card" />
@@ -89,6 +89,7 @@
               }
               this.game = data.game
               this.players = data.players
+              this.community = data.community
               console.log(data)
               if (this.gamer == data.turn){
                 if (data.call){
@@ -110,34 +111,37 @@
           },
           loadGame: function(){
             axios.get('/loadgame').then((response)=> {
-              console.log(response.data)
+              this.players = response.data.players
+              this.game = response.data.game
+              this.community = response.data.community
               if (this.game.phase == 'blind-bets'){
               }
               else if (this.game.phase == 'preflop'){
                 console.log('preflop')
-                this.dealPreflop()
+              }
+              else if (this.game.phase == 'flop'){
+                console.log('flop')
               }
               if (this.gamer == response.data.turn){
                 alert("Your turn!")
               }
-              this.players = response.data.players
-              this.game = response.data.game
-              this.community = response.data.community
             })
             .catch((error)=>{
               console.log(error);
             });
           },
           addToken(token){
-            console.log(token)
+            // console.log(token)
             this.bets = this.bets + token;
           },
           makeBet: function(bet){
-            console.log('betttt')
+            console.log('bet')
             axios.post('/bet', {bet: bet, match: this.match})
               .then((response)=> {
+              console.log(response.data)      
               this.players = response.data.players
               this.game = response.data.game
+              this.community = response.data.community
             });
           },
           dealPreflop(){

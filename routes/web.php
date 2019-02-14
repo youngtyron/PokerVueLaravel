@@ -24,4 +24,5 @@ Route::get('/loadgame', 'GameController@loadgame');
 Route::get('/dealpreflop', 'GameController@dealPreflop');
 
 Route::post('/bet', 'GameController@bet');
+
 Route::post('/blinds', 'GameController@blinds');

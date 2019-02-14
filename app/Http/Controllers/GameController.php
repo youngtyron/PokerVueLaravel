@@ -17,12 +17,19 @@ class GameController extends Controller
       $round = $game->round;
       $round->playersArrangement();
       $playersArr = $game->playersArray();
+      if ($round->phase == 'flop' or $round->phase == 'turn' or $round->phase == 'river'){
+        $communityarr = array('first_card' => '/cards/'.$round->first_card.'.png', 'second_card'=>'/cards/'.$round->second_card.'.png', 'third_card'=>'/cards/'.$round->third_card.'.png');
+      }
+      else{
+        $communityarr = null; 
+      }
       $gameArr = array('game' => array('phase' => $round->phase,
                                        'bank' => $round->bank,
                                        'id'=>$game->id),
                        'players'=>$playersArr,
                        'turn'=>$game->round->current_player_id,
-                       'community'=>array('first_card' => '/cards/'.$round->first_card.'.png', 'second_card'=>'/cards/'.$round->second_card.'.png', 'third_card'=>'/cards/'.$round->third_card.'.png'));
+                       'community'=>$communityarr);
+
       return $gameArr;
     }
     public function bet(Request $request){
@@ -35,14 +42,23 @@ class GameController extends Controller
       $player->last_bet = $player->last_bet+$bet;
       $player->save();
       $round->bank = $round->bank + $bet;
-      if ($player->last_bet+$bet > $round->max_bet){
+      if ($player->last_bet> $round->max_bet){
         $round->max_bet = $player->last_bet+$bet;
       }
       if ($round->betted+1 >= count($players)){
         $turn_player = $round->whoMustCallNext();
         if (is_null($turn_player)){
           $call = null;
-          //FLOP
+          $round->phase = 'flop';
+          $round->dealFlop();
+          $round->current_player_id = $round->small_blind_id;
+          $round->betted = 0;
+          $round->max_bet = 0;
+          foreach ($players as $p){
+            $p->last_bet = null;
+            $p->save();
+          }
+          $turn = $game->round->current_player_id;
         }
         else {
           $call = $round->max_bet - $turn_player->last_bet;
@@ -79,7 +95,8 @@ class GameController extends Controller
                     'players'=>$game->playersArray(),
                     'match_id'=>$game->id,
                     'turn'=>$turn,
-                    'call'=>$call
+                    'call'=>$call,
+                    'community'=>$round->communityArray()
                   );
        event(new DeskCommonEvent($data));
        return $data;
