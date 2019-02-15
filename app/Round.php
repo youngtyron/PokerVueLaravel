@@ -15,6 +15,17 @@ class Round extends Model
   public function players(){
     return $this->game->players;
   }
+  public function zeroRound(){
+     $this->current_player_id = $this->small_blind_id;
+     $this->betted = 0;
+     $this->max_bet = 0;
+     $this->save();
+     foreach ($this->players() as $p){
+       $p->last_bet = null;
+       $p->save();
+     }
+     return true;
+  }
   public function generateDeck(){
     $deck = array();
     for ($r = 1; $r<14; $r++){
@@ -105,6 +116,8 @@ class Round extends Model
     $this->first_card = $first;
     $this->second_card = $second;
     $this->third_card = $third;
+    $this->phase = 'flop';
+    $this->zeroRound();
     $this->save();
     return true;
   }

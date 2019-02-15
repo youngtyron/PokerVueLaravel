@@ -21,7 +21,11 @@
                             <button type="button" class="btn btn-info tokens-button" @click="addToken(25)">25</button>
                             <button type="button" class="btn btn-info tokens-button" @click="addToken(50)">50</button>
                             <button type="button" class="btn btn-info tokens-button" @click="addToken(100)">100</button>
-                            <button v-model="bets" type="button" class="btn btn-info bets-button" @click="makeBet(100)">
+                            <button v-model="bets" type="button" class="btn btn-info bets-button" @click="makeBet(bets)">
+                          <!--     <p>
+                                                            <button type="button" class="pass-button btn btn-info" @click="">Pass</button>
+
+                              </p> -->
                             {{bets}}</button>
                             <p @click="cleatBets">Clear bet</p>
                           </div>
@@ -33,6 +37,10 @@
                             <button disabled type="button" class="btn btn-info tokens-button">50</button>
                             <button disabled type="button" class="btn btn-info tokens-button">100</button>
                             <button disabled v-model="bets" type="button" class="btn btn-info bets-button">{{bets}}</button>
+                      <!--       <p>
+                                                          <button type="button" class="pass-button btn btn-info" @click="">Pass</button>
+
+                            </p> -->
                           </div>
 
                     </div>
@@ -92,12 +100,13 @@
               this.community = data.community
               console.log(data)
               if (this.gamer == data.turn){
-                if (data.call){
-                  alert ("You have to call with " + data.call + " more")
-                }
-                else{
-                  alert("Your turn!")
-                }
+                // if (data.call){
+                //   alert ("You have to call with " + data.call + " more")
+                // }
+                // else{
+                //   alert("Your turn!")
+                // }
+                alert(data.message)
               }
             });
         },
@@ -105,25 +114,29 @@
           startGame(){
             console.log('start')
             axios.post('/blinds', {match: this.match}).then((response)=> {
-              console.log(response.data)
-              console.log('response is received')
+              if (response.data.other == "blinds_done"){
+                alert("Blinds is done!")
+              }
+              this.game = response.data.game
+              this.players = response.data.players
             });
           },
           loadGame: function(){
             axios.get('/loadgame').then((response)=> {
+              console.log(response.data)
               this.players = response.data.players
               this.game = response.data.game
               this.community = response.data.community
               if (this.game.phase == 'blind-bets'){
               }
               else if (this.game.phase == 'preflop'){
-                console.log('preflop')
+                // console.log('preflop')
               }
               else if (this.game.phase == 'flop'){
-                console.log('flop')
+                // console.log('flop')
               }
               if (this.gamer == response.data.turn){
-                alert("Your turn!")
+                // alert("Your turn!")
               }
             })
             .catch((error)=>{
@@ -131,18 +144,22 @@
             });
           },
           addToken(token){
-            // console.log(token)
             this.bets = this.bets + token;
           },
           makeBet: function(bet){
-            console.log('bet')
-            axios.post('/bet', {bet: bet, match: this.match})
-              .then((response)=> {
-              console.log(response.data)      
-              this.players = response.data.players
-              this.game = response.data.game
-              this.community = response.data.community
-            });
+            var me = this.findMeInPlayers();
+            if (bet + me.last_bet < this.game.max_bet){
+              alert('Your bet is too small')
+            }
+            else{
+              axios.post('/bet', {bet: bet, match: this.match})
+                .then((response)=> {
+                console.log(response.data)      
+                this.players = response.data.players
+                this.game = response.data.game
+                this.community = response.data.community
+              });
+            }
           },
           dealPreflop(){
             axios.get('/dealpreflop').then((response)=> {
@@ -151,6 +168,14 @@
           },
           cleatBets(){
             this.bets = 0;
+          },
+          findMeInPlayers(){
+            for (var i=0; i<this.players.length; i++){
+              if (this.players[i].id == this.gamer){
+                var me = this.players[i]
+              }
+            }
+            return me;
           }
         }
     }

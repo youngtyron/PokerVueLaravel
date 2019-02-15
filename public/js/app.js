@@ -53807,6 +53807,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['match', 'gamer'],
@@ -53840,68 +53848,87 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       _this.community = data.community;
       console.log(data);
       if (_this.gamer == data.turn) {
-        if (data.call) {
-          alert("You have to call with " + data.call + " more");
-        } else {
-          alert("Your turn!");
-        }
+        // if (data.call){
+        //   alert ("You have to call with " + data.call + " more")
+        // }
+        // else{
+        //   alert("Your turn!")
+        // }
+        alert(data.message);
       }
     });
   },
 
   methods: {
     startGame: function startGame() {
+      var _this2 = this;
+
       console.log('start');
       axios.post('/blinds', { match: this.match }).then(function (response) {
-        console.log(response.data);
-        console.log('response is received');
+        if (response.data.other == "blinds_done") {
+          alert("Blinds is done!");
+        }
+        _this2.game = response.data.game;
+        _this2.players = response.data.players;
       });
     },
 
     loadGame: function loadGame() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios.get('/loadgame').then(function (response) {
-        _this2.players = response.data.players;
-        _this2.game = response.data.game;
-        _this2.community = response.data.community;
-        if (_this2.game.phase == 'blind-bets') {} else if (_this2.game.phase == 'preflop') {
-          console.log('preflop');
-        } else if (_this2.game.phase == 'flop') {
-          console.log('flop');
+        console.log(response.data);
+        _this3.players = response.data.players;
+        _this3.game = response.data.game;
+        _this3.community = response.data.community;
+        if (_this3.game.phase == 'blind-bets') {} else if (_this3.game.phase == 'preflop') {
+          // console.log('preflop')
+        } else if (_this3.game.phase == 'flop') {
+          // console.log('flop')
         }
-        if (_this2.gamer == response.data.turn) {
-          alert("Your turn!");
+        if (_this3.gamer == response.data.turn) {
+          // alert("Your turn!")
         }
       }).catch(function (error) {
         console.log(error);
       });
     },
     addToken: function addToken(token) {
-      // console.log(token)
       this.bets = this.bets + token;
     },
 
     makeBet: function makeBet(bet) {
-      var _this3 = this;
-
-      console.log('bet');
-      axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
-        console.log(response.data);
-        _this3.players = response.data.players;
-        _this3.game = response.data.game;
-        _this3.community = response.data.community;
-      });
-    },
-    dealPreflop: function dealPreflop() {
       var _this4 = this;
 
+      var me = this.findMeInPlayers();
+      if (bet + me.last_bet < this.game.max_bet) {
+        alert('Your bet is too small');
+      } else {
+        axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
+          console.log(response.data);
+          _this4.players = response.data.players;
+          _this4.game = response.data.game;
+          _this4.community = response.data.community;
+        });
+      }
+    },
+    dealPreflop: function dealPreflop() {
+      var _this5 = this;
+
       axios.get('/dealpreflop').then(function (response) {
-        _this4.players = response.data;
+        _this5.players = response.data;
       });
     },
     cleatBets: function cleatBets() {
       this.bets = 0;
+    },
+    findMeInPlayers: function findMeInPlayers() {
+      for (var i = 0; i < this.players.length; i++) {
+        if (this.players[i].id == this.gamer) {
+          var me = this.players[i];
+        }
+      }
+      return me;
     }
   }
 });
@@ -54042,7 +54069,7 @@ var render = function() {
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.makeBet(100)
+                                    return _vm.makeBet(_vm.bets)
                                   }
                                 },
                                 model: {
