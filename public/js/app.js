@@ -53813,8 +53813,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['match', 'gamer'],
@@ -53848,13 +53846,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       _this.community = data.community;
       console.log(data);
       if (_this.gamer == data.turn) {
-        // if (data.call){
-        //   alert ("You have to call with " + data.call + " more")
-        // }
-        // else{
-        //   alert("Your turn!")
-        // }
-        alert(data.message);
+        if (data.bet_type == 'raise') {
+          alert(data.previous.name + ' raises to ' + data.previous.bet + '!');
+        } else if (data.bet_type == 'bet') {
+          alert(data.previous.name + ' bets ' + data.previous.bet + '!');
+        } else if (data.bet_type == 'call') {
+          alert(data.previous.name + ' calls with ' + data.previous.bet + '!');
+        }
       }
     });
   },
@@ -53904,6 +53902,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       if (bet + me.last_bet < this.game.max_bet) {
         alert('Your bet is too small');
       } else {
+        console.log('bet go');
         axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
           console.log(response.data);
           _this4.players = response.data.players;
@@ -53929,6 +53928,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         }
       }
       return me;
+    },
+    passRound: function passRound() {
+      console.log("I'm passing");
+      axios.post('/pass', { match: this.match }).then(function (response) {
+        console.log(response.data);
+        // this.players = response.data.players
+        // this.game = response.data.game
+        // this.community = response.data.community
+      });
     }
   }
 });
@@ -53966,6 +53974,10 @@ var render = function() {
                       _vm._v(" "),
                       player.big_blind
                         ? _c("p", [_vm._v("BIG BLIND")])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      player.passing != 0
+                        ? _c("p", [_vm._v("PLAYER IS OUT OF GAME")])
                         : _vm._e(),
                       _vm._v(" "),
                       _c("p", [_vm._v(_vm._s(player.name))]),
@@ -54080,12 +54092,17 @@ var render = function() {
                                   expression: "bets"
                                 }
                               },
-                              [
-                                _vm._v(
-                                  "\n                        " +
-                                    _vm._s(_vm.bets)
-                                )
-                              ]
+                              [_vm._v(_vm._s(_vm.bets))]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "pass-button btn btn-info",
+                                attrs: { type: "button" },
+                                on: { click: _vm.passRound }
+                              },
+                              [_vm._v("Pass")]
                             ),
                             _vm._v(" "),
                             _c("p", { on: { click: _vm.cleatBets } }, [
@@ -54154,6 +54171,15 @@ var render = function() {
                                 }
                               },
                               [_vm._v(_vm._s(_vm.bets))]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "pass-button btn btn-info",
+                                attrs: { disabled: "", type: "button" }
+                              },
+                              [_vm._v("Pass")]
                             )
                           ])
                     ])

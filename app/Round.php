@@ -13,7 +13,22 @@ class Round extends Model
     return $this->belongsTo('App\Game');
   }
   public function players(){
-    return $this->game->players;
+    $players = Player::where('game_id', $this->game_id)->where('passing', 0)->get();
+    return $players;
+    // return $this->game->players;
+  }
+  public function winner(){
+    if (count($this->players())==1){
+      return $this->players()[0];
+    }
+    else {
+      if ($this->phase == 'showdown'){
+        //Проверка комбинаций
+      }
+      else{
+        return null;
+      }
+    }
   }
   public function zeroRound(){
      $this->current_player_id = $this->small_blind_id;
@@ -49,27 +64,33 @@ class Round extends Model
     return $deck;
   }
   public function whoMustCallNext(){
+    $next = null;
     $players = $this->players();
+    $extendedPlayers = $this->game->players;
     $current = Player::find($this->current_player_id);
-    foreach ($players as $p) {
+    foreach ($extendedPlayers as $p) {
       if ($p->id == $current->id){
-        $current_index = array_search($p, $players->all());
+        $current_index = array_search($p, $extendedPlayers->all());
       }
     }
     for($i = 1; $i<=count($players); ++$i){
       if ($current_index+$i >= count($players)){
         $cycle_index = $i - (count($players) - $current_index);
+        if ($players[$cycle_index]->last_bet < $this->max_bet){
+          $next = $players[$cycle_index];
+          break;
+        }
       }
       else{
         $cycle_index = $current_index+$i;
       }
-      if ($players[$cycle_index]->last_bet < $this->max_bet){
-        return $players[$cycle_index];
-      }
-      else {
-        return null;
-      }
-    };
+    }
+    if ($next){
+      return $next;
+    }
+    else {
+      return null;
+    }
   }
   public function dealPreflop(){
     $players = $this->game->players;
@@ -153,14 +174,5 @@ class Round extends Model
       $this->save();
     }
     return true;
-  }
-  public function communityArray(){
-    if ($this->phase == 'flop' or $this->phase == 'turn' or $this->phase == 'river'){
-      $communityarr = array('first_card' => '/cards/'.$this->first_card.'.png', 'second_card'=>'/cards/'.$this->second_card.'.png', 'third_card'=>'/cards/'.$this->third_card.'.png');
-    }
-    else{
-      $communityarr = null; 
-    }
-    return $communityarr;
   }
 }

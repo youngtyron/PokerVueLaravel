@@ -24,15 +24,58 @@ class GameController extends Controller
 
       return $gameArr;
     }
+    public function pass(Request $request){
+      $player = $request->user()->player;
+      $game = $player->game;
+      $player->passing = 1;
+      $player->save();
+      $round = $game->round;
+      $players = $round->players();
+      if ($round->betted>= count($players)){
+        $winner = $round->winner();
+        if ($winner){
+          $answer = 'Winner is: ' . $winner->user->name;
+        }
+        else{
+          $turn_player = $round->whoMustCallNext();
+          if (is_null($turn_player)){
+            $answer = 'Game continues, next round';
+          }
+          else {
+            $turn = $turn_player->id;
+            $round->current_player_id = $turn_player->id;
+            $call = $round->max_bet - $turn_player->last_bet;
+            $answer = 'Game continues, '.$turn_player->user->name . ' should bet ' . $call;
+          }
+        }
+      }
+      else{
+        $answer = 'Game continues, this round';
+      }
+      $round->save();
+      return $answer;
+    }
     public function bet(Request $request){
       $bet = $request->input('bet');
       $player = $request->user()->player;
       $game = $player->game;
       $round = $game->round;
-      $players = $game->players;
+      $players = $round->players();
       $player->money = $player->money - $bet;
       $player->last_bet = $player->last_bet+$bet;
       $player->save();
+      if ($bet>$round->max_bet and $round->max_bet!=0){
+        $bet_type = 'raise';
+        $bet_amount = $player->last_bet;
+      }
+      elseif ($round->max_bet==0){
+        $bet_type = 'bet';
+        $bet_amount = $bet;
+      }
+      else{
+        $bet_type = 'call';
+        $bet_amount = $bet;
+      }
       $round->bank = $round->bank + $bet;
       if ($player->last_bet> $round->max_bet){
         $round->max_bet = $player->last_bet;
@@ -82,7 +125,9 @@ class GameController extends Controller
                     'turn'=>$turn,
                     'call'=>$call,
                     'community'=>$game->communityArray(),
-                    'message'=> $message
+                    'message'=> $message,
+                    'bet_type'=>$bet_type,
+                    'previous'=>array('name'=>$player->user->name, 'bet'=>$bet_amount)
                   );
        event(new DeskCommonEvent($data));
        return $data;
@@ -100,14 +145,16 @@ class GameController extends Controller
                             'me'=>true,
                             'first_card'=>'/cards/'.$player->hand->first_card.'.png',
                             'second_card'=>'/cards/'.$player->hand->second_card.'.png',
-                            'money'=>$player->money);
+                            'money'=>$player->money,
+                            'passing'=>$player->passing);
         }
         else{
           $exemplar = array('id' => $player->user->id,
                             'name'=>$player->user->name,
                             'first_card'=>'/cards/'.$player->hand->first_card.'.png',
                             'second_card'=>'/cards/'.$player->hand->second_card.'.png',
-                            'money'=>$player->money);
+                            'money'=>$player->money,
+                            'passing'=>$player->passing);
         }
         array_push($arr, $exemplar);
       }

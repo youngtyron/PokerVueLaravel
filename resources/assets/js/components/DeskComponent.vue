@@ -10,6 +10,7 @@
                       <p v-if="player.button">BUTTON</p>
                       <p v-if="player.small_blind">SMALL BLIND</p>
                       <p v-if="player.big_blind">BIG BLIND</p>
+                      <p v-if='player.passing!=0'>PLAYER IS OUT OF GAME</p>
                       <p>{{player.name}}</p>
                       <p>Money:{{player.money}}</p>
                       <p><img v-if="player.first_card" class="mini-card" :src="player.first_card" />
@@ -21,12 +22,11 @@
                             <button type="button" class="btn btn-info tokens-button" @click="addToken(25)">25</button>
                             <button type="button" class="btn btn-info tokens-button" @click="addToken(50)">50</button>
                             <button type="button" class="btn btn-info tokens-button" @click="addToken(100)">100</button>
-                            <button v-model="bets" type="button" class="btn btn-info bets-button" @click="makeBet(bets)">
-                          <!--     <p>
-                                                            <button type="button" class="pass-button btn btn-info" @click="">Pass</button>
+                            <button v-model="bets" type="button" class="btn btn-info bets-button" @click="makeBet(bets)">{{bets}}</button>
 
-                              </p> -->
-                            {{bets}}</button>
+                                                            <button type="button" class="pass-button btn btn-info" @click="passRound">Pass</button>
+
+                            
                             <p @click="cleatBets">Clear bet</p>
                           </div>
                           <div class="tokens-buttons" v-else>
@@ -37,10 +37,8 @@
                             <button disabled type="button" class="btn btn-info tokens-button">50</button>
                             <button disabled type="button" class="btn btn-info tokens-button">100</button>
                             <button disabled v-model="bets" type="button" class="btn btn-info bets-button">{{bets}}</button>
-                      <!--       <p>
-                                                          <button type="button" class="pass-button btn btn-info" @click="">Pass</button>
+                                                      <button disabled type="button" class="pass-button btn btn-info">Pass</button>
 
-                            </p> -->
                           </div>
 
                     </div>
@@ -100,13 +98,15 @@
               this.community = data.community
               console.log(data)
               if (this.gamer == data.turn){
-                // if (data.call){
-                //   alert ("You have to call with " + data.call + " more")
-                // }
-                // else{
-                //   alert("Your turn!")
-                // }
-                alert(data.message)
+                if (data.bet_type=='raise'){
+                  alert(data.previous.name + ' raises to ' + data.previous.bet + '!')
+                }
+                else if(data.bet_type=='bet'){
+                  alert(data.previous.name + ' bets ' + data.previous.bet + '!')
+                }
+                else if(data.bet_type=='call'){
+                  alert(data.previous.name + ' calls with ' + data.previous.bet + '!')
+                }
               }
             });
         },
@@ -152,6 +152,7 @@
               alert('Your bet is too small')
             }
             else{
+              console.log('bet go')
               axios.post('/bet', {bet: bet, match: this.match})
                 .then((response)=> {
                 console.log(response.data)      
@@ -176,6 +177,16 @@
               }
             }
             return me;
+          },
+          passRound(){
+            console.log("I'm passing")
+              axios.post('/pass', {match: this.match})
+                .then((response)=> {
+                console.log(response.data)      
+                // this.players = response.data.players
+                // this.game = response.data.game
+                // this.community = response.data.community
+              });
           }
         }
     }
