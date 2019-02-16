@@ -84,7 +84,7 @@ class GameController extends Controller
         $turn_player = $round->whoMustCallNext();
         if (is_null($turn_player)){
           $call = null;
-          $round->dealFlop();
+          $round->nextStep();
           $turn = $game->round->current_player_id;
           $message = "You bet";
         }
@@ -119,18 +119,33 @@ class GameController extends Controller
         $turn = $game->round->current_player_id;
       }
       $round->save();
-      $data =  array('game' => $game->gameArray(),
-                    'players'=>$game->playersArray(),
-                    'match_id'=>$game->id,
-                    'turn'=>$turn,
-                    'call'=>$call,
-                    'community'=>$game->communityArray(),
-                    'message'=> $message,
-                    'bet_type'=>$bet_type,
-                    'previous'=>array('name'=>$player->user->name, 'bet'=>$bet_amount)
-                  );
-       event(new DeskCommonEvent($data));
-       return $data;
+      if ($round->phase!='shotdown'){
+        $data =  array('game' => $game->gameArray(),
+              'players'=>$game->playersArray(),
+              'match_id'=>$game->id,
+              'turn'=>$turn,
+              'call'=>$call,
+              'community'=>$game->communityArray(),
+              'message'=> $message,
+              'bet_type'=>$bet_type,
+              'previous'=>array('name'=>$player->user->name, 'bet'=>$bet_amount)
+            );
+      }
+      else{
+        $data = array('game' => $game->gameArray(),
+              'players'=>$game->playersArray(),
+              'match_id'=>$game->id,
+              'turn'=>$turn,
+              'call'=>$call,
+              'community'=>$game->communityArray(),
+              'message'=> 'game is over',
+              // 'bet_type'=>$bet_type,
+              // 'previous'=>array('name'=>$player->user->name, 'bet'=>$bet_amount)
+            );
+      }
+
+     event(new DeskCommonEvent($data));
+     return $data;
     }
     public function dealPreflop(Request $request){
       $player = $request->user()->player;

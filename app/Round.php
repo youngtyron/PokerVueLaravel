@@ -92,6 +92,25 @@ class Round extends Model
       return null;
     }
   }
+  public function nextStep(){
+    if ($this->phase == 'blind-bets'){
+      $this->dealPreflop();
+    }
+    else if ($this->phase == 'preflop'){
+      $this->dealFlop();
+    }
+    else if ($this->phase == 'flop'){
+      $this->dealTurn();
+    }
+    else if ($this->phase == 'turn'){
+      $this->dealRiver();
+    }
+    else if ($this->phase == 'river'){
+      $this->phase = 'shotdown';
+      $this->save();
+    }
+    return true;
+  }
   public function dealPreflop(){
     $players = $this->game->players;
     //Вероятно этот кусок не нужен: начало->
@@ -116,6 +135,9 @@ class Round extends Model
         $hand->save();
       };
     };
+    $this->phase = 'preflop';
+    $this->zeroRound();
+    $this->save();
     return true;
   }
   public function dealFlop(){
@@ -138,6 +160,47 @@ class Round extends Model
     $this->second_card = $second;
     $this->third_card = $third;
     $this->phase = 'flop';
+    $this->zeroRound();
+    $this->save();
+    return true;
+  }
+  public function dealTurn(){
+    $players = $this->game->players;
+    $cardsonhands = array();
+    foreach ($players as $player){
+      if ($player->hand){
+        array_push($cardsonhands, $player->hand->first_card);
+        array_push($cardsonhands, $player->hand->second_card);
+      };
+    };
+    array_push($cardsonhands, $this->first_card);
+    array_push($cardsonhands, $this->second_card);
+    array_push($cardsonhands, $this->third_card);
+    $turn = array_diff($this->generateDeck(), $cardsonhands);
+    $fourth = $turn[array_rand($turn, 1)];
+    $this->fourth_card = $fourth;
+    $this->phase = 'turn';
+    $this->zeroRound();
+    $this->save();
+    return true;
+  }
+  public function dealRiver(){
+    $players = $this->game->players;
+    $cardsonhands = array();
+    foreach ($players as $player){
+      if ($player->hand){
+        array_push($cardsonhands, $player->hand->first_card);
+        array_push($cardsonhands, $player->hand->second_card);
+      };
+    };
+    array_push($cardsonhands, $this->first_card);
+    array_push($cardsonhands, $this->second_card);
+    array_push($cardsonhands, $this->third_card);
+    array_push($cardsonhands, $this->fourth_card);
+    $river = array_diff($this->generateDeck(), $cardsonhands);
+    $fifth = $river[array_rand($river, 1)];
+    $this->fifth_card = $fifth;
+    $this->phase = 'river';
     $this->zeroRound();
     $this->save();
     return true;
