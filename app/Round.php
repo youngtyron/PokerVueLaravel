@@ -15,15 +15,33 @@ class Round extends Model
   public function players(){
     $players = Player::where('game_id', $this->game_id)->where('passing', 0)->get();
     return $players;
-    // return $this->game->players;
+  }
+  public function combinations(){
+    $combinations = array();
+    $rates = array();
+    foreach ($this->players() as $player) {
+      array_push($combinations, array('player'=>$player->user->name, 'rate'=>$player->hand->combination()));
+      array_push($rates, $player->hand->combination());
+    }
+    $combinations += ['rates'=>$rates];
+    return $combinations;
   }
   public function winner(){
     if (count($this->players())==1){
       return $this->players()[0];
     }
     else {
-      if ($this->phase == 'showdown'){
-        //Проверка комбинаций
+      if ($this->phase == 'shotdown'){
+        $combinations = $this->combinations();
+        $rates = $combinations['rates'];
+        $max = max($rates);
+        foreach ($combinations as $combination) {
+          if ($combination['rate']==$max){
+            $winner = $combination['player'];
+            break;
+          }
+        }
+        return $winner;
       }
       else{
         return null;

@@ -17,56 +17,6 @@ class Hand extends Model
   	$cards = array($this->first_card, $this->second_card, $round->first_card, $round->second_card, $round->third_card, $round->fourth_card, $round->fifth_card);
   	return $cards;
   }
-  public function ranks(){
-  	$cards = $this->allcards();
-  	$ranks = array();
-  	foreach ($cards as $card){
-  		if ($card!=null){
-  			$rank = explode('-', $card)[1];
-			array_push($ranks, $rank);
-  		}
-  	}
-  	return $ranks;
-  }
-  public function suits(){
-  	$cards = $this->allcards();
-  	$suits = array();
-  	foreach ($cards as $card){
-  		if ($card!=null){
-  			$suit = explode('-', $card)[0];
-			array_push($suits, $suit);
-  		}
-  	}
-  	return $suits;
-  }
-  public function combination(){
-  	$cards = $this->allcards_array();
-  	if ($this->royal_and_straight_flush($cards)=='R'){
-  		$combination = 'royal flush';
-  	}
-  	else if ($this->royal_and_straight_flush($cards)=='S'){
-  		$combination = 'straight flush';
-  	}
-  	else {
-  		if ($this->flush($this->suits())){
-  			if ($this->equal_ranks_combination($this->ranks())!='full house'){
-  				$combination = 'flush';
-  			}
-  			else {
-  				$combination = 'full house';
-  			}
-  		}
-  		else {
-  			if ($this->straight($this->ranks())){
-  				$combination = 'straight';
-  			}
-  			else {
-  				$combination = $this->equal_ranks_combination($this->ranks());
-  			}
-  		}
-  	}
-  	return $combination;
-  }
   public function allcards_array(){
   	$cards = $this->allcards();
   	$array = array();
@@ -79,39 +29,84 @@ class Hand extends Model
   	}
 	return $array;
   }
+  public function ranks($cards){
+  	$ranks = array();
+  	foreach ($cards as $card){
+		array_push($ranks , $card['rank']);
+  	}
+  	return $ranks;
+  }
+  public function suits($cards){
+  	$suits = array();
+  	foreach ($cards as $card){
+ 		array_push($suits , $card['suit']);
+  	}
+  	return $suits;
+  }
+  public function combination(){
+  	$cards = $this->allcards_array();
+  	$equals = $this->equal_ranks_combination($this->ranks($cards));
+  	if ($this->straight($this->ranks($cards))){
+  		if ($this->royal_and_straight_flush($cards)=='R'){
+  			$combination = 10;
+  		}
+  		else if ($this->royal_and_straight_flush($cards)=='S'){
+  			$combination = 9;
+	  	}
+	  	else {
+			if ($this->flush($this->suits($cards))){
+	  			$combination = 6;
+	  		}
+	  		else {
+	  			$combination = 5;
+	  		}
+	  	}
+  	}
+  	else {
+  		if ($this->flush($this->suits($cards))){
+			$combination = 6;
+	  	}
+	  	else {
+	  		$combination = $equals;
+	  	}
+  	}
+  	return $combination;
+  }
+
   public function royal_and_straight_flush($cards){
-	$card_row= array();
-	$ranks_row = array();
-	foreach($cards as $card){
-		if (($card['rank'] == 1 and  !(in_array($card['rank'], $ranks_row))) or
-			($card['rank'] == 13 and !(in_array($card['rank'], $ranks_row))) or
-			($card['rank'] == 12 and !(in_array($card['rank'], $ranks_row))) or
-			($card['rank'] == 11 and !(in_array($card['rank'], $ranks_row))) or
-			($card['rank'] == 10 and !(in_array($card['rank'], $ranks_row))) 
-		){
-			array_push($card_row, $card);
-			array_push($ranks_row, $card['rank']);
-		}
-	}
-	if (count($card_row)==5){
-		$suit = $card_row[0]['suit'];
-		$counter = 0;
-		foreach ($card_row as $card) {
-			if ($card['suit']==$suit){
-				$counter +=1;
-				continue;
-			}
-		}
-		if ($counter==5){
-			return 'R';
-		}
-		else {
-			return 'S';
-		}
-	}		
-	else{
-		return false;
-	}
+  	$suits = $this->suits($cards);
+  	$freq = array_count_values ($suits);
+  	$combo_siut = false;
+  	foreach ($freq as $key => $value){
+  		if ($value == 5){
+  			$combo_siut = $key;
+  			break;
+  		}
+  	}
+  	if ($combo_siut == false) {
+  		return false;
+  	}
+  	else {
+  		$rank_row = array();
+  		foreach ($cards as $card) {
+  			if ($card['suit']==$combo_siut){
+  				array_push($rank_row, $card['rank']);
+  			}
+  		}
+		sort($rank_row);
+  		if ($rank_row == array(1, 10, 11, 12, 13)){
+  			return 'R';
+  		}
+  		else {
+  			$min = min($rank_row);	
+  			if ($rank_row == array($min, $min+1, $min+2, $min+3, $min+4)){
+  				return 'S';
+  			}
+  			else {
+  				return false;
+  			}
+  		}
+  	}
   }
   public function equal_ranks_combination($ranks){
   	$freq = array_count_values ($ranks);
@@ -130,29 +125,32 @@ class Hand extends Model
 		}
   	}
   	if ($quads !=0){
-  		return 'quads';
+  		return 8;
   	}
   	else if ($pairs == 1 and $triples == 0){
-  		return 'one pair';
+  		return 2;
   	}
   	else if ($pairs == 2 and $triples == 0){
-  		return 'two pair';
+  		return 3;
   	}
   	else if ($pairs == 1 and $triples == 1){
-  		return 'full house';
+  		return 7;
   	}
   	else if ($pairs == 0 and $triples == 1){
-  		return 'three';
+  		return 4;
   	}
   	else {
-  		return 'kicker';
+  		return 1;
   	}
   }
   public function straight($ranks){
+  	if (in_array(1, $ranks)){
+  		array_push($ranks, 14);
+  	}
   	sort($ranks);
   	$min = min($ranks);
   	$straight = false;
-  	for ($i=0; $i < 3; $i++) { 
+  	for ($i=0; $i < 4; $i++) { 
   		if (in_array($min+1, $ranks) and 
 	  		in_array($min+2, $ranks) and
 	  		in_array($min+3, $ranks) and
@@ -162,7 +160,7 @@ class Hand extends Model
   			break;
   		}
   		else{
-  			unset($ranks[0]);
+  			array_splice($ranks, 0, 1);
   			$min = min($ranks);
   		}
   	}
