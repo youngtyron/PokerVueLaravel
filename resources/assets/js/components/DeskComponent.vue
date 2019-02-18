@@ -83,7 +83,7 @@
         },
         computed: {
           deskCommonChannel(){
-            return window.Echo.private('desk-common.' + this.match);
+            return window.Echo.private('desk-common.' + this.match + '-'+ this.gamer);
           }
         },
         mounted() {
@@ -93,10 +93,11 @@
               if (data.other == "blinds_done"){
                 alert("Blinds is done!")
               }
+              console.log('event!!!')
               this.game = data.game
               this.players = data.players
               this.community = data.community
-              console.log(data)
+              console.log(data.message)
               if (this.gamer == data.turn){
                 if (data.bet_type=='raise'){
                   alert(data.previous.name + ' raises to ' + data.previous.bet + '!')
@@ -112,7 +113,7 @@
         },
         methods: {
           startGame(){
-            console.log('start')
+            // console.log('start')
             axios.post('/blinds', {match: this.match}).then((response)=> {
               if (response.data.other == "blinds_done"){
                 alert("Blinds is done!")
@@ -123,7 +124,7 @@
           },
           loadGame: function(){
             axios.get('/loadgame').then((response)=> {
-              console.log(response.data)
+              // console.log(response.data)
               this.players = response.data.players
               this.game = response.data.game
               this.community = response.data.community
@@ -152,13 +153,13 @@
               alert('Your bet is too small')
             }
             else{
-              console.log('bet go')
+              // console.log('bet go')
               axios.post('/bet', {bet: bet, match: this.match})
                 .then((response)=> {
                 console.log(response.data)      
-                this.players = response.data.players
-                this.game = response.data.game
-                this.community = response.data.community
+                // this.players = response.data.players
+                // this.game = response.data.game
+                // this.community = response.data.community
               });
             }
           },
@@ -182,7 +183,7 @@
             console.log("I'm passing")
               axios.post('/pass', {match: this.match})
                 .then((response)=> {
-                console.log(response.data)      
+                // console.log(response.data)      
                 // this.players = response.data.players
                 // this.game = response.data.game
                 // this.community = response.data.community

@@ -53828,7 +53828,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
   computed: {
     deskCommonChannel: function deskCommonChannel() {
-      return window.Echo.private('desk-common.' + this.match);
+      return window.Echo.private('desk-common.' + this.match + '-' + this.gamer);
     }
   },
   mounted: function mounted() {
@@ -53841,10 +53841,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       if (data.other == "blinds_done") {
         alert("Blinds is done!");
       }
+      console.log('event!!!');
       _this.game = data.game;
       _this.players = data.players;
       _this.community = data.community;
-      console.log(data);
+      console.log(data.message);
       if (_this.gamer == data.turn) {
         if (data.bet_type == 'raise') {
           alert(data.previous.name + ' raises to ' + data.previous.bet + '!');
@@ -53861,7 +53862,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     startGame: function startGame() {
       var _this2 = this;
 
-      console.log('start');
+      // console.log('start')
       axios.post('/blinds', { match: this.match }).then(function (response) {
         if (response.data.other == "blinds_done") {
           alert("Blinds is done!");
@@ -53875,7 +53876,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var _this3 = this;
 
       axios.get('/loadgame').then(function (response) {
-        console.log(response.data);
+        // console.log(response.data)
         _this3.players = response.data.players;
         _this3.game = response.data.game;
         _this3.community = response.data.community;
@@ -53896,26 +53897,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
     makeBet: function makeBet(bet) {
-      var _this4 = this;
-
       var me = this.findMeInPlayers();
       if (bet + me.last_bet < this.game.max_bet) {
         alert('Your bet is too small');
       } else {
-        console.log('bet go');
+        // console.log('bet go')
         axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
           console.log(response.data);
-          _this4.players = response.data.players;
-          _this4.game = response.data.game;
-          _this4.community = response.data.community;
+          // this.players = response.data.players
+          // this.game = response.data.game
+          // this.community = response.data.community
         });
       }
     },
     dealPreflop: function dealPreflop() {
-      var _this5 = this;
+      var _this4 = this;
 
       axios.get('/dealpreflop').then(function (response) {
-        _this5.players = response.data;
+        _this4.players = response.data;
       });
     },
     cleatBets: function cleatBets() {
@@ -53932,7 +53931,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     passRound: function passRound() {
       console.log("I'm passing");
       axios.post('/pass', { match: this.match }).then(function (response) {
-        console.log(response.data);
+        // console.log(response.data)      
         // this.players = response.data.players
         // this.game = response.data.game
         // this.community = response.data.community

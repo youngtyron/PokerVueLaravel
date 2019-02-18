@@ -68,7 +68,7 @@ class GameController extends Controller
         $bet_type = 'raise';
         $bet_amount = $player->last_bet;
       }
-      elseif ($round->max_bet==0){
+      else if ($round->max_bet==0){
         $bet_type = 'bet';
         $bet_amount = $bet;
       }
@@ -80,100 +80,60 @@ class GameController extends Controller
       if ($player->last_bet> $round->max_bet){
         $round->max_bet = $player->last_bet;
       }
+      $round->save();
       if ($round->betted+1 >= count($players)){
         $turn_player = $round->whoMustCallNext();
         if (is_null($turn_player)){
-          $call = null;
+          $call_required = null;
           $round->nextStep();
-          $turn = $game->round->current_player_id;
-          $message = "You bet";
+          $turn = $round->current_player_id;
+          $message = "Your turn to bet";
         }
         else {
-          $call = $round->max_bet - $turn_player->last_bet;
+          $call_required = $round->max_bet - $turn_player->last_bet;
           $turn = $turn_player->id;
           $round->current_player_id = $turn_player->id;
-          if ($round->betted <count($players)){
+          if ($round->betted < count($players)){
             $round->betted = $game->round->betted+1;
           }
-          $message = "You have to call with " . $call . " more";
+          $round->save();
+          $message = "You have to call with " . $call_required . " more";
         }
       }
       else{
-        $message = $player->user->name . ' bets ' . $player->last_bet; 
         foreach ($players as $p) {
           if ($p->id == $player->id){
             $current_index = array_search($p, $players->all());
           }
         }
-
         if ($current_index+1 == count($players)){
           $new_index = 0;
         }
         else{
           $new_index = $current_index+1;
         }
-
         $round->current_player_id = $players[$new_index]->id;
-        $round->betted = $game->round->betted+1;
-        $call = null;
+        $round->betted = $round->betted+1;
+        $call_required = $player->last_bet;
+        $round->save();
+        if ($round->betted == 1){
+          $message = $player->user->name . ' bets ' . $player->last_bet; 
+        }
+        else {
+          $message = $player->user->name . ' calls with ' . $player->last_bet;
+        }
         $turn = $game->round->current_player_id;
       }
-      $round->save();
-      if ($round->phase!='shotdown'){
-        $data =  array('game' => $game->gameArray(),
-              'players'=>$game->playersArray(),
-              'match_id'=>$game->id,
-              'turn'=>$turn,
-              'call'=>$call,
-              'community'=>$game->communityArray(),
-              'message'=> $message,
-              'bet_type'=>$bet_type,
-              'previous'=>array('name'=>$player->user->name, 'bet'=>$bet_amount)
-            );
+      $communityarr = $game->communityArray();
+      $gamearr = $game->gameArray();
+      $previous = array('name'=>$player->user->name, 'bet'=>$bet_amount);
+      foreach ($players as $p) {
+        $data = array('game'=>$gamearr, 'players'=>$game->playersArray($p), 'match_id'=>$game->id, 'turn'=>$turn, 
+                      'call'=>$call_required, 'community'=>$communityarr, 'message'=>$message, 'bet_type'=>$bet_type, 
+                      'previous'=>$previous, 'gamer'=>$p->id);
+        event(new DeskCommonEvent($data));
       }
-      else{
-        $data = array('game' => $game->gameArray(),
-              'players'=>$game->playersArray(),
-              'match_id'=>$game->id,
-              'turn'=>$turn,
-              'call'=>$call,
-              'community'=>$game->communityArray(),
-              'message'=> 'game is over',
-              // 'bet_type'=>$bet_type,
-              // 'previous'=>array('name'=>$player->user->name, 'bet'=>$bet_amount)
-            );
-      }
-
-     event(new DeskCommonEvent($data));
-     return $data;
-    }
-    public function dealPreflop(Request $request){
-      $player = $request->user()->player;
-      $game = $player->game;
-      $game->round->dealPreflop();
-      $players = $game->players;
-      $arr = array();
-      foreach ($players as $player) {
-        if($player->user_id == $request->user()->id){
-          $exemplar = array('id' => $player->user->id,
-                            'name'=>$player->user->name,
-                            'me'=>true,
-                            'first_card'=>'/cards/'.$player->hand->first_card.'.png',
-                            'second_card'=>'/cards/'.$player->hand->second_card.'.png',
-                            'money'=>$player->money,
-                            'passing'=>$player->passing);
-        }
-        else{
-          $exemplar = array('id' => $player->user->id,
-                            'name'=>$player->user->name,
-                            'first_card'=>'/cards/'.$player->hand->first_card.'.png',
-                            'second_card'=>'/cards/'.$player->hand->second_card.'.png',
-                            'money'=>$player->money,
-                            'passing'=>$player->passing);
-        }
-        array_push($arr, $exemplar);
-      }
-      return $arr;
+      return $data;
     }
     public function blinds(Request $request){
       $player = $request->user()->player;

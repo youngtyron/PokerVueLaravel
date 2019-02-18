@@ -24,6 +24,6 @@ class DeskCommonEvent implements ShouldBroadcast
 
     public function broadcastOn()
     {
-      return new PrivateChannel('desk-common.'. $this->data['match_id']);
+      return new PrivateChannel('desk-common.'. $this->data['match_id'].'-'.$this->data['gamer']);
     }
 }
