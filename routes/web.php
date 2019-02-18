@@ -22,7 +22,6 @@ Route::get('/loadgame', 'GameController@loadgame');
 Route::post('/blinds', 'GameController@blinds');
 Route::post('/bet', 'GameController@bet');
 Route::post('/pass', 'GameController@pass');
-// Route::get('/dealpreflop', 'GameController@dealPreflop');
 
 
 

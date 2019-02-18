@@ -37,7 +37,7 @@ class Round extends Model
         $max = max($rates);
         foreach ($combinations as $combination) {
           if ($combination['rate']==$max){
-            $winner = $combination['player'];
+            $winner = array('player'=>$combination['player'], 'combination'=>$combination['rate']);
             break;
           }
         }
@@ -135,16 +135,7 @@ class Round extends Model
   }
   public function dealPreflop(){
     $players = $this->game->players;
-    //Вероятно этот кусок не нужен: начало->
-    $cardsonhands = array();
-    foreach ($players as $player){
-      if ($player->hand){
-        array_push($cardsonhands, $player->hand->first_card);
-        array_push($cardsonhands, $player->hand->second_card);
-      };
-    };
-    //<-конец
-    $preflop = array_diff($this->generateDeck(), $cardsonhands);
+    $preflop = $this->generateDeck();
     foreach ($players as $player){
       if (!$player->hand or !$player->hand->first_card){
         $hand = Hand::firstOrCreate(['player_id'=>$player->id]);

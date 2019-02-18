@@ -16,12 +16,14 @@ class GameController extends Controller
       $game = $player->game;
       $round = $game->round;
       $round->playersArrangement();
-      $playersArr = $game->playersArray();
-      $gameArr = array('game' => $game->gameArray() ,
+      $playersArr = $game->playersArray($player->id, $round->phase);
+      $gameArr = array('game' => $game->gameArray(),
                        'players'=>$playersArr,
                        'turn'=>$game->round->current_player_id,
                        'community'=>$game->communityArray());
-
+      if ($round->phase == 'shotdown'){
+        $gameArr += ['winner'=>$round->winner()];
+      }
       return $gameArr;
     }
     public function pass(Request $request){
@@ -128,9 +130,12 @@ class GameController extends Controller
       $gamearr = $game->gameArray();
       $previous = array('name'=>$player->user->name, 'bet'=>$bet_amount);
       foreach ($players as $p) {
-        $data = array('game'=>$gamearr, 'players'=>$game->playersArray($p), 'match_id'=>$game->id, 'turn'=>$turn, 
-                      'call'=>$call_required, 'community'=>$communityarr, 'message'=>$message, 'bet_type'=>$bet_type, 
-                      'previous'=>$previous, 'gamer'=>$p->id);
+        $data = array('game'=>$gamearr, 'players'=>$game->playersArray($p->id, $round->phase), 'match_id'=>$game->id, 
+                      'turn'=>$turn, 'call'=>$call_required, 'community'=>$communityarr, 'message'=>$message, 
+                      'bet_type'=>$bet_type, 'previous'=>$previous, 'gamer'=>$p->id);
+        if ($round->phase == 'shotdown'){
+          $data += ['winner'=>$round->winner()];
+        }
         event(new DeskCommonEvent($data));
       }
       return $data;
@@ -145,15 +150,12 @@ class GameController extends Controller
       $big_blind->money = $big_blind->money - 10;
       $big_blind->save();
       $game->round->bank = 15;
-      $game->round->phase = 'preflop';
       $game->round->save();
       $game->round->dealPreflop();
-      $playersarr = $game->playersArray();
-      $data =  array('game' => $game->gameArray(),
-                    'players'=>$playersarr,
-                    'match_id'=>$game->id,
-                    'other'=>'blinds_done');
-       event(new DeskCommonEvent($data));
-       return $data;
+      foreach ($game->players as $p) {
+        $data = array('game'=>$gamearr, 'players'=>$game->playersArray($p->id, $game->round->phase), 'match_id'=>$game->id, 'gamer'=>$p->id);
+        event(new DeskCommonEvent($data));
+      }
+      return $data;
     }
 }

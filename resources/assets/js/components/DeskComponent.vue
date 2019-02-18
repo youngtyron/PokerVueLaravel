@@ -40,6 +40,7 @@
                                                       <button disabled type="button" class="pass-button btn btn-info">Pass</button>
 
                           </div>
+                          <p>{{player.combination}}</p>
 
                     </div>
                     <div class="player" v-else>
@@ -52,6 +53,7 @@
                       <p>Money:{{player.money}}</p>
                       <p><img v-if="player.first_card" class="mini-card" src="/cards/back.jpg" />
                          <img v-if="player.second_card" class="mini-card" src="/cards/back.jpg" /></p>
+                      <p>{{player.combination}}</p>
                     </div>
                   </li>
                 </ul>
@@ -79,6 +81,7 @@
             game: [],
             community: [],
             bets: 0,
+            winner: []
           }
         },
         computed: {
@@ -93,11 +96,9 @@
               if (data.other == "blinds_done"){
                 alert("Blinds is done!")
               }
-              console.log('event!!!')
               this.game = data.game
               this.players = data.players
               this.community = data.community
-              console.log(data.message)
               if (this.gamer == data.turn){
                 if (data.bet_type=='raise'){
                   alert(data.previous.name + ' raises to ' + data.previous.bet + '!')
@@ -109,6 +110,10 @@
                   alert(data.previous.name + ' calls with ' + data.previous.bet + '!')
                 }
               }
+              if (this.game.phase == 'shotdown'){
+                this.winner = data.winner
+                alert (this.winner.player + ' wins!')
+              }
             });
         },
         methods: {
@@ -118,26 +123,25 @@
               if (response.data.other == "blinds_done"){
                 alert("Blinds is done!")
               }
+              if (response.data.other == "blinds_done"){
+                alert("Blinds is done!")
+              }
               this.game = response.data.game
               this.players = response.data.players
             });
           },
           loadGame: function(){
             axios.get('/loadgame').then((response)=> {
-              // console.log(response.data)
+              console.log(response.data)
               this.players = response.data.players
               this.game = response.data.game
               this.community = response.data.community
-              if (this.game.phase == 'blind-bets'){
-              }
-              else if (this.game.phase == 'preflop'){
-                // console.log('preflop')
-              }
-              else if (this.game.phase == 'flop'){
-                // console.log('flop')
-              }
               if (this.gamer == response.data.turn){
-                // alert("Your turn!")
+                alert("Your turn!")
+              }
+              if (this.game.phase == 'shotdown'){
+                this.winner = response.data.winner
+                alert (this.winner.player + ' wins!')
               }
             })
             .catch((error)=>{
@@ -157,9 +161,9 @@
               axios.post('/bet', {bet: bet, match: this.match})
                 .then((response)=> {
                 console.log(response.data)      
-                // this.players = response.data.players
-                // this.game = response.data.game
-                // this.community = response.data.community
+                this.players = response.data.players
+                this.game = response.data.game
+                this.community = response.data.community
               });
             }
           },
@@ -184,11 +188,11 @@
               axios.post('/pass', {match: this.match})
                 .then((response)=> {
                 // console.log(response.data)      
-                // this.players = response.data.players
-                // this.game = response.data.game
-                // this.community = response.data.community
+                this.players = response.data.players
+                this.game = response.data.game
+                this.community = response.data.community
               });
-          }
+          },
         }
     }
 </script>

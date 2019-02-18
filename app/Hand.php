@@ -72,7 +72,39 @@ class Hand extends Model
   	}
   	return $combination;
   }
-
+  public function name_of_combination($rate){
+    if ($rate == 1){
+      $combination = 'High card';
+    }
+    else if ($rate == 2){
+      $combination = 'One pair';
+    }
+    else if ($rate == 3){
+      $combination = 'Two pair';
+    }
+    else if ($rate == 4){
+      $combination = 'Three of a Kind';
+    }
+    else if ($rate == 5){
+      $combination = 'Straight';
+    }
+    else if ($rate == 6){
+      $combination = 'Flush';
+    }
+    else if ($rate == 7){
+      $combination = 'Full House';
+    }
+    else if ($rate == 8){
+      $combination = 'Four of a Kind';
+    }
+    else if ($rate == 9){
+      $combination = 'Straight Flush';
+    }
+    else if ($rate == 10){
+      $combination = 'Royal Flush';
+    }
+    return $combination;
+  }
   public function royal_and_straight_flush($cards){
   	$suits = $this->suits($cards);
   	$freq = array_count_values ($suits);
