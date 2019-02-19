@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-
+Route::get('/users', 'UserController@index')->name('users');
 Route::get('/game', 'GameController@index')->name('game');
 Route::get('/loadgame', 'GameController@loadgame');
 Route::post('/blinds', 'GameController@blinds');

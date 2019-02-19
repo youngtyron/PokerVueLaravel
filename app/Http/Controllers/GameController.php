@@ -20,7 +20,8 @@ class GameController extends Controller
       $gameArr = array('game' => $game->gameArray(),
                        'players'=>$playersArr,
                        'turn'=>$game->round->current_player_id,
-                       'community'=>$game->communityArray());
+                       'community'=>$game->communityArray(),
+                       'me'=>$game->my_playerArray($player->id, $round->phase));
       if ($round->phase == 'shotdown'){
         $gameArr += ['winner'=>$round->winner()];
       }

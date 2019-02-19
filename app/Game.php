@@ -2,6 +2,7 @@
 
 namespace App;
 use Illuminate\Database\Eloquent\Model;
+use App\Player;
 
 class Game extends Model
 {
@@ -14,6 +15,30 @@ class Game extends Model
   {
     return $this->hasOne('App\Round');
   }
+  public function my_playerArray($id, $phase){
+    $me = Player::find($id);
+    $arr = array('id' => $me->user->id,
+                  'name'=>$me->user->name,
+                  'money'=>$me->money,
+                  'passing'=>$me->passing);
+
+    if ($me->hand){
+        if ($me->hand->first_card){$arr += ['first_card'=>'/cards/'.$me->hand->first_card.'.png'];};
+        if ($me->hand->second_card){$arr += ['second_card'=>'/cards/'.$me->hand->second_card.'.png'];};
+    }
+
+    if ($phase=='shotdown'){
+      $arr += ['combination'=>$me->hand->name_of_combination($me->hand->combination())];
+    };
+    if ($me->id == $this->round->button_id){$arr += ['button'=>true];};
+    if ($me->id == $this->round->small_blind_id){$arr += ['small_blind'=>true];};
+    if ($me->id == $this->round->big_blind_id){$arr += ['big_blind'=>true];};
+    if ($me->id == $this->round->current_player_id){$arr += ['current'=>true];};
+    if ($me->last_bet){$arr += ['last_bet'=>$me->last_bet];}
+    else {$arr += ['last_bet'=>0];}
+    return $arr;
+  }
+  
   public function playersArray($id, $phase){
     $players = $this->players;
     $arr = array();
