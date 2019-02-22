@@ -15,6 +15,12 @@ class UserController extends Controller
     }
     public function loadusers(Request $request){
     	$users = User::all();
-    	return $users;
+    	$online = array();
+    	foreach ($users as $user) {
+    		if ($user->isOnline() and $user->player->game_id == 0){
+    			array_push($online, $user);
+    		}
+    	}
+    	return $online;
     }
 }
