@@ -1,65 +1,22 @@
 <template>
     <div class="container-fluid">
         <div class="row">
-              <div class="col-md-6">
+              <div class="col">
                 <span v-if="game.bank">Bank: {{game.bank}}</span>
                 <span v-else>Bank is empty</span>
                 <ul class="list-group">
-                  <li class="list-group-item" v-for="player in players" :id='player.id'>
-                    <div class="player" v-if="player.id == gamer">
-                      <p v-if="player.button">BUTTON</p>
-                      <p v-if="player.small_blind">SMALL BLIND</p>
-                      <p v-if="player.big_blind">BIG BLIND</p>
-                      <p v-if='player.passing!=0'>PLAYER IS OUT OF GAME</p>
-                      <p>{{player.name}}</p>
-                      <p>Money:{{player.money}}</p>
-                      <p><img v-if="player.first_card" class="mini-card" :src="player.first_card" />
-                         <img v-if="player.second_card" class="mini-card" :src="player.second_card" /></p>
-                          <div class="tokens-buttons" v-if="player.current">
-                            <p>[CURRENT]</p>
-                            <button type="button" class="btn btn-info tokens-button" @click="addToken(5)">5</button>
-                            <button type="button" class="btn btn-info tokens-button" @click="addToken(10)">10</button>
-                            <button type="button" class="btn btn-info tokens-button" @click="addToken(25)">25</button>
-                            <button type="button" class="btn btn-info tokens-button" @click="addToken(50)">50</button>
-                            <button type="button" class="btn btn-info tokens-button" @click="addToken(100)">100</button>
-                            <button v-model="bets" type="button" class="btn btn-info bets-button" @click="makeBet(bets)">{{bets}}</button>
-
-                                                            <button type="button" class="pass-button btn btn-info" @click="passRound">Pass</button>
-
-                            
-                            <p @click="cleatBets">Clear bet</p>
-                          </div>
-                          <div class="tokens-buttons" v-else>
-                            <p>[NOT MY TURN]</p>
-                            <button disabled type="button" class="btn btn-info tokens-button">5</button>
-                            <button disabled type="button" class="btn btn-info tokens-button">10</button>
-                            <button disabled type="button" class="btn btn-info tokens-button">25</button>
-                            <button disabled type="button" class="btn btn-info tokens-button">50</button>
-                            <button disabled type="button" class="btn btn-info tokens-button">100</button>
-                            <button disabled v-model="bets" type="button" class="btn btn-info bets-button">{{bets}}</button>
-                                                      <button disabled type="button" class="pass-button btn btn-info">Pass</button>
-
-                          </div>
-                          <p>{{player.combination}}</p>
-
-                    </div>
-                    <div class="player" v-else>
-                      <p v-if="player.button">BUTTON</p>
-                      <p v-if="player.small_blind">SMALL BLIND</p>
-                      <p v-if="player.big_blind">BIG BLIND</p>
-                      <p v-if="player.current">YOUR MOVE!</p>
-
-                      <p>{{player.name}}</p>
-                      <p>Money:{{player.money}}</p>
-                      <p><img v-if="player.first_card" class="mini-card" src="/cards/back.jpg" />
-                         <img v-if="player.second_card" class="mini-card" src="/cards/back.jpg" /></p>
-                      <p>{{player.combination}}</p>
-                    </div>
+                  <li class="list-group-item" v-for="opponent in opponents" :id='opponent.id'>
+                    <h4 class="player-box-text">{{opponent.name}} {{opponent.last_name}}</h4>
+                    <img v-if="opponent.first_card" class="my-mini-card" src="cards/back.jpg" />
+                    <img v-if="opponent.second_card" class="my-mini-card" src="cards/back.jpg" />
                   </li>
                 </ul>
-                <button type="button" class="btn btn-primary" @click="startGame">Start game</button>
-              </div>
-              <div v-if="community" class="col-md-6" style="backgroung-color: grey;">
+ 
+<!--                 <button type="button" class="btn btn-primary" @click="startGame">Start game</button>
+ -->           </div>
+        </div>
+        <div class="row">
+              <div v-if="community" class="community-cards" style="backgroung-color: grey;">
                 <p>Community cards</p>
                 <img v-if="community.first_card" class="mini-card" :src="community.first_card" />
                 <img v-if="community.second_card" class="mini-card" :src="community.second_card" />
@@ -67,6 +24,17 @@
                 <img v-if="community.fourth_card" class="mini-card" :src="community.fourth_card" />
                 <img v-if="community.fifth_card" class="mini-card" :src="community.fifth_card" />
               </div>
+
+             <div class="player-box" v-model='player'>
+              <h4 class="player-box-text">{{player.name}} {{player.last_name}}</h4>
+              <img v-if="player.first_card" class="my-mini-card" :src="player.first_card" />
+              <img v-if="player.second_card" class="my-mini-card" :src="player.second_card" />
+              <input class="chip" type="image" src="/chips/1.png"  @click="addToken(1)"/>
+              <input class="chip" type="image" src="/chips/5.png" @click="addToken(5)"/>
+              <input class="chip" type="image" src="/chips/25.png" @click="addToken(25)"/>
+              <input class="chip" type="image" src="/chips/100.png" @click="addToken(100)"/>
+              <button type="button" class="btn btn-primary" @click="makeBet(bets)">{{bets}}</button>
+            </div>
         </div>
     </div>
 </template>
@@ -76,28 +44,30 @@
         props: ['match', 'gamer'],
         data(){
           return {
-            deck: [],
-            players: [],
+            player: '',
             game: [],
             community: [],
             bets: 0,
-            winner: []
+            winner: [],
+            opponents: []
           }
         },
         computed: {
-          deskCommonChannel(){
+          channel(){
             return window.Echo.private('desk-common.' + this.match + '-'+ this.gamer);
           }
         },
         mounted() {
           this.loadGame();
-          this.deskCommonChannel
+          this.channel
             .listen('DeskCommonEvent', ({data})=>{
               if (data.other == "blinds_done"){
                 alert("Blinds is done!")
               }
+              console.log(data)
               this.game = data.game
-              this.players = data.players
+              this.player = data.player
+              this.opponents = data.opponents
               this.community = data.community
               if (this.gamer == data.turn){
                 if (data.bet_type=='raise'){
@@ -112,7 +82,7 @@
               }
               if (this.game.phase == 'shotdown'){
                 this.winner = data.winner
-                alert (this.winner.player + ' wins!')
+                // alert (this.winner.player + ' wins!')
               }
             });
         },
@@ -132,8 +102,9 @@
           },
           loadGame: function(){
             axios.get('/loadgame').then((response)=> {
-              console.log(response.data)
-              this.players = response.data.players
+              // console.log(response.data)
+              this.player = response.data.player
+              this.opponents = response.data.opponents
               this.game = response.data.game
               this.community = response.data.community
               if (this.gamer == response.data.turn){
@@ -141,7 +112,7 @@
               }
               if (this.game.phase == 'shotdown'){
                 this.winner = response.data.winner
-                alert (this.winner.player + ' wins!')
+                // alert (this.winner.player + ' wins!')
               }
             })
             .catch((error)=>{
@@ -152,16 +123,15 @@
             this.bets = this.bets + token;
           },
           makeBet: function(bet){
-            var me = this.findMeInPlayers();
-            if (bet + me.last_bet < this.game.max_bet){
+            if (bet + this.player.last_bet < this.game.max_bet){
               alert('Your bet is too small')
             }
             else{
-              // console.log('bet go')
               axios.post('/bet', {bet: bet, match: this.match})
                 .then((response)=> {
                 console.log(response.data)      
-                this.players = response.data.players
+                this.player = response.data.player
+                this.opponents = response.data.opponents
                 this.game = response.data.game
                 this.community = response.data.community
               });
@@ -175,22 +145,15 @@
           cleatBets(){
             this.bets = 0;
           },
-          findMeInPlayers(){
-            for (var i=0; i<this.players.length; i++){
-              if (this.players[i].id == this.gamer){
-                var me = this.players[i]
-              }
-            }
-            return me;
-          },
           passRound(){
             console.log("I'm passing")
               axios.post('/pass', {match: this.match})
                 .then((response)=> {
                 // console.log(response.data)      
-                this.players = response.data.players
                 this.game = response.data.game
                 this.community = response.data.community
+                this.player = response.data.player
+                this.opponents = response.data.opponents
               });
           },
         }

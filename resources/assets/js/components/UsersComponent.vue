@@ -6,7 +6,12 @@
                     <div class="panel-heading">Users Component</div>
 
                     <div class="panel-body">
-                        I'm an example component!
+                        <ul class="list-group">
+                            <li v-for="user in users" class="list-group-item">
+                                <p>{{user.name}} {{user.last_name}}</p>
+                            </li>
+                        </ul>
+                        <p v-model="activeUsers">{{activeUsers}}</p>
                     </div>
                 </div>
             </div>
@@ -16,8 +21,26 @@
 
 <script>
     export default {
+        props: ['user_id'],
+        data(){
+            return  {
+                users: [],
+            }
+        },
+        computed: {
+      
+        },
         mounted() {
-            console.log('Component mounted.')
-        }
+            this.loadUsers();
+        },
+        methods: {
+            loadUsers(){
+                console.log('users')
+                axios.get('/loadusers').then((response)=> {
+                    console.log(response.data)
+                    this.users = response.data
+                });
+            },
+        },
     }
 </script>

@@ -15,6 +15,7 @@
 //     return (int) $user->id === (int) $id;
 // });
 //
-Broadcast::channel('desk-common.{match}', function ($match, $user) {
-    return true;
+
+Broadcast::channel('desk-common.{match}-{id}', function ($user, $match, $id) {
+    return (int) $user->player->id === (int) $id and (int)$user->player->game_id === (int) $match;
 });

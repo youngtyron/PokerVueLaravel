@@ -11,6 +11,9 @@ class Game extends Model
   {
     return $this->hasMany('App\Player');
   }
+  public function opponents($id){
+    return Player::where('game_id', $this->id)->where('id', '!=', $id)->get();
+  }
   public function round()
   {
     return $this->hasOne('App\Round');
@@ -19,6 +22,7 @@ class Game extends Model
     $me = Player::find($id);
     $arr = array('id' => $me->user->id,
                   'name'=>$me->user->name,
+                  'last_name'=>$me->user->last_name,
                   'money'=>$me->money,
                   'passing'=>$me->passing);
 
@@ -38,24 +42,19 @@ class Game extends Model
     else {$arr += ['last_bet'=>0];}
     return $arr;
   }
-  
+
   public function playersArray($id, $phase){
-    $players = $this->players;
+    $players = $this->opponents($id);
     $arr = array();
     foreach ($players as $player) {
       $exemplar = array('id' => $player->user->id,
                         'name'=>$player->user->name,
+                        'last_name'=>$player->user->last_name,
                         'money'=>$player->money,
                         'passing'=>$player->passing);
       if ($player->hand){
-        if ($player->id == $id){
-          if ($player->hand->first_card){$exemplar += ['first_card'=>'/cards/'.$player->hand->first_card.'.png'];};
-          if ($player->hand->second_card){$exemplar += ['second_card'=>'/cards/'.$player->hand->second_card.'.png'];};
-        }
-        else {
-          if ($player->hand->first_card){$exemplar += ['first_card'=>'hidden'];};
-          if ($player->hand->second_card){$exemplar += ['second_card'=>'hidden'];};
-        }
+        if ($player->hand->first_card){$exemplar += ['first_card'=>true];};
+        if ($player->hand->second_card){$exemplar += ['second_card'=>true];};
       } 
       if ($phase=='shotdown'){
         $exemplar += ['combination'=>$player->hand->name_of_combination($player->hand->combination())];

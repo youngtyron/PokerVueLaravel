@@ -17,11 +17,14 @@ Route::get('/', function () {
 
 Auth::routes();
 Route::get('/users', 'UserController@index')->name('users');
+Route::get('/loadusers', 'UserController@loadusers');
+
 Route::get('/game', 'GameController@index')->name('game');
 Route::get('/loadgame', 'GameController@loadgame');
 Route::post('/blinds', 'GameController@blinds');
 Route::post('/bet', 'GameController@bet');
 Route::post('/pass', 'GameController@pass');
+
 
 
 

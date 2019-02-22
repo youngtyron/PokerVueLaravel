@@ -8,6 +8,10 @@ use App\Player;
 
 class GameController extends Controller
 {
+    public function __construct()
+    {
+       $this->middleware('auth');
+    }
     public function index(Request $request){
       return view('desk', ['match_id'=>$request->user()->player->game->id, 'gamer_id'=>$request->user()->player->id]);
     }
@@ -18,10 +22,10 @@ class GameController extends Controller
       $round->playersArrangement();
       $playersArr = $game->playersArray($player->id, $round->phase);
       $gameArr = array('game' => $game->gameArray(),
-                       'players'=>$playersArr,
+                       'opponents'=>$playersArr,
                        'turn'=>$game->round->current_player_id,
                        'community'=>$game->communityArray(),
-                       'me'=>$game->my_playerArray($player->id, $round->phase));
+                       'player'=>$game->my_playerArray($player->id, $round->phase));
       if ($round->phase == 'shotdown'){
         $gameArr += ['winner'=>$round->winner()];
       }
@@ -130,8 +134,9 @@ class GameController extends Controller
       $communityarr = $game->communityArray();
       $gamearr = $game->gameArray();
       $previous = array('name'=>$player->user->name, 'bet'=>$bet_amount);
-      foreach ($players as $p) {
-        $data = array('game'=>$gamearr, 'players'=>$game->playersArray($p->id, $round->phase), 'match_id'=>$game->id, 
+      foreach ($game->players as $p) {
+        $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($p->id, $round->phase),
+                      'opponents'=>$game->playersArray($p->id, $round->phase), 'match_id'=>$game->id, 
                       'turn'=>$turn, 'call'=>$call_required, 'community'=>$communityarr, 'message'=>$message, 
                       'bet_type'=>$bet_type, 'previous'=>$previous, 'gamer'=>$p->id);
         if ($round->phase == 'shotdown'){
@@ -139,6 +144,10 @@ class GameController extends Controller
         }
         event(new DeskCommonEvent($data));
       }
+      $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($player->id, $round->phase),
+                      'opponents'=>$game->playersArray($player->id, $round->phase), 'match_id'=>$game->id, 
+                      'turn'=>$turn, 'call'=>$call_required, 'community'=>$communityarr, 'message'=>$message, 
+                      'bet_type'=>$bet_type, 'previous'=>$previous, 'gamer'=>$p->id);
       return $data;
     }
     public function blinds(Request $request){

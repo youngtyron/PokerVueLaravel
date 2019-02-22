@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 30);
+/******/ 	return __webpack_require__(__webpack_require__.s = 31);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -71,7 +71,7 @@
 
 
 var bind = __webpack_require__(13);
-var isBuffer = __webpack_require__(39);
+var isBuffer = __webpack_require__(40);
 
 /*global toString:true*/
 
@@ -383,7 +383,7 @@ module.exports = {
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(59);
+exports = module.exports = __webpack_require__(60);
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
@@ -779,15 +779,15 @@ Emitter.prototype.hasListeners = function(event){
  * Module dependencies.
  */
 
-var keys = __webpack_require__(69);
+var keys = __webpack_require__(70);
 var hasBinary = __webpack_require__(24);
-var sliceBuffer = __webpack_require__(71);
-var after = __webpack_require__(72);
-var utf8 = __webpack_require__(73);
+var sliceBuffer = __webpack_require__(72);
+var after = __webpack_require__(73);
+var utf8 = __webpack_require__(74);
 
 var base64encoder;
 if (typeof ArrayBuffer !== 'undefined') {
-  base64encoder = __webpack_require__(74);
+  base64encoder = __webpack_require__(75);
 }
 
 /**
@@ -845,7 +845,7 @@ var err = { type: 'error', data: 'parser error' };
  * Create a blob api even for blob builder when vendor prefixes exist
  */
 
-var Blob = __webpack_require__(75);
+var Blob = __webpack_require__(76);
 
 /**
  * Encodes a packet.
@@ -1445,7 +1445,7 @@ module.exports = function(a, b){
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(0);
-var normalizeHeaderName = __webpack_require__(41);
+var normalizeHeaderName = __webpack_require__(42);
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -1738,7 +1738,7 @@ process.umask = function() { return 0; };
 
 var debug = __webpack_require__(1)('socket.io-parser');
 var Emitter = __webpack_require__(3);
-var binary = __webpack_require__(61);
+var binary = __webpack_require__(62);
 var isArray = __webpack_require__(19);
 var isBuf = __webpack_require__(20);
 
@@ -2163,9 +2163,9 @@ function error(msg) {
 
 
 
-var base64 = __webpack_require__(62)
-var ieee754 = __webpack_require__(63)
-var isArray = __webpack_require__(64)
+var base64 = __webpack_require__(63)
+var ieee754 = __webpack_require__(64)
+var isArray = __webpack_require__(65)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -3951,7 +3951,7 @@ function isnan (val) {
 
 // browser shim for xmlhttprequest module
 
-var hasCORS = __webpack_require__(67);
+var hasCORS = __webpack_require__(68);
 
 module.exports = function (opts) {
   var xdomain = opts.xdomain;
@@ -4180,12 +4180,12 @@ module.exports = function bind(fn, thisArg) {
 
 
 var utils = __webpack_require__(0);
-var settle = __webpack_require__(42);
-var buildURL = __webpack_require__(44);
-var parseHeaders = __webpack_require__(45);
-var isURLSameOrigin = __webpack_require__(46);
+var settle = __webpack_require__(43);
+var buildURL = __webpack_require__(45);
+var parseHeaders = __webpack_require__(46);
+var isURLSameOrigin = __webpack_require__(47);
 var createError = __webpack_require__(15);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(47);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(48);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -4282,7 +4282,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(48);
+      var cookies = __webpack_require__(49);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -4366,7 +4366,7 @@ module.exports = function xhrAdapter(config) {
 "use strict";
 
 
-var enhanceError = __webpack_require__(43);
+var enhanceError = __webpack_require__(44);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -4514,7 +4514,7 @@ function isBuf(obj) {
  * Module dependencies.
  */
 
-var eio = __webpack_require__(65);
+var eio = __webpack_require__(66);
 var Socket = __webpack_require__(27);
 var Emitter = __webpack_require__(3);
 var parser = __webpack_require__(9);
@@ -4522,7 +4522,7 @@ var on = __webpack_require__(28);
 var bind = __webpack_require__(29);
 var debug = __webpack_require__(1)('socket.io-client:manager');
 var indexOf = __webpack_require__(26);
-var Backoff = __webpack_require__(80);
+var Backoff = __webpack_require__(81);
 
 /**
  * IE6+ hasOwnProperty
@@ -5093,9 +5093,9 @@ Manager.prototype.onreconnect = function () {
  */
 
 var XMLHttpRequest = __webpack_require__(11);
-var XHR = __webpack_require__(68);
-var JSONP = __webpack_require__(76);
-var websocket = __webpack_require__(77);
+var XHR = __webpack_require__(69);
+var JSONP = __webpack_require__(77);
+var websocket = __webpack_require__(78);
 
 /**
  * Export transports.
@@ -5404,7 +5404,7 @@ Polling.prototype.uri = function () {
  * Module requirements.
  */
 
-var isArray = __webpack_require__(70);
+var isArray = __webpack_require__(71);
 
 var toString = Object.prototype.toString;
 var withNativeBlob = typeof Blob === 'function' ||
@@ -5566,7 +5566,7 @@ module.exports = function(arr, obj){
 
 var parser = __webpack_require__(9);
 var Emitter = __webpack_require__(3);
-var toArray = __webpack_require__(79);
+var toArray = __webpack_require__(80);
 var on = __webpack_require__(28);
 var bind = __webpack_require__(29);
 var debug = __webpack_require__(1)('socket.io-client:socket');
@@ -6060,14 +6060,123 @@ module.exports = function(obj, fn){
 
 /***/ }),
 /* 30 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-__webpack_require__(31);
-module.exports = __webpack_require__(89);
+/* globals __VUE_SSR_CONTEXT__ */
+
+// IMPORTANT: Do NOT use ES2015 features in this file.
+// This module is a runtime utility for cleaner component module output and will
+// be included in the final webpack user bundle.
+
+module.exports = function normalizeComponent (
+  rawScriptExports,
+  compiledTemplate,
+  functionalTemplate,
+  injectStyles,
+  scopeId,
+  moduleIdentifier /* server only */
+) {
+  var esModule
+  var scriptExports = rawScriptExports = rawScriptExports || {}
+
+  // ES6 modules interop
+  var type = typeof rawScriptExports.default
+  if (type === 'object' || type === 'function') {
+    esModule = rawScriptExports
+    scriptExports = rawScriptExports.default
+  }
+
+  // Vue.extend constructor export interop
+  var options = typeof scriptExports === 'function'
+    ? scriptExports.options
+    : scriptExports
+
+  // render functions
+  if (compiledTemplate) {
+    options.render = compiledTemplate.render
+    options.staticRenderFns = compiledTemplate.staticRenderFns
+    options._compiled = true
+  }
+
+  // functional template
+  if (functionalTemplate) {
+    options.functional = true
+  }
+
+  // scopedId
+  if (scopeId) {
+    options._scopeId = scopeId
+  }
+
+  var hook
+  if (moduleIdentifier) { // server build
+    hook = function (context) {
+      // 2.3 injection
+      context =
+        context || // cached call
+        (this.$vnode && this.$vnode.ssrContext) || // stateful
+        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
+      // 2.2 with runInNewContext: true
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__
+      }
+      // inject component styles
+      if (injectStyles) {
+        injectStyles.call(this, context)
+      }
+      // register component module identifier for async chunk inferrence
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier)
+      }
+    }
+    // used by ssr in case component is cached and beforeCreate
+    // never gets called
+    options._ssrRegister = hook
+  } else if (injectStyles) {
+    hook = injectStyles
+  }
+
+  if (hook) {
+    var functional = options.functional
+    var existing = functional
+      ? options.render
+      : options.beforeCreate
+
+    if (!functional) {
+      // inject component registration as beforeCreate hook
+      options.beforeCreate = existing
+        ? [].concat(existing, hook)
+        : [hook]
+    } else {
+      // for template-only hot-reload because in that case the render fn doesn't
+      // go through the normalizer
+      options._injectStyles = hook
+      // register for functioal component in vue file
+      options.render = function renderWithStyleInjection (h, context) {
+        hook.call(context)
+        return existing(h, context)
+      }
+    }
+  }
+
+  return {
+    esModule: esModule,
+    exports: scriptExports,
+    options: options
+  }
+}
 
 
 /***/ }),
 /* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(32);
+module.exports = __webpack_require__(92);
+
+
+/***/ }),
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -6077,9 +6186,9 @@ module.exports = __webpack_require__(89);
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-__webpack_require__(32);
+__webpack_require__(33);
 
-window.Vue = __webpack_require__(81);
+window.Vue = __webpack_require__(82);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -6088,22 +6197,22 @@ window.Vue = __webpack_require__(81);
  */
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue'));
-Vue.component('desk-component', __webpack_require__(85));
-Vue.component('users-component', __webpack_require__(100));
+Vue.component('desk-component', __webpack_require__(86));
+Vue.component('users-component', __webpack_require__(89));
 
 var app = new Vue({
   el: '#app'
 });
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_laravel_echo__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_laravel_echo__ = __webpack_require__(57);
 
-window._ = __webpack_require__(33);
+window._ = __webpack_require__(34);
 
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
@@ -6112,9 +6221,9 @@ window._ = __webpack_require__(33);
  */
 
 try {
-  window.$ = window.jQuery = __webpack_require__(35);
+  window.$ = window.jQuery = __webpack_require__(36);
 
-  __webpack_require__(36);
+  __webpack_require__(37);
 } catch (e) {}
 
 /**
@@ -6123,7 +6232,7 @@ try {
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 
-window.axios = __webpack_require__(37);
+window.axios = __webpack_require__(38);
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
@@ -6148,7 +6257,7 @@ if (token) {
  */
 
 
-window.io = __webpack_require__(57);
+window.io = __webpack_require__(58);
 
 window.Echo = new __WEBPACK_IMPORTED_MODULE_0_laravel_echo__["a" /* default */]({
   broadcaster: 'socket.io',
@@ -6165,7 +6274,7 @@ window.Echo = new __WEBPACK_IMPORTED_MODULE_0_laravel_echo__["a" /* default */](
 // });
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -23277,10 +23386,10 @@ window.Echo = new __WEBPACK_IMPORTED_MODULE_0_laravel_echo__["a" /* default */](
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(34)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(35)(module)))
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -23308,7 +23417,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -33679,7 +33788,7 @@ return jQuery;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports) {
 
 /*!
@@ -36093,13 +36202,13 @@ if (typeof jQuery === 'undefined') {
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(38);
+module.exports = __webpack_require__(39);
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36107,7 +36216,7 @@ module.exports = __webpack_require__(38);
 
 var utils = __webpack_require__(0);
 var bind = __webpack_require__(13);
-var Axios = __webpack_require__(40);
+var Axios = __webpack_require__(41);
 var defaults = __webpack_require__(7);
 
 /**
@@ -36142,14 +36251,14 @@ axios.create = function create(instanceConfig) {
 
 // Expose Cancel & CancelToken
 axios.Cancel = __webpack_require__(17);
-axios.CancelToken = __webpack_require__(54);
+axios.CancelToken = __webpack_require__(55);
 axios.isCancel = __webpack_require__(16);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(55);
+axios.spread = __webpack_require__(56);
 
 module.exports = axios;
 
@@ -36158,7 +36267,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports) {
 
 /*!
@@ -36185,7 +36294,7 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36193,8 +36302,8 @@ function isSlowBuffer (obj) {
 
 var defaults = __webpack_require__(7);
 var utils = __webpack_require__(0);
-var InterceptorManager = __webpack_require__(49);
-var dispatchRequest = __webpack_require__(50);
+var InterceptorManager = __webpack_require__(50);
+var dispatchRequest = __webpack_require__(51);
 
 /**
  * Create a new instance of Axios
@@ -36271,7 +36380,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36290,7 +36399,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36323,7 +36432,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36351,7 +36460,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36426,7 +36535,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36486,7 +36595,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36561,7 +36670,7 @@ module.exports = (
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36604,7 +36713,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36664,7 +36773,7 @@ module.exports = (
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36723,18 +36832,18 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var transformData = __webpack_require__(51);
+var transformData = __webpack_require__(52);
 var isCancel = __webpack_require__(16);
 var defaults = __webpack_require__(7);
-var isAbsoluteURL = __webpack_require__(52);
-var combineURLs = __webpack_require__(53);
+var isAbsoluteURL = __webpack_require__(53);
+var combineURLs = __webpack_require__(54);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -36816,7 +36925,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36843,7 +36952,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36864,7 +36973,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36885,7 +36994,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36949,7 +37058,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36983,7 +37092,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -38228,7 +38337,7 @@ var Echo = function () {
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -38236,7 +38345,7 @@ var Echo = function () {
  * Module dependencies.
  */
 
-var url = __webpack_require__(58);
+var url = __webpack_require__(59);
 var parser = __webpack_require__(9);
 var Manager = __webpack_require__(21);
 var debug = __webpack_require__(1)('socket.io-client');
@@ -38328,7 +38437,7 @@ exports.Socket = __webpack_require__(27);
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -38409,7 +38518,7 @@ function url (uri, loc) {
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -38425,7 +38534,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(60);
+exports.humanize = __webpack_require__(61);
 
 /**
  * Active `debug` instances.
@@ -38640,7 +38749,7 @@ function coerce(val) {
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports) {
 
 /**
@@ -38798,7 +38907,7 @@ function plural(ms, n, name) {
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*global Blob,File*/
@@ -38945,7 +39054,7 @@ exports.removeBlobs = function(data, callback) {
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39103,7 +39212,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -39193,7 +39302,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -39204,11 +39313,11 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-module.exports = __webpack_require__(66);
+module.exports = __webpack_require__(67);
 
 /**
  * Exports parser
@@ -39220,7 +39329,7 @@ module.exports.parser = __webpack_require__(4);
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -39972,7 +40081,7 @@ Socket.prototype.filterUpgrades = function (upgrades) {
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports) {
 
 
@@ -39995,7 +40104,7 @@ try {
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* global attachEvent */
@@ -40416,7 +40525,7 @@ function unloadHandler () {
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports) {
 
 
@@ -40441,7 +40550,7 @@ module.exports = Object.keys || function keys (obj){
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -40452,7 +40561,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports) {
 
 /**
@@ -40487,7 +40596,7 @@ module.exports = function(arraybuffer, start, end) {
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports) {
 
 module.exports = after
@@ -40521,7 +40630,7 @@ function noop() {}
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports) {
 
 /*! https://mths.be/utf8js v2.1.2 by @mathias */
@@ -40737,7 +40846,7 @@ module.exports = {
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports) {
 
 /*
@@ -40810,7 +40919,7 @@ module.exports = {
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports) {
 
 /**
@@ -40916,7 +41025,7 @@ module.exports = (function() {
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -41162,7 +41271,7 @@ JSONPPolling.prototype.doWrite = function (data, fn) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {/**
@@ -41184,7 +41293,7 @@ if (typeof WebSocket !== 'undefined') {
   BrowserWebSocket = self.WebSocket || self.MozWebSocket;
 } else {
   try {
-    NodeWebSocket = __webpack_require__(78);
+    NodeWebSocket = __webpack_require__(79);
   } catch (e) { }
 }
 
@@ -41462,13 +41571,13 @@ WS.prototype.check = function () {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10).Buffer))
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports) {
 
 module.exports = toArray
@@ -41487,7 +41596,7 @@ function toArray(list, index) {
 
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports) {
 
 
@@ -41578,18 +41687,18 @@ Backoff.prototype.setJitter = function(jitter){
 
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 if (false) {
   module.exports = require('./vue.common.prod.js')
 } else {
-  module.exports = __webpack_require__(82)
+  module.exports = __webpack_require__(83)
 }
 
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -53316,10 +53425,10 @@ Vue.compile = compileToFunctions;
 
 module.exports = Vue;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(83).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(84).setImmediate))
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -53375,7 +53484,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(84);
+__webpack_require__(85);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -53389,7 +53498,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -53582,11 +53691,11 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(8)))
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(86)
+var normalizeComponent = __webpack_require__(30)
 /* script */
 var __vue_script__ = __webpack_require__(87)
 /* template */
@@ -53626,115 +53735,6 @@ if (false) {(function () {
 })()}
 
 module.exports = Component.exports
-
-
-/***/ }),
-/* 86 */
-/***/ (function(module, exports) {
-
-/* globals __VUE_SSR_CONTEXT__ */
-
-// IMPORTANT: Do NOT use ES2015 features in this file.
-// This module is a runtime utility for cleaner component module output and will
-// be included in the final webpack user bundle.
-
-module.exports = function normalizeComponent (
-  rawScriptExports,
-  compiledTemplate,
-  functionalTemplate,
-  injectStyles,
-  scopeId,
-  moduleIdentifier /* server only */
-) {
-  var esModule
-  var scriptExports = rawScriptExports = rawScriptExports || {}
-
-  // ES6 modules interop
-  var type = typeof rawScriptExports.default
-  if (type === 'object' || type === 'function') {
-    esModule = rawScriptExports
-    scriptExports = rawScriptExports.default
-  }
-
-  // Vue.extend constructor export interop
-  var options = typeof scriptExports === 'function'
-    ? scriptExports.options
-    : scriptExports
-
-  // render functions
-  if (compiledTemplate) {
-    options.render = compiledTemplate.render
-    options.staticRenderFns = compiledTemplate.staticRenderFns
-    options._compiled = true
-  }
-
-  // functional template
-  if (functionalTemplate) {
-    options.functional = true
-  }
-
-  // scopedId
-  if (scopeId) {
-    options._scopeId = scopeId
-  }
-
-  var hook
-  if (moduleIdentifier) { // server build
-    hook = function (context) {
-      // 2.3 injection
-      context =
-        context || // cached call
-        (this.$vnode && this.$vnode.ssrContext) || // stateful
-        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
-      // 2.2 with runInNewContext: true
-      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-        context = __VUE_SSR_CONTEXT__
-      }
-      // inject component styles
-      if (injectStyles) {
-        injectStyles.call(this, context)
-      }
-      // register component module identifier for async chunk inferrence
-      if (context && context._registeredComponents) {
-        context._registeredComponents.add(moduleIdentifier)
-      }
-    }
-    // used by ssr in case component is cached and beforeCreate
-    // never gets called
-    options._ssrRegister = hook
-  } else if (injectStyles) {
-    hook = injectStyles
-  }
-
-  if (hook) {
-    var functional = options.functional
-    var existing = functional
-      ? options.render
-      : options.beforeCreate
-
-    if (!functional) {
-      // inject component registration as beforeCreate hook
-      options.beforeCreate = existing
-        ? [].concat(existing, hook)
-        : [hook]
-    } else {
-      // for template-only hot-reload because in that case the render fn doesn't
-      // go through the normalizer
-      options._injectStyles = hook
-      // register for functioal component in vue file
-      options.render = function renderWithStyleInjection (h, context) {
-        hook.call(context)
-        return existing(h, context)
-      }
-    }
-  }
-
-  return {
-    esModule: esModule,
-    exports: scriptExports,
-    options: options
-  }
-}
 
 
 /***/ }),
@@ -53784,54 +53784,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['match', 'gamer'],
   data: function data() {
     return {
-      deck: [],
-      players: [],
+      player: '',
       game: [],
       community: [],
       bets: 0,
-      winner: []
+      winner: [],
+      opponents: []
     };
   },
 
   computed: {
-    deskCommonChannel: function deskCommonChannel() {
+    channel: function channel() {
       return window.Echo.private('desk-common.' + this.match + '-' + this.gamer);
     }
   },
@@ -53839,14 +53807,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     var _this = this;
 
     this.loadGame();
-    this.deskCommonChannel.listen('DeskCommonEvent', function (_ref) {
+    this.channel.listen('DeskCommonEvent', function (_ref) {
       var data = _ref.data;
 
       if (data.other == "blinds_done") {
         alert("Blinds is done!");
       }
+      console.log(data);
       _this.game = data.game;
-      _this.players = data.players;
+      _this.player = data.player;
+      _this.opponents = data.opponents;
       _this.community = data.community;
       if (_this.gamer == data.turn) {
         if (data.bet_type == 'raise') {
@@ -53859,7 +53829,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       }
       if (_this.game.phase == 'shotdown') {
         _this.winner = data.winner;
-        alert(_this.winner.player + ' wins!');
+        // alert (this.winner.player + ' wins!')
       }
     });
   },
@@ -53885,8 +53855,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var _this3 = this;
 
       axios.get('/loadgame').then(function (response) {
-        console.log(response.data);
-        _this3.players = response.data.players;
+        // console.log(response.data)
+        _this3.player = response.data.player;
+        _this3.opponents = response.data.opponents;
         _this3.game = response.data.game;
         _this3.community = response.data.community;
         if (_this3.gamer == response.data.turn) {
@@ -53894,7 +53865,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         }
         if (_this3.game.phase == 'shotdown') {
           _this3.winner = response.data.winner;
-          alert(_this3.winner.player + ' wins!');
+          // alert (this.winner.player + ' wins!')
         }
       }).catch(function (error) {
         console.log(error);
@@ -53907,14 +53878,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     makeBet: function makeBet(bet) {
       var _this4 = this;
 
-      var me = this.findMeInPlayers();
-      if (bet + me.last_bet < this.game.max_bet) {
+      if (bet + this.player.last_bet < this.game.max_bet) {
         alert('Your bet is too small');
       } else {
-        // console.log('bet go')
         axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
           console.log(response.data);
-          _this4.players = response.data.players;
+          _this4.player = response.data.player;
+          _this4.opponents = response.data.opponents;
           _this4.game = response.data.game;
           _this4.community = response.data.community;
         });
@@ -53930,23 +53900,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     cleatBets: function cleatBets() {
       this.bets = 0;
     },
-    findMeInPlayers: function findMeInPlayers() {
-      for (var i = 0; i < this.players.length; i++) {
-        if (this.players[i].id == this.gamer) {
-          var me = this.players[i];
-        }
-      }
-      return me;
-    },
     passRound: function passRound() {
       var _this6 = this;
 
       console.log("I'm passing");
       axios.post('/pass', { match: this.match }).then(function (response) {
         // console.log(response.data)      
-        _this6.players = response.data.players;
         _this6.game = response.data.game;
         _this6.community = response.data.community;
+        _this6.player = response.data.player;
+        _this6.opponents = response.data.opponents;
       });
     }
   }
@@ -53962,7 +53925,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container-fluid" }, [
     _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-md-6" }, [
+      _c("div", { staticClass: "col" }, [
         _vm.game.bank
           ? _c("span", [_vm._v("Bank: " + _vm._s(_vm.game.bank))])
           : _c("span", [_vm._v("Bank is empty")]),
@@ -53970,291 +53933,44 @@ var render = function() {
         _c(
           "ul",
           { staticClass: "list-group" },
-          _vm._l(_vm.players, function(player) {
+          _vm._l(_vm.opponents, function(opponent) {
             return _c(
               "li",
-              { staticClass: "list-group-item", attrs: { id: player.id } },
+              { staticClass: "list-group-item", attrs: { id: opponent.id } },
               [
-                player.id == _vm.gamer
-                  ? _c("div", { staticClass: "player" }, [
-                      player.button ? _c("p", [_vm._v("BUTTON")]) : _vm._e(),
-                      _vm._v(" "),
-                      player.small_blind
-                        ? _c("p", [_vm._v("SMALL BLIND")])
-                        : _vm._e(),
-                      _vm._v(" "),
-                      player.big_blind
-                        ? _c("p", [_vm._v("BIG BLIND")])
-                        : _vm._e(),
-                      _vm._v(" "),
-                      player.passing != 0
-                        ? _c("p", [_vm._v("PLAYER IS OUT OF GAME")])
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _c("p", [_vm._v(_vm._s(player.name))]),
-                      _vm._v(" "),
-                      _c("p", [_vm._v("Money:" + _vm._s(player.money))]),
-                      _vm._v(" "),
-                      _c("p", [
-                        player.first_card
-                          ? _c("img", {
-                              staticClass: "mini-card",
-                              attrs: { src: player.first_card }
-                            })
-                          : _vm._e(),
-                        _vm._v(" "),
-                        player.second_card
-                          ? _c("img", {
-                              staticClass: "mini-card",
-                              attrs: { src: player.second_card }
-                            })
-                          : _vm._e()
-                      ]),
-                      _vm._v(" "),
-                      player.current
-                        ? _c("div", { staticClass: "tokens-buttons" }, [
-                            _c("p", [_vm._v("[CURRENT]")]),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info tokens-button",
-                                attrs: { type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.addToken(5)
-                                  }
-                                }
-                              },
-                              [_vm._v("5")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info tokens-button",
-                                attrs: { type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.addToken(10)
-                                  }
-                                }
-                              },
-                              [_vm._v("10")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info tokens-button",
-                                attrs: { type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.addToken(25)
-                                  }
-                                }
-                              },
-                              [_vm._v("25")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info tokens-button",
-                                attrs: { type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.addToken(50)
-                                  }
-                                }
-                              },
-                              [_vm._v("50")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info tokens-button",
-                                attrs: { type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.addToken(100)
-                                  }
-                                }
-                              },
-                              [_vm._v("100")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info bets-button",
-                                attrs: { type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.makeBet(_vm.bets)
-                                  }
-                                },
-                                model: {
-                                  value: _vm.bets,
-                                  callback: function($$v) {
-                                    _vm.bets = $$v
-                                  },
-                                  expression: "bets"
-                                }
-                              },
-                              [_vm._v(_vm._s(_vm.bets))]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "pass-button btn btn-info",
-                                attrs: { type: "button" },
-                                on: { click: _vm.passRound }
-                              },
-                              [_vm._v("Pass")]
-                            ),
-                            _vm._v(" "),
-                            _c("p", { on: { click: _vm.cleatBets } }, [
-                              _vm._v("Clear bet")
-                            ])
-                          ])
-                        : _c("div", { staticClass: "tokens-buttons" }, [
-                            _c("p", [_vm._v("[NOT MY TURN]")]),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info tokens-button",
-                                attrs: { disabled: "", type: "button" }
-                              },
-                              [_vm._v("5")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info tokens-button",
-                                attrs: { disabled: "", type: "button" }
-                              },
-                              [_vm._v("10")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info tokens-button",
-                                attrs: { disabled: "", type: "button" }
-                              },
-                              [_vm._v("25")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info tokens-button",
-                                attrs: { disabled: "", type: "button" }
-                              },
-                              [_vm._v("50")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info tokens-button",
-                                attrs: { disabled: "", type: "button" }
-                              },
-                              [_vm._v("100")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info bets-button",
-                                attrs: { disabled: "", type: "button" },
-                                model: {
-                                  value: _vm.bets,
-                                  callback: function($$v) {
-                                    _vm.bets = $$v
-                                  },
-                                  expression: "bets"
-                                }
-                              },
-                              [_vm._v(_vm._s(_vm.bets))]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "pass-button btn btn-info",
-                                attrs: { disabled: "", type: "button" }
-                              },
-                              [_vm._v("Pass")]
-                            )
-                          ]),
-                      _vm._v(" "),
-                      _c("p", [_vm._v(_vm._s(player.combination))])
-                    ])
-                  : _c("div", { staticClass: "player" }, [
-                      player.button ? _c("p", [_vm._v("BUTTON")]) : _vm._e(),
-                      _vm._v(" "),
-                      player.small_blind
-                        ? _c("p", [_vm._v("SMALL BLIND")])
-                        : _vm._e(),
-                      _vm._v(" "),
-                      player.big_blind
-                        ? _c("p", [_vm._v("BIG BLIND")])
-                        : _vm._e(),
-                      _vm._v(" "),
-                      player.current
-                        ? _c("p", [_vm._v("YOUR MOVE!")])
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _c("p", [_vm._v(_vm._s(player.name))]),
-                      _vm._v(" "),
-                      _c("p", [_vm._v("Money:" + _vm._s(player.money))]),
-                      _vm._v(" "),
-                      _c("p", [
-                        player.first_card
-                          ? _c("img", {
-                              staticClass: "mini-card",
-                              attrs: { src: "/cards/back.jpg" }
-                            })
-                          : _vm._e(),
-                        _vm._v(" "),
-                        player.second_card
-                          ? _c("img", {
-                              staticClass: "mini-card",
-                              attrs: { src: "/cards/back.jpg" }
-                            })
-                          : _vm._e()
-                      ]),
-                      _vm._v(" "),
-                      _c("p", [_vm._v(_vm._s(player.combination))])
-                    ])
+                _c("h4", { staticClass: "player-box-text" }, [
+                  _vm._v(
+                    _vm._s(opponent.name) + " " + _vm._s(opponent.last_name)
+                  )
+                ]),
+                _vm._v(" "),
+                opponent.first_card
+                  ? _c("img", {
+                      staticClass: "my-mini-card",
+                      attrs: { src: "cards/back.jpg" }
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                opponent.second_card
+                  ? _c("img", {
+                      staticClass: "my-mini-card",
+                      attrs: { src: "cards/back.jpg" }
+                    })
+                  : _vm._e()
               ]
             )
           }),
           0
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-primary",
-            attrs: { type: "button" },
-            on: { click: _vm.startGame }
-          },
-          [_vm._v("Start game")]
         )
-      ]),
-      _vm._v(" "),
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
       _vm.community
         ? _c(
             "div",
             {
-              staticClass: "col-md-6",
+              staticClass: "community-cards",
               staticStyle: { "backgroung-color": "grey" }
             },
             [
@@ -54296,7 +54012,94 @@ var render = function() {
                 : _vm._e()
             ]
           )
-        : _vm._e()
+        : _vm._e(),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "player-box",
+          model: {
+            value: _vm.player,
+            callback: function($$v) {
+              _vm.player = $$v
+            },
+            expression: "player"
+          }
+        },
+        [
+          _c("h4", { staticClass: "player-box-text" }, [
+            _vm._v(_vm._s(_vm.player.name) + " " + _vm._s(_vm.player.last_name))
+          ]),
+          _vm._v(" "),
+          _vm.player.first_card
+            ? _c("img", {
+                staticClass: "my-mini-card",
+                attrs: { src: _vm.player.first_card }
+              })
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.player.second_card
+            ? _c("img", {
+                staticClass: "my-mini-card",
+                attrs: { src: _vm.player.second_card }
+              })
+            : _vm._e(),
+          _vm._v(" "),
+          _c("input", {
+            staticClass: "chip",
+            attrs: { type: "image", src: "/chips/1.png" },
+            on: {
+              click: function($event) {
+                return _vm.addToken(1)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("input", {
+            staticClass: "chip",
+            attrs: { type: "image", src: "/chips/5.png" },
+            on: {
+              click: function($event) {
+                return _vm.addToken(5)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("input", {
+            staticClass: "chip",
+            attrs: { type: "image", src: "/chips/25.png" },
+            on: {
+              click: function($event) {
+                return _vm.addToken(25)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("input", {
+            staticClass: "chip",
+            attrs: { type: "image", src: "/chips/100.png" },
+            on: {
+              click: function($event) {
+                return _vm.addToken(100)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-primary",
+              attrs: { type: "button" },
+              on: {
+                click: function($event) {
+                  return _vm.makeBet(_vm.bets)
+                }
+              }
+            },
+            [_vm._v(_vm._s(_vm.bets))]
+          )
+        ]
+      )
     ])
   ])
 }
@@ -54312,30 +54115,14 @@ if (false) {
 
 /***/ }),
 /* 89 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 90 */,
-/* 91 */,
-/* 92 */,
-/* 93 */,
-/* 94 */,
-/* 95 */,
-/* 96 */,
-/* 97 */,
-/* 98 */,
-/* 99 */,
-/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(86)
+var normalizeComponent = __webpack_require__(30)
 /* script */
-var __vue_script__ = __webpack_require__(101)
+var __vue_script__ = __webpack_require__(90)
 /* template */
-var __vue_template__ = __webpack_require__(102)
+var __vue_template__ = __webpack_require__(91)
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
@@ -54374,7 +54161,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 101 */
+/* 90 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -54395,47 +54182,88 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user_id'],
+    data: function data() {
+        return {
+            users: []
+        };
+    },
+
+    computed: {},
     mounted: function mounted() {
-        console.log('Component mounted.');
+        this.loadUsers();
+    },
+
+    methods: {
+        loadUsers: function loadUsers() {
+            var _this = this;
+
+            console.log('users');
+            axios.get('/loadusers').then(function (response) {
+                console.log(response.data);
+                _this.users = response.data;
+            });
+        }
     }
 });
 
 /***/ }),
-/* 102 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "container" }, [
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-md-8 col-md-offset-2" }, [
-          _c("div", { staticClass: "panel panel-default" }, [
-            _c("div", { staticClass: "panel-heading" }, [
-              _vm._v("Users Component")
-            ]),
+  return _c("div", { staticClass: "container" }, [
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-md-8 col-md-offset-2" }, [
+        _c("div", { staticClass: "panel panel-default" }, [
+          _c("div", { staticClass: "panel-heading" }, [
+            _vm._v("Users Component")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "panel-body" }, [
+            _c(
+              "ul",
+              { staticClass: "list-group" },
+              _vm._l(_vm.users, function(user) {
+                return _c("li", { staticClass: "list-group-item" }, [
+                  _c("p", [
+                    _vm._v(_vm._s(user.name) + " " + _vm._s(user.last_name))
+                  ])
+                ])
+              }),
+              0
+            ),
             _vm._v(" "),
-            _c("div", { staticClass: "panel-body" }, [
-              _vm._v(
-                "\n                    I'm an example component!\n                "
-              )
-            ])
+            _c(
+              "p",
+              {
+                model: {
+                  value: _vm.activeUsers,
+                  callback: function($$v) {
+                    _vm.activeUsers = $$v
+                  },
+                  expression: "activeUsers"
+                }
+              },
+              [_vm._v(_vm._s(_vm.activeUsers))]
+            )
           ])
         ])
       ])
     ])
-  }
-]
+  ])
+}
+var staticRenderFns = []
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
@@ -54444,6 +54272,12 @@ if (false) {
     require("vue-hot-reload-api")      .rerender("data-v-986a6968", module.exports)
   }
 }
+
+/***/ }),
+/* 92 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);
