@@ -43,3 +43,10 @@
   margin-top: 400px;
   border: 1px solid black;
  }
+.light-text{
+  color: #FFFFC7;
+ }
+ .col-centered{
+    float: none;
+    margin: 0 auto;
+}

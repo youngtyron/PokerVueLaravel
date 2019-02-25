@@ -16,14 +16,15 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-Route::get('/users', 'UserController@index')->name('users');
-Route::get('/loadusers', 'UserController@loadusers');
-
-Route::get('/game', 'GameController@index')->name('game');
-Route::get('/loadgame', 'GameController@loadgame');
-Route::post('/blinds', 'GameController@blinds');
-Route::post('/bet', 'GameController@bet');
-Route::post('/pass', 'GameController@pass');
+Route::get('/users', 'UserController@index')->name('users')->middleware('auth');
+Route::get('/loadusers', 'UserController@loadusers')->middleware('auth');
+Route::get('/findgame', 'GameController@findgame')->name('findgame')->middleware('auth');
+Route::get('/game', 'GameController@index')->name('game')->middleware('auth');
+Route::get('/loadgame', 'GameController@loadgame')->middleware('auth');
+Route::post('/blinds', 'GameController@blinds')->middleware('auth');
+Route::post('/bet', 'GameController@bet')->middleware('auth');
+Route::post('/pass', 'GameController@pass')->middleware('auth');
+Route::post('/search', 'GameController@search_game')->middleware('auth');
 
 
 

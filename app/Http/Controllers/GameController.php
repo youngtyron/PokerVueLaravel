@@ -5,12 +5,50 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Events\DeskCommonEvent;
 use App\Player;
+use App\Game;
+use App\Round;
+
 
 class GameController extends Controller
 {
     public function __construct()
     {
        $this->middleware('auth');
+    }
+    public function findgame(){
+      return view('findgame');
+    }
+    public function search_game(Request $request){
+      $player = $request->user()->player;
+      $num = $request->input('num');
+      $player->search_number_players = $num;
+      $player->save();
+      $i = 0;
+      while ($i <= 5) {
+        $partners = Player::where('game_id', Null)->where('search_number_players', $num)->take($num)->get();
+        if (count($partners)<$num){
+          sleep(2);
+        }
+        else{
+          break;
+        }
+        $i +=1;
+      }
+      if (count($partners)==$num){
+        $game = new Game;
+        $game->save();
+        foreach ($partners as $partner) {
+          $partner->game_id = $game->id;
+          $partner->search_number_players = Null;
+          $partner->save();
+        }
+        $round=Round::create(['game_id'=>$game->id]);
+        $round->save();
+        return response()->json(['message' => 'success'], 200);
+      }
+      else{
+        return response()->json(['message' => 'Not enough free players oline'], 200);
+      }
     }
     public function index(Request $request){
       return view('desk', ['match_id'=>$request->user()->player->game->id, 'gamer_id'=>$request->user()->player->id]);

@@ -6198,7 +6198,7 @@ window.Vue = __webpack_require__(82);
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue'));
 Vue.component('desk-component', __webpack_require__(86));
-Vue.component('users-component', __webpack_require__(89));
+Vue.component('findgame-component', __webpack_require__(106));
 
 var app = new Vue({
   el: '#app'
@@ -54114,15 +54114,37 @@ if (false) {
 }
 
 /***/ }),
-/* 89 */
+/* 89 */,
+/* 90 */,
+/* 91 */,
+/* 92 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 93 */,
+/* 94 */,
+/* 95 */,
+/* 96 */,
+/* 97 */,
+/* 98 */,
+/* 99 */,
+/* 100 */,
+/* 101 */,
+/* 102 */,
+/* 103 */,
+/* 104 */,
+/* 105 */,
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(30)
 /* script */
-var __vue_script__ = __webpack_require__(90)
+var __vue_script__ = __webpack_require__(107)
 /* template */
-var __vue_template__ = __webpack_require__(91)
+var __vue_template__ = __webpack_require__(108)
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
@@ -54139,7 +54161,7 @@ var Component = normalizeComponent(
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "resources/assets/js/components/UsersComponent.vue"
+Component.options.__file = "resources/assets/js/components/FindGameComponent.vue"
 
 /* hot reload */
 if (false) {(function () {
@@ -54148,9 +54170,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-986a6968", Component.options)
+    hotAPI.createRecord("data-v-e184146a", Component.options)
   } else {
-    hotAPI.reload("data-v-986a6968", Component.options)
+    hotAPI.reload("data-v-e184146a", Component.options)
   }
   module.hot.dispose(function (data) {
     disposed = true
@@ -54161,7 +54183,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 90 */
+/* 107 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -54183,39 +54205,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user_id'],
     data: function data() {
-        return {
-            users: []
-        };
+        return {};
     },
-
-    computed: {},
-    mounted: function mounted() {
-        this.loadUsers();
-    },
+    mounted: function mounted() {},
 
     methods: {
-        loadUsers: function loadUsers() {
-            var _this = this;
-
-            console.log('users');
-            axios.get('/loadusers').then(function (response) {
+        findGame: function findGame(num) {
+            console.log('start search');
+            axios.post('/search', { num: num }).then(function (response) {
                 console.log(response.data);
-                _this.users = response.data;
             });
         }
     }
 });
 
 /***/ }),
-/* 91 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -54224,40 +54232,76 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
     _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-md-8 col-md-offset-2" }, [
-        _c("div", { staticClass: "panel panel-default" }, [
-          _c("div", { staticClass: "panel-heading" }, [
-            _vm._v("Users Component")
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "panel-body" }, [
-            _c(
-              "ul",
-              { staticClass: "list-group" },
-              _vm._l(_vm.users, function(user) {
-                return _c("li", { staticClass: "list-group-item" }, [
-                  _c("p", [
-                    _vm._v(_vm._s(user.name) + " " + _vm._s(user.last_name))
-                  ])
-                ])
-              }),
-              0
-            ),
-            _vm._v(" "),
-            _c(
-              "p",
-              {
-                model: {
-                  value: _vm.activeUsers,
-                  callback: function($$v) {
-                    _vm.activeUsers = $$v
-                  },
-                  expression: "activeUsers"
+      _c("div", { staticClass: "col-sm-4 col-centered" }, [
+        _c("h4", { staticClass: "light-text text-center" }, [
+          _vm._v("Select the number of players")
+        ]),
+        _vm._v(" "),
+        _c("ul", { staticClass: "list-group" }, [
+          _c(
+            "li",
+            {
+              staticClass: "list-group-item",
+              on: {
+                click: function($event) {
+                  return _vm.findGame(2)
                 }
-              },
-              [_vm._v(_vm._s(_vm.activeUsers))]
-            )
-          ])
+              }
+            },
+            [_c("h4", [_vm._v("2 Players")])]
+          ),
+          _vm._v(" "),
+          _c(
+            "li",
+            {
+              staticClass: "list-group-item",
+              on: {
+                click: function($event) {
+                  return _vm.findGame(4)
+                }
+              }
+            },
+            [_c("h4", [_vm._v("4 Players")])]
+          ),
+          _vm._v(" "),
+          _c(
+            "li",
+            {
+              staticClass: "list-group-item",
+              on: {
+                click: function($event) {
+                  return _vm.findGame(6)
+                }
+              }
+            },
+            [_c("h4", [_vm._v("6 Players")])]
+          ),
+          _vm._v(" "),
+          _c(
+            "li",
+            {
+              staticClass: "list-group-item",
+              on: {
+                click: function($event) {
+                  return _vm.findGame(8)
+                }
+              }
+            },
+            [_c("h4", [_vm._v("8 Players")])]
+          ),
+          _vm._v(" "),
+          _c(
+            "li",
+            {
+              staticClass: "list-group-item",
+              on: {
+                click: function($event) {
+                  return _vm.findGame(0)
+                }
+              }
+            },
+            [_c("h4", [_vm._v("Any Number")])]
+          )
         ])
       ])
     ])
@@ -54269,15 +54313,9 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-986a6968", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-e184146a", module.exports)
   }
 }
-
-/***/ }),
-/* 92 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);
