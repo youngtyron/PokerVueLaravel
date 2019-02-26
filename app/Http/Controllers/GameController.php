@@ -20,36 +20,101 @@ class GameController extends Controller
     }
     public function search_game(Request $request){
       $player = $request->user()->player;
-      $num = $request->input('num');
-      $player->search_number_players = $num;
-      $player->save();
-      $i = 0;
-      while ($i <= 5) {
-        $partners = Player::where('game_id', Null)->where('search_number_players', $num)->take($num)->get();
-        if (count($partners)<$num){
-          sleep(2);
-        }
-        else{
-          break;
-        }
-        $i +=1;
-      }
-      if (count($partners)==$num){
-        $game = new Game;
-        $game->save();
-        foreach ($partners as $partner) {
-          $partner->game_id = $game->id;
-          $partner->search_number_players = Null;
-          $partner->save();
-        }
-        $round=Round::create(['game_id'=>$game->id]);
-        $round->save();
-        return response()->json(['message' => 'success'], 200);
-      }
-      else{
-        return response()->json(['message' => 'Not enough free players oline'], 200);
-      }
+      return response()->json(['message' => 'ok', 'partners'=>$player->any_partners_amount()], 200);
+      // if ($num !=0){
+      //   $partners = $player->definite_partners_amount($num);
+      // }
+      // else{
+      //   $partners = $player->any_partners_amount();
+      // }
+      // if ($partners){
+      //   return response()->json(['message' => 'ok', 'partners'=>$partners], 200);
+      // }
+      // else{
+      //   return response()->json(['message' => 'not'], 200);
+      // }
     }
+    // public function search_game(Request $request){
+    //   $player = $request->user()->player;
+    //   $num = $request->input('num');
+    //   $player->search_number_players = $num;
+    //   $player->save();
+    //   $free_gamers = Player::where('game_id', Null);
+    //   if ($num == 0){
+    //     $found = false;
+    //     $i = 0;
+    //     while ($i <= 5) {
+    //       $n_arr = [0, 2, 4, 6, 8];
+    //       while (count($n_arr)>0){
+    //         $variant = array_rand($n_arr);
+    //         if ($variant == 0){
+
+    //         }
+    //         else {
+    //           $partners=$free_gamers->where('search_number_players', $variant)->orWhere('search_number_players', 0)
+    //                                                                           ->take($variant)->get();
+    //           if (count($partners)<$variant){
+    //             array_splice($n_arr, array_search($variant, $n_arr), 1);
+    //           }
+    //           else{
+    //             break;
+    //           }
+    //         }
+    //       }
+    //       if (count($partners)<$variant){
+    //         sleep(1);
+    //       }
+    //       else{
+    //         $found = true;
+    //         break;
+    //       }
+    //     }
+    //     if ($found){
+    //       $game = new Game;
+    //       $game->save();
+    //       foreach ($partners as $partner) {
+    //         $partner->game_id = $game->id;
+    //         $partner->search_number_players = Null;
+    //         $partner->save();
+    //       }
+    //       $round=Round::create(['game_id'=>$game->id]);
+    //       $round->save();
+    //       return response()->json(['message' => 'ok'], 200);  
+    //     }
+    //     else{
+    //       return response()->json(['message' => 'not'], 200);
+    //     }
+    //   }
+    //   else{
+    //     while ($i <= 5) {
+    //       $i = 0;
+    //       $partners=$free_gamers->where('search_number_players', $num)->orWhere('search_number_players', 0)
+    //                                                                   ->take($num)->get();
+    //       if (count($partners)<$num){
+    //         sleep(1);
+    //       }
+    //       else{
+    //         break;
+    //       }
+    //       $i +=1;
+    //       if (count($partners)==$num){
+    //         $game = new Game;
+    //         $game->save();
+    //         foreach ($partners as $partner) {
+    //           $partner->game_id = $game->id;
+    //           $partner->search_number_players = Null;
+    //           $partner->save();
+    //         }
+    //         $round=Round::create(['game_id'=>$game->id]);
+    //         $round->save();
+    //         return response()->json(['message' => 'ok'], 200);  
+    //       }
+    //       else{
+    //         return response()->json(['message' => 'not'], 200);
+    //       }
+    //     }
+    //   }
+    // }
     public function index(Request $request){
       return view('desk', ['match_id'=>$request->user()->player->game->id, 'gamer_id'=>$request->user()->player->id]);
     }

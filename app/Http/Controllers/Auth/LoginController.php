@@ -13,7 +13,7 @@ class LoginController extends Controller
     use AuthenticatesUsers;
 
    
-    protected $redirectTo = '/users';
+    protected $redirectTo = '/findgame';
 
     public function authenticate()
     {

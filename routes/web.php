@@ -16,8 +16,6 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-Route::get('/users', 'UserController@index')->name('users')->middleware('auth');
-Route::get('/loadusers', 'UserController@loadusers')->middleware('auth');
 Route::get('/findgame', 'GameController@findgame')->name('findgame')->middleware('auth');
 Route::get('/game', 'GameController@index')->name('game')->middleware('auth');
 Route::get('/loadgame', 'GameController@loadgame')->middleware('auth');
