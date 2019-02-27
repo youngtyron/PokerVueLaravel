@@ -54230,18 +54230,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             axios.post('/search', { num: num }).then(function (response) {
                 _this.waitingCircle = false;
                 console.log(response.data);
-                // if (response.data.message == 'not' && !this.waitingCircle){
-                //     this.waitingCircle = false;
-                //     Swal.fire({
-                //       title: 'Not found!',
-                //       text: 'Not enough online players! Try another type of game or wait some time',
-                //       type: 'info',
-                //       confirmButtonText: 'Ok'
-                //     })
-                // }
-                // else if (response.data.message == 'ok'){
-                //     location.replace(window.location.origin + '/game');
-                // }
+                if (response.data.message == 'not' && !_this.waitingCircle) {
+                    _this.waitingCircle = false;
+                    __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
+                        title: 'Not found!',
+                        text: 'Not enough online players! Try another type of game or wait some time',
+                        type: 'info',
+                        confirmButtonText: 'Ok'
+                    });
+                } else if (response.data.message == 'ok') {
+                    location.replace(window.location.origin + '/game');
+                }
             });
         }
     }
