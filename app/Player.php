@@ -18,6 +18,16 @@ class Player extends Model
   public function hand(){
     return $this->hasOne('App\Hand');
   }
+  public function infoArray(){
+    $info = array('id' => $this->user->id,
+                  'name'=>$this->user->name,
+                  'last_name'=>$this->user->last_name,
+                  'money'=>$this->money,
+                  'first_card'=>'/cards/'.$this->hand->first_card.'.png',
+                  'second_card'=>'/cards/'.$this->hand->second_card.'.png',
+                  'combination'=>$this->hand->name_of_combination($this->hand->combination()));
+    return $info;
+  }
   public function definite_partners_amount($num){
     $this->search_number_players = $num;
     $this->save();
@@ -47,7 +57,7 @@ class Player extends Model
     $partners = false;
     $i = 0;
     while ($i <= 5) {
-      $n_arr = [2, 4, 6, 8];
+      $n_arr = [2, 3, 5, 7];
       while (count($n_arr)>0){
         $variant = $n_arr[array_rand($n_arr)];
         $pre_partners=Player::where('game_id', Null)->where('search_number_players', $variant)

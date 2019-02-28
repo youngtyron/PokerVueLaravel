@@ -6199,6 +6199,7 @@ window.Vue = __webpack_require__(82);
 // Vue.component('example-component', require('./components/ExampleComponent.vue'));
 Vue.component('desk-component', __webpack_require__(86));
 Vue.component('findgame-component', __webpack_require__(89));
+Vue.component('roundresults-component', __webpack_require__(106));
 
 var app = new Vue({
   el: '#app'
@@ -53743,6 +53744,20 @@ module.exports = Component.exports
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__RoundResults_vue__ = __webpack_require__(106);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__RoundResults_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__RoundResults_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -53785,8 +53800,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['match', 'gamer'],
+  components: {
+    RoundResultsSlot: __WEBPACK_IMPORTED_MODULE_0__RoundResults_vue___default.a
+  },
   data: function data() {
     return {
       player: '',
@@ -53794,7 +53813,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       community: [],
       bets: 0,
       winner: [],
-      opponents: []
+      opponents: [],
+      call: '',
+      results: []
     };
   },
 
@@ -53813,10 +53834,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       if (data.other == "blinds_done") {
         alert("Blinds is done!");
       }
-      console.log(data);
       _this.game = data.game;
       _this.player = data.player;
       _this.opponents = data.opponents;
+      _this.call = data.call;
       _this.community = data.community;
       if (_this.gamer == data.turn) {
         if (data.bet_type == 'raise') {
@@ -53827,10 +53848,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           alert(data.previous.name + ' calls with ' + data.previous.bet + '!');
         }
       }
-      if (_this.game.phase == 'shotdown') {
-        _this.winner = data.winner;
-        // alert (this.winner.player + ' wins!')
-      }
     });
   },
 
@@ -53838,7 +53855,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     startGame: function startGame() {
       var _this2 = this;
 
-      // console.log('start')
       axios.post('/blinds', { match: this.match }).then(function (response) {
         if (response.data.other == "blinds_done") {
           alert("Blinds is done!");
@@ -53855,17 +53871,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var _this3 = this;
 
       axios.get('/loadgame').then(function (response) {
-        // console.log(response.data)
         _this3.player = response.data.player;
         _this3.opponents = response.data.opponents;
         _this3.game = response.data.game;
+        _this3.call = response.data.call;
         _this3.community = response.data.community;
-        if (_this3.gamer == response.data.turn) {
+        _this3.results = response.data.results;
+        if (_this3.gamer == response.data.turn && _this3.game.phase != 'shotdown') {
           alert("Your turn!");
         }
         if (_this3.game.phase == 'shotdown') {
-          _this3.winner = response.data.winner;
-          // alert (this.winner.player + ' wins!')
+          document.getElementById('game-row').style.display = 'none';
         }
       }).catch(function (error) {
         console.log(error);
@@ -53882,9 +53898,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         alert('Your bet is too small');
       } else {
         axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
+          _this4.bets = 0;
           console.log(response.data);
           _this4.player = response.data.player;
           _this4.opponents = response.data.opponents;
+          _this4.call = response.data.call;
           _this4.game = response.data.game;
           _this4.community = response.data.community;
         });
@@ -53897,7 +53915,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         _this5.players = response.data;
       });
     },
-    cleatBets: function cleatBets() {
+    clearBets: function clearBets() {
       this.bets = 0;
     },
     passRound: function passRound() {
@@ -53908,6 +53926,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         // console.log(response.data)      
         _this6.game = response.data.game;
         _this6.community = response.data.community;
+        _this6.call = response.data.call;
         _this6.player = response.data.player;
         _this6.opponents = response.data.opponents;
       });
@@ -53923,19 +53942,176 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container-fluid" }, [
-    _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col" }, [
-        _vm.game.bank
-          ? _c("span", [_vm._v("Bank: " + _vm._s(_vm.game.bank))])
-          : _c("span", [_vm._v("Bank is empty")]),
+  return _c(
+    "div",
+    { staticClass: "container-fluid" },
+    [
+      _vm.game.phase == "shotdown"
+        ? _c("RoundResultsSlot", { attrs: { results: this.results } })
+        : _vm._e(),
+      _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-md-4 col-centered" }, [
+          _vm.game.bank
+            ? _c("span", { staticClass: "text-center" }, [
+                _vm._v("Bank: " + _vm._s(_vm.game.bank))
+              ])
+            : _c("span", { staticClass: "text-center" }, [
+                _vm._v("Bank is empty")
+              ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row", attrs: { id: "game-row" } }, [
+        _c("div", { staticClass: "col-md-3" }, [
+          _c(
+            "div",
+            {
+              staticClass: "player-box",
+              model: {
+                value: _vm.player,
+                callback: function($$v) {
+                  _vm.player = $$v
+                },
+                expression: "player"
+              }
+            },
+            [
+              _c("h4", { staticClass: "player-box-text" }, [
+                _vm._v(
+                  _vm._s(_vm.player.name) + " " + _vm._s(_vm.player.last_name)
+                )
+              ]),
+              _vm._v(" "),
+              _c("h4", { staticClass: "player-box-text" }, [
+                _vm._v("Money: " + _vm._s(_vm.player.money))
+              ]),
+              _vm._v(" "),
+              _c("p", [
+                _vm.player.first_card
+                  ? _c("img", {
+                      staticClass: "my-mini-card",
+                      attrs: { src: _vm.player.first_card }
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.player.second_card
+                  ? _c("img", {
+                      staticClass: "my-mini-card",
+                      attrs: { src: _vm.player.second_card }
+                    })
+                  : _vm._e()
+              ]),
+              _vm._v(" "),
+              _c("p", [
+                _c(
+                  "button",
+                  {
+                    staticClass: "chip-button",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.addToken(5)
+                      }
+                    }
+                  },
+                  [_vm._v("5")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "chip-button",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.addToken(10)
+                      }
+                    }
+                  },
+                  [_vm._v("10")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "chip-button",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.addToken(25)
+                      }
+                    }
+                  },
+                  [_vm._v("25")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "chip-button",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.addToken(50)
+                      }
+                    }
+                  },
+                  [_vm._v("50")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "chip-button",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.addToken(100)
+                      }
+                    }
+                  },
+                  [_vm._v("100")]
+                )
+              ]),
+              _vm._v(" "),
+              _c("p", { staticClass: "player-box-text" }, [
+                _vm._v("Current bet: " + _vm._s(_vm.bets))
+              ]),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "bet-button",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      return _vm.makeBet(_vm.bets)
+                    }
+                  }
+                },
+                [_vm._v("Bet")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "clear-button",
+                  attrs: { type: "button" },
+                  on: { click: _vm.clearBets }
+                },
+                [_vm._v("Clear")]
+              )
+            ]
+          )
+        ]),
         _vm._v(" "),
         _c(
-          "ul",
-          { staticClass: "list-group" },
+          "div",
+          { staticClass: "col-md-6" },
           _vm._l(_vm.opponents, function(opponent) {
             return _c(
-              "li",
+              "div",
               { staticClass: "list-group-item", attrs: { id: opponent.id } },
               [
                 _c("h4", { staticClass: "player-box-text" }, [
@@ -53961,147 +54137,61 @@ var render = function() {
             )
           }),
           0
-        )
+        ),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-md-3" }, [
+          _vm.community
+            ? _c(
+                "div",
+                {
+                  staticClass: "community-cards",
+                  staticStyle: { "backgroung-color": "grey" }
+                },
+                [
+                  _c("p", [_vm._v("Community cards")]),
+                  _vm._v(" "),
+                  _vm.community.first_card
+                    ? _c("img", {
+                        staticClass: "mini-card",
+                        attrs: { src: _vm.community.first_card }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.community.second_card
+                    ? _c("img", {
+                        staticClass: "mini-card",
+                        attrs: { src: _vm.community.second_card }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.community.third_card
+                    ? _c("img", {
+                        staticClass: "mini-card",
+                        attrs: { src: _vm.community.third_card }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.community.fourth_card
+                    ? _c("img", {
+                        staticClass: "mini-card",
+                        attrs: { src: _vm.community.fourth_card }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.community.fifth_card
+                    ? _c("img", {
+                        staticClass: "mini-card",
+                        attrs: { src: _vm.community.fifth_card }
+                      })
+                    : _vm._e()
+                ]
+              )
+            : _vm._e()
+        ])
       ])
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "row" }, [
-      _vm.community
-        ? _c(
-            "div",
-            {
-              staticClass: "community-cards",
-              staticStyle: { "backgroung-color": "grey" }
-            },
-            [
-              _c("p", [_vm._v("Community cards")]),
-              _vm._v(" "),
-              _vm.community.first_card
-                ? _c("img", {
-                    staticClass: "mini-card",
-                    attrs: { src: _vm.community.first_card }
-                  })
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.community.second_card
-                ? _c("img", {
-                    staticClass: "mini-card",
-                    attrs: { src: _vm.community.second_card }
-                  })
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.community.third_card
-                ? _c("img", {
-                    staticClass: "mini-card",
-                    attrs: { src: _vm.community.third_card }
-                  })
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.community.fourth_card
-                ? _c("img", {
-                    staticClass: "mini-card",
-                    attrs: { src: _vm.community.fourth_card }
-                  })
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.community.fifth_card
-                ? _c("img", {
-                    staticClass: "mini-card",
-                    attrs: { src: _vm.community.fifth_card }
-                  })
-                : _vm._e()
-            ]
-          )
-        : _vm._e(),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "player-box",
-          model: {
-            value: _vm.player,
-            callback: function($$v) {
-              _vm.player = $$v
-            },
-            expression: "player"
-          }
-        },
-        [
-          _c("h4", { staticClass: "player-box-text" }, [
-            _vm._v(_vm._s(_vm.player.name) + " " + _vm._s(_vm.player.last_name))
-          ]),
-          _vm._v(" "),
-          _vm.player.first_card
-            ? _c("img", {
-                staticClass: "my-mini-card",
-                attrs: { src: _vm.player.first_card }
-              })
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.player.second_card
-            ? _c("img", {
-                staticClass: "my-mini-card",
-                attrs: { src: _vm.player.second_card }
-              })
-            : _vm._e(),
-          _vm._v(" "),
-          _c("input", {
-            staticClass: "chip",
-            attrs: { type: "image", src: "/chips/1.png" },
-            on: {
-              click: function($event) {
-                return _vm.addToken(1)
-              }
-            }
-          }),
-          _vm._v(" "),
-          _c("input", {
-            staticClass: "chip",
-            attrs: { type: "image", src: "/chips/5.png" },
-            on: {
-              click: function($event) {
-                return _vm.addToken(5)
-              }
-            }
-          }),
-          _vm._v(" "),
-          _c("input", {
-            staticClass: "chip",
-            attrs: { type: "image", src: "/chips/25.png" },
-            on: {
-              click: function($event) {
-                return _vm.addToken(25)
-              }
-            }
-          }),
-          _vm._v(" "),
-          _c("input", {
-            staticClass: "chip",
-            attrs: { type: "image", src: "/chips/100.png" },
-            on: {
-              click: function($event) {
-                return _vm.addToken(100)
-              }
-            }
-          }),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-primary",
-              attrs: { type: "button" },
-              on: {
-                click: function($event) {
-                  return _vm.makeBet(_vm.bets)
-                }
-              }
-            },
-            [_vm._v(_vm._s(_vm.bets))]
-          )
-        ]
-      )
-    ])
-  ])
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -57443,11 +57533,11 @@ var render = function() {
               staticClass: "list-group-item",
               on: {
                 click: function($event) {
-                  return _vm.findGame(4)
+                  return _vm.findGame(3)
                 }
               }
             },
-            [_c("h4", [_vm._v("4 Players")])]
+            [_c("h4", [_vm._v("3 Players")])]
           ),
           _vm._v(" "),
           _c(
@@ -57456,11 +57546,11 @@ var render = function() {
               staticClass: "list-group-item",
               on: {
                 click: function($event) {
-                  return _vm.findGame(6)
+                  return _vm.findGame(5)
                 }
               }
             },
-            [_c("h4", [_vm._v("6 Players")])]
+            [_c("h4", [_vm._v("5 Players")])]
           ),
           _vm._v(" "),
           _c(
@@ -57469,11 +57559,11 @@ var render = function() {
               staticClass: "list-group-item",
               on: {
                 click: function($event) {
-                  return _vm.findGame(8)
+                  return _vm.findGame(7)
                 }
               }
             },
-            [_c("h4", [_vm._v("8 Players")])]
+            [_c("h4", [_vm._v("7 Players")])]
           ),
           _vm._v(" "),
           _c(
@@ -57573,6 +57663,148 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 99 */,
+/* 100 */,
+/* 101 */,
+/* 102 */,
+/* 103 */,
+/* 104 */,
+/* 105 */,
+/* 106 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(30)
+/* script */
+var __vue_script__ = __webpack_require__(107)
+/* template */
+var __vue_template__ = __webpack_require__(108)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/assets/js/components/RoundResults.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-6b8a743f", Component.options)
+  } else {
+    hotAPI.reload("data-v-6b8a743f", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 107 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['results'],
+    data: function data() {
+        return {};
+    },
+    mounted: function mounted() {},
+
+    methods: {}
+});
+
+/***/ }),
+/* 108 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "row" }, [
+    _c("div", { staticClass: "col-sm-4 col-centered" }, [
+      _c(
+        "ul",
+        { staticClass: "list-group" },
+        _vm._l(_vm.results, function(result) {
+          return _c("li", { staticClass: "list-group-item" }, [
+            _c("p", [
+              _vm._v(_vm._s(result.name) + " " + _vm._s(result.last_name))
+            ]),
+            _vm._v(" "),
+            _c("p", [_vm._v(_vm._s(result.combination))]),
+            _vm._v(" "),
+            _c("img", {
+              staticClass: "my-mini-card",
+              attrs: { src: result.first_card }
+            }),
+            _vm._v(" "),
+            _c("img", {
+              staticClass: "my-mini-card",
+              attrs: { src: result.second_card }
+            }),
+            _vm._v(" "),
+            result.winner
+              ? _c("i", {
+                  staticClass: "fas fa-star fa-2x",
+                  staticStyle: { color: "#F4EE1F" }
+                })
+              : _vm._e()
+          ])
+        }),
+        0
+      )
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-6b8a743f", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

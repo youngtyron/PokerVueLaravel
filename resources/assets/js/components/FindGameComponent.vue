@@ -5,9 +5,9 @@
                 <h4 class="light-text text-center">Select the number of players</h4>
                     <ul class="list-group">
                         <li class="list-group-item" @click="findGame(2)"><h4>2 Players</h4></li>
-                        <li class="list-group-item" @click="findGame(4)"><h4>4 Players</h4></li>
-                        <li class="list-group-item" @click="findGame(6)"><h4>6 Players</h4></li>
-                        <li class="list-group-item" @click="findGame(8)"><h4>8 Players</h4></li>
+                        <li class="list-group-item" @click="findGame(3)"><h4>3 Players</h4></li>
+                        <li class="list-group-item" @click="findGame(5)"><h4>5 Players</h4></li>
+                        <li class="list-group-item" @click="findGame(7)"><h4>7 Players</h4></li>
                         <li class="list-group-item" @click="findGame(0)"><h4>Any Number</h4></li>
                     </ul>
 

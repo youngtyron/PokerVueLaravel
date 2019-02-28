@@ -58,7 +58,7 @@ class GameController extends Controller
                        'community'=>$game->communityArray(),
                        'player'=>$game->my_playerArray($player->id, $round->phase));
       if ($round->phase == 'shotdown'){
-        $gameArr += ['winner'=>$round->winner()];
+        $gameArr += ['results'=>$round->results()];
       }
       return $gameArr;
     }
@@ -171,7 +171,7 @@ class GameController extends Controller
                       'turn'=>$turn, 'call'=>$call_required, 'community'=>$communityarr, 'message'=>$message, 
                       'bet_type'=>$bet_type, 'previous'=>$previous, 'gamer'=>$p->id);
         if ($round->phase == 'shotdown'){
-          $data += ['winner'=>$round->winner()];
+          $data += ['winner'=>$round->winner()]; 
         }
         event(new DeskCommonEvent($data));
       }

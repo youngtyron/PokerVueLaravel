@@ -1,6 +1,8 @@
 <?php
 
 namespace App;
+use Carbon\Carbon;
+use Cache;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,11 +18,40 @@ class Round extends Model
     $players = Player::where('game_id', $this->game_id)->where('passing', 0)->get();
     return $players;
   }
+  public function writeCache(){
+    $expiresAt = Carbon::now()->addMinutes(10);
+    $data = array('bank'=>$this->bank, 
+                  'results'=>$this->results());
+    Cache::put('round.'.$this->id, $data, $expiresAt);  
+    return true;
+  }
+  public function returnCache(){
+    if (Cache::has('round.'.$this->id))
+      {
+          $value = Cache::get('round.'.$this->id);
+          return $value;
+      }
+    else{
+      return false;
+    }
+  }
+  public function results(){
+    $results = array();
+    $winner_id = $this->winner();
+    foreach ($this->players() as $player){
+      $player_info = $player->infoArray();
+      if ($player->id == $winner_id){
+        $player_info += ['winner'=>true];
+      }
+      array_push($results, $player_info);
+    }
+    return $results;
+  }
   public function combinations(){
     $combinations = array();
     $rates = array();
     foreach ($this->players() as $player) {
-      array_push($combinations, array('player'=>$player->user->name, 'rate'=>$player->hand->combination()));
+      array_push($combinations, array('player'=>$player->user->id, 'rate'=>$player->hand->combination()));
       array_push($rates, $player->hand->combination());
     }
     $combinations += ['rates'=>$rates];
@@ -37,7 +68,7 @@ class Round extends Model
         $max = max($rates);
         foreach ($combinations as $combination) {
           if ($combination['rate']==$max){
-            $winner = array('player'=>$combination['player'], 'combination'=>$combination['rate']);
+            $winner = $combination['player'];
             break;
           }
         }

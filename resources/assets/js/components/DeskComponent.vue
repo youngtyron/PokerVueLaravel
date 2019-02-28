@@ -1,47 +1,63 @@
 <template>
     <div class="container-fluid">
+        <RoundResultsSlot v-if="game.phase=='shotdown'" :results='this.results'></RoundResultsSlot>
         <div class="row">
-              <div class="col">
-                <span v-if="game.bank">Bank: {{game.bank}}</span>
-                <span v-else>Bank is empty</span>
-                <ul class="list-group">
-                  <li class="list-group-item" v-for="opponent in opponents" :id='opponent.id'>
+          <div class="col-md-4 col-centered">
+              <span class="text-center" v-if="game.bank">Bank: {{game.bank}}</span>
+              <span class="text-center" v-else>Bank is empty</span>
+<!--               <button class="btn btn-info" v-if="game.phase=='shotdown'">Leave the game</button>
+ -->          </div>
+        </div>
+        <div class="row" id='game-row'>
+              <div class="col-md-3">
+                <div class="player-box" v-model='player'>
+                  <h4 class="player-box-text">{{player.name}} {{player.last_name}}</h4>
+                  <h4 class="player-box-text">Money: {{player.money}}</h4>
+                  <p>
+                    <img v-if="player.first_card" class="my-mini-card" :src="player.first_card" />
+                    <img v-if="player.second_card" class="my-mini-card" :src="player.second_card" />
+                  </p>
+                  <p>
+                    <button type="button" class="chip-button" @click="addToken(5)">5</button>
+                    <button type="button" class="chip-button" @click="addToken(10)">10</button>
+                    <button type="button" class="chip-button" @click="addToken(25)">25</button>
+                    <button type="button" class="chip-button" @click="addToken(50)">50</button>
+                    <button type="button" class="chip-button" @click="addToken(100)">100</button>
+                  </p>
+                  <p class="player-box-text">Current bet: {{bets}}</p>
+                  <button type="button" class="bet-button" @click="makeBet(bets)">Bet</button>
+                  <button type="button" class="clear-button" @click="clearBets">Clear</button>
+                </div>
+              </div>
+               <div class="col-md-6">
+                  <div class="list-group-item" v-for="opponent in opponents" :id='opponent.id'>
                     <h4 class="player-box-text">{{opponent.name}} {{opponent.last_name}}</h4>
                     <img v-if="opponent.first_card" class="my-mini-card" src="cards/back.jpg" />
                     <img v-if="opponent.second_card" class="my-mini-card" src="cards/back.jpg" />
-                  </li>
-                </ul>
- 
-<!--                 <button type="button" class="btn btn-primary" @click="startGame">Start game</button>
- -->           </div>
-        </div>
-        <div class="row">
-              <div v-if="community" class="community-cards" style="backgroung-color: grey;">
-                <p>Community cards</p>
-                <img v-if="community.first_card" class="mini-card" :src="community.first_card" />
-                <img v-if="community.second_card" class="mini-card" :src="community.second_card" />
-                <img v-if="community.third_card" class="mini-card" :src="community.third_card" />
-                <img v-if="community.fourth_card" class="mini-card" :src="community.fourth_card" />
-                <img v-if="community.fifth_card" class="mini-card" :src="community.fifth_card" />
-              </div>
+                  </div>
+               </div>
 
-             <div class="player-box" v-model='player'>
-              <h4 class="player-box-text">{{player.name}} {{player.last_name}}</h4>
-              <img v-if="player.first_card" class="my-mini-card" :src="player.first_card" />
-              <img v-if="player.second_card" class="my-mini-card" :src="player.second_card" />
-              <input class="chip" type="image" src="/chips/1.png"  @click="addToken(1)"/>
-              <input class="chip" type="image" src="/chips/5.png" @click="addToken(5)"/>
-              <input class="chip" type="image" src="/chips/25.png" @click="addToken(25)"/>
-              <input class="chip" type="image" src="/chips/100.png" @click="addToken(100)"/>
-              <button type="button" class="btn btn-primary" @click="makeBet(bets)">{{bets}}</button>
-            </div>
+               <div class="col-md-3">
+                  <div v-if="community" class="community-cards" style="backgroung-color: grey;">
+                    <p>Community cards</p>
+                    <img v-if="community.first_card" class="mini-card" :src="community.first_card" />
+                    <img v-if="community.second_card" class="mini-card" :src="community.second_card" />
+                    <img v-if="community.third_card" class="mini-card" :src="community.third_card" />
+                    <img v-if="community.fourth_card" class="mini-card" :src="community.fourth_card" />
+                    <img v-if="community.fifth_card" class="mini-card" :src="community.fifth_card" />
+                  </div>
+               </div>
         </div>
     </div>
 </template>
 
 <script>
+    import RoundResultsSlot from './RoundResults.vue'
     export default {
         props: ['match', 'gamer'],
+        components: {
+          RoundResultsSlot,
+        },
         data(){
           return {
             player: '',
@@ -49,7 +65,9 @@
             community: [],
             bets: 0,
             winner: [],
-            opponents: []
+            opponents: [],
+            call: '',
+            results: [],
           }
         },
         computed: {
@@ -64,10 +82,10 @@
               if (data.other == "blinds_done"){
                 alert("Blinds is done!")
               }
-              console.log(data)
               this.game = data.game
               this.player = data.player
               this.opponents = data.opponents
+              this.call = data.call
               this.community = data.community
               if (this.gamer == data.turn){
                 if (data.bet_type=='raise'){
@@ -80,15 +98,11 @@
                   alert(data.previous.name + ' calls with ' + data.previous.bet + '!')
                 }
               }
-              if (this.game.phase == 'shotdown'){
-                this.winner = data.winner
-                // alert (this.winner.player + ' wins!')
-              }
+
             });
         },
         methods: {
           startGame(){
-            // console.log('start')
             axios.post('/blinds', {match: this.match}).then((response)=> {
               if (response.data.other == "blinds_done"){
                 alert("Blinds is done!")
@@ -102,17 +116,17 @@
           },
           loadGame: function(){
             axios.get('/loadgame').then((response)=> {
-              // console.log(response.data)
               this.player = response.data.player
               this.opponents = response.data.opponents
               this.game = response.data.game
+              this.call = response.data.call
               this.community = response.data.community
-              if (this.gamer == response.data.turn){
+              this.results = response.data.results
+              if (this.gamer == response.data.turn && this.game.phase!='shotdown'){
                 alert("Your turn!")
               }
-              if (this.game.phase == 'shotdown'){
-                this.winner = response.data.winner
-                // alert (this.winner.player + ' wins!')
+              if (this.game.phase=='shotdown'){
+                document.getElementById('game-row').style.display = 'none';
               }
             })
             .catch((error)=>{
@@ -129,9 +143,11 @@
             else{
               axios.post('/bet', {bet: bet, match: this.match})
                 .then((response)=> {
+                this.bets = 0;
                 console.log(response.data)      
                 this.player = response.data.player
                 this.opponents = response.data.opponents
+                this.call = response.data.call
                 this.game = response.data.game
                 this.community = response.data.community
               });
@@ -142,7 +158,7 @@
               this.players = response.data
             });
           },
-          cleatBets(){
+          clearBets(){
             this.bets = 0;
           },
           passRound(){
@@ -152,6 +168,7 @@
                 // console.log(response.data)      
                 this.game = response.data.game
                 this.community = response.data.community
+                this.call = response.data.call
                 this.player = response.data.player
                 this.opponents = response.data.opponents
               });
