@@ -1,12 +1,12 @@
 <template>
     <div class="container-fluid">
-        <RoundResultsSlot v-if="game.phase=='shotdown'" :results='this.results'></RoundResultsSlot>
-        <div class="row">
+        <RoundResultsSlot v-if="roundend" :results='this.results' :bank="this.bank" :community="this.community_cards"></RoundResultsSlot>
+        <button v-if="roundend" type="button" class="btn btn-info" @click = 'nextRound'>Next Round</button>
+        <div class="row" id="bank-row">
           <div class="col-md-4 col-centered">
               <span class="text-center" v-if="game.bank">Bank: {{game.bank}}</span>
               <span class="text-center" v-else>Bank is empty</span>
-<!--               <button class="btn btn-info" v-if="game.phase=='shotdown'">Leave the game</button>
- -->          </div>
+          </div>
         </div>
         <div class="row" id='game-row'>
               <div class="col-md-3">
@@ -45,7 +45,7 @@
                     <img v-if="community.third_card" class="mini-card" :src="community.third_card" />
                     <img v-if="community.fourth_card" class="mini-card" :src="community.fourth_card" />
                     <img v-if="community.fifth_card" class="mini-card" :src="community.fifth_card" />
-                  </div>
+                  </div>  
                </div>
         </div>
     </div>
@@ -68,6 +68,9 @@
             opponents: [],
             call: '',
             results: [],
+            bank: 0,
+            community_cards: [],
+            roundend: false
           }
         },
         computed: {
@@ -79,23 +82,33 @@
           this.loadGame();
           this.channel
             .listen('DeskCommonEvent', ({data})=>{
-              if (data.other == "blinds_done"){
-                alert("Blinds is done!")
+              if (data.end){
+                this.roundend = true
+                this.results = data.results.results 
+                this.bank = data.results.bank 
+                this.community_cards = data.results.community 
+                document.getElementById('game-row').style.display = 'none';
+                document.getElementById('bank-row').style.display = 'none';
               }
-              this.game = data.game
-              this.player = data.player
-              this.opponents = data.opponents
-              this.call = data.call
-              this.community = data.community
-              if (this.gamer == data.turn){
-                if (data.bet_type=='raise'){
-                  alert(data.previous.name + ' raises to ' + data.previous.bet + '!')
+              else{
+                if (data.other == "blinds_done"){
+                  alert("Blinds is done!")
                 }
-                else if(data.bet_type=='bet'){
-                  alert(data.previous.name + ' bets ' + data.previous.bet + '!')
-                }
-                else if(data.bet_type=='call'){
-                  alert(data.previous.name + ' calls with ' + data.previous.bet + '!')
+                this.game = data.game
+                this.player = data.player
+                this.opponents = data.opponents
+                this.call = data.call
+                this.community = data.community
+                if (this.gamer == data.turn){
+                  if (data.bet_type=='raise'){
+                    alert(data.previous.name + ' raises to ' + data.previous.bet + '!')
+                  }
+                  else if(data.bet_type=='bet'){
+                    alert(data.previous.name + ' bets ' + data.previous.bet + '!')
+                  }
+                  else if(data.bet_type=='call'){
+                    alert(data.previous.name + ' calls with ' + data.previous.bet + '!')
+                  }
                 }
               }
 
@@ -107,27 +120,32 @@
               if (response.data.other == "blinds_done"){
                 alert("Blinds is done!")
               }
-              if (response.data.other == "blinds_done"){
-                alert("Blinds is done!")
-              }
               this.game = response.data.game
               this.players = response.data.players
             });
           },
           loadGame: function(){
-            axios.get('/loadgame').then((response)=> {
-              this.player = response.data.player
-              this.opponents = response.data.opponents
-              this.game = response.data.game
-              this.call = response.data.call
-              this.community = response.data.community
-              this.results = response.data.results
-              if (this.gamer == response.data.turn && this.game.phase!='shotdown'){
-                alert("Your turn!")
-              }
-              if (this.game.phase=='shotdown'){
+              axios.get('/loadgame').then((response)=> {
+              console.log(response.data)
+              if (response.data.end){
+                this.roundend = true
+                this.results = response.data.results.results 
+                this.bank = response.data.results.bank 
+                this.community_cards = response.data.results.community 
                 document.getElementById('game-row').style.display = 'none';
+                document.getElementById('bank-row').style.display = 'none';
               }
+              else{
+                this.player = response.data.player
+                this.opponents = response.data.opponents
+                this.game = response.data.game
+                this.call = response.data.call
+                this.community = response.data.community
+                if (this.gamer == response.data.turn){
+                  alert("Your turn!")
+                }
+              }
+
             })
             .catch((error)=>{
               console.log(error);
@@ -144,12 +162,22 @@
               axios.post('/bet', {bet: bet, match: this.match})
                 .then((response)=> {
                 this.bets = 0;
-                console.log(response.data)      
-                this.player = response.data.player
-                this.opponents = response.data.opponents
-                this.call = response.data.call
-                this.game = response.data.game
-                this.community = response.data.community
+                console.log(response.data)   
+                if (response.data.end){
+                  this.roundend = true
+                  this.results = response.data.results.results 
+                  this.bank = response.data.results.bank 
+                  this.community_cards = response.data.results.community 
+                  document.getElementById('game-row').style.display = 'none';
+                  document.getElementById('bank-row').style.display = 'none';
+                }   
+                else{
+                  this.player = response.data.player
+                  this.opponents = response.data.opponents
+                  this.call = response.data.call
+                  this.game = response.data.game
+                  this.community = response.data.community
+                }
               });
             }
           },
@@ -173,6 +201,12 @@
                 this.opponents = response.data.opponents
               });
           },
+          nextRound(){
+            axios.post('/nextround').then((response)=> {
+              console.log(response.data)
+              this.loadGame();
+            });
+          }
         }
     }
 </script>

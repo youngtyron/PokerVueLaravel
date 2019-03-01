@@ -19,6 +19,7 @@ Auth::routes();
 Route::get('/findgame', 'GameController@findgame')->name('findgame')->middleware('auth');
 Route::get('/game', 'GameController@index')->name('game')->middleware('auth');
 Route::get('/loadgame', 'GameController@loadgame')->middleware('auth');
+Route::post('/nextround', 'GameController@nextround')->middleware('auth');
 Route::post('/blinds', 'GameController@blinds')->middleware('auth');
 Route::post('/bet', 'GameController@bet')->middleware('auth');
 Route::post('/pass', 'GameController@pass')->middleware('auth');

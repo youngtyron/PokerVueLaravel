@@ -50,16 +50,22 @@ class GameController extends Controller
       $player = $request->user()->player;
       $game = $player->game;
       $round = $game->round;
-      $round->playersArrangement();
-      $playersArr = $game->playersArray($player->id, $round->phase);
-      $gameArr = array('game' => $game->gameArray(),
-                       'opponents'=>$playersArr,
-                       'turn'=>$game->round->current_player_id,
-                       'community'=>$game->communityArray(),
-                       'player'=>$game->my_playerArray($player->id, $round->phase));
-      if ($round->phase == 'shotdown'){
-        $gameArr += ['results'=>$round->results()];
+      if ($round->phase ==  'shotdown'){
+        $gameArr = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$player->id, 'match_id'=>$game->id);
       }
+      else{
+        $round->playersArrangement();
+        if ($round->phase == 'blind-bets'){
+          $round->blinds();
+        }
+        $playersArr = $game->playersArray($player->id, $round->phase);
+        $gameArr = array('game' => $game->gameArray(),
+                         'opponents'=>$playersArr,
+                         'turn'=>$game->round->current_player_id,
+                         'community'=>$game->communityArray(),
+                         'player'=>$game->my_playerArray($player->id, $round->phase));
+      }
+
       return $gameArr;
     }
     public function pass(Request $request){
@@ -165,20 +171,30 @@ class GameController extends Controller
       $communityarr = $game->communityArray();
       $gamearr = $game->gameArray();
       $previous = array('name'=>$player->user->name, 'bet'=>$bet_amount);
+      if ($round->phase == 'shotdown'){
+        $round->writeCache();
+      }
       foreach ($game->players as $p) {
-        $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($p->id, $round->phase),
-                      'opponents'=>$game->playersArray($p->id, $round->phase), 'match_id'=>$game->id, 
-                      'turn'=>$turn, 'call'=>$call_required, 'community'=>$communityarr, 'message'=>$message, 
-                      'bet_type'=>$bet_type, 'previous'=>$previous, 'gamer'=>$p->id);
         if ($round->phase == 'shotdown'){
-          $data += ['winner'=>$round->winner()]; 
+          $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
+        }
+        else{
+          $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($p->id, $round->phase),
+                        'opponents'=>$game->playersArray($p->id, $round->phase), 'match_id'=>$game->id, 
+                        'turn'=>$turn, 'call'=>$call_required, 'community'=>$communityarr, 'message'=>$message, 
+                        'bet_type'=>$bet_type, 'previous'=>$previous, 'gamer'=>$p->id);
         }
         event(new DeskCommonEvent($data));
       }
-      $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($player->id, $round->phase),
-                      'opponents'=>$game->playersArray($player->id, $round->phase), 'match_id'=>$game->id, 
-                      'turn'=>$turn, 'call'=>$call_required, 'community'=>$communityarr, 'message'=>$message, 
-                      'bet_type'=>$bet_type, 'previous'=>$previous, 'gamer'=>$p->id);
+      if ($round->phase == 'shotdown'){
+        $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
+      }
+      else{
+        $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($player->id, $round->phase),
+                        'opponents'=>$game->playersArray($player->id, $round->phase), 'match_id'=>$game->id, 
+                        'turn'=>$turn, 'call'=>$call_required, 'community'=>$communityarr, 'message'=>$message, 
+                        'bet_type'=>$bet_type, 'previous'=>$previous, 'gamer'=>$p->id);
+      }
       return $data;
     }
     public function blinds(Request $request){
@@ -198,5 +214,26 @@ class GameController extends Controller
         event(new DeskCommonEvent($data));
       }
       return $data;
+    }
+    public function nextround(Request $request){
+      $player = $request->user()->player;
+      $game = $player->game;
+      $round = $game->round;
+      if ($round->phase == 'shotdown'){
+        $winner = Player::find($round->winner());
+        $winner->money = $winner->money + $round->bank;
+        $winner->save();
+        $round->delete();
+        $players = $game->players();
+        foreach ($players as $p) {
+          $p->hand->delete();
+          $p->passing = 0;
+          $p->last_bet = Null;
+          $p->save();
+        }
+        // $newround = new Round(array('game_id'=>$game->id));
+        // $newround->save();
+      }
+      return 'true';
     }
 }

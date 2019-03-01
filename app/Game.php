@@ -3,6 +3,8 @@
 namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Player;
+use Cache;
+
 
 class Game extends Model
 {
@@ -17,6 +19,16 @@ class Game extends Model
   public function round()
   {
     return $this->hasOne('App\Round');
+  }
+  public function returnCache(){
+    if (Cache::has('result.'.$this->id))
+      {
+          $value = Cache::get('result.'.$this->id);
+          return $value;
+      }
+    else{
+      return false;
+    }
   }
   public function my_playerArray($id, $phase){
     $me = Player::find($id);

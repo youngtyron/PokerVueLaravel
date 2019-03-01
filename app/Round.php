@@ -3,6 +3,7 @@
 namespace App;
 use Carbon\Carbon;
 use Cache;
+use App\Player;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,22 +20,23 @@ class Round extends Model
     return $players;
   }
   public function writeCache(){
-    $expiresAt = Carbon::now()->addMinutes(10);
+    $expiresAt = Carbon::now()->addMinutes(100);
     $data = array('bank'=>$this->bank, 
-                  'results'=>$this->results());
-    Cache::put('round.'.$this->id, $data, $expiresAt);  
+                  'results'=>$this->results(),
+                  'community'=>$this->community_cards());
+    Cache::put('result.'.$this->game->id, $data, $expiresAt);  
     return true;
   }
-  public function returnCache(){
-    if (Cache::has('round.'.$this->id))
-      {
-          $value = Cache::get('round.'.$this->id);
-          return $value;
-      }
-    else{
-      return false;
-    }
-  }
+  // public function returnCache(){
+  //   if (Cache::has('round.'.$this->id))
+  //     {
+  //         $value = Cache::get('round.'.$this->id);
+  //         return $value;
+  //     }
+  //   else{
+  //     return false;
+  //   }
+  // }
   public function results(){
     $results = array();
     $winner_id = $this->winner();
@@ -46,6 +48,14 @@ class Round extends Model
       array_push($results, $player_info);
     }
     return $results;
+  }
+  public function community_cards(){
+    $array = array('first_card'=>'/cards/'.$this->first_card.'.png',
+                  'second_card'=>'/cards/'.$this->second_card.'.png',
+                  'third_card'=>'/cards/'.$this->third_card.'.png',
+                  'fourth_card'=>'/cards/'.$this->fourth_card.'.png',
+                  'fifth_card'=>'/cards/'.$this->fifth_card.'.png');
+    return $array;
   }
   public function combinations(){
     $combinations = array();
@@ -78,6 +88,19 @@ class Round extends Model
         return null;
       }
     }
+  }
+  public function blinds(){
+    // $this->playersArrangement();
+    $small_blind = Player::find($this->small_blind_id);
+    $small_blind->money = $small_blind->money - 5;
+    $small_blind->save();
+    $big_blind = Player::find($this->big_blind_id);
+    $big_blind->money = $big_blind->money - 10;
+    $big_blind->save();
+    $this->bank = 15;
+    $this->save();
+    $this->dealPreflop();
+    return true;
   }
   public function zeroRound(){
      $this->current_player_id = $this->small_blind_id;
