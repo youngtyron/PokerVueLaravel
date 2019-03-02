@@ -27,16 +27,6 @@ class Round extends Model
     Cache::put('result.'.$this->game->id, $data, $expiresAt);  
     return true;
   }
-  // public function returnCache(){
-  //   if (Cache::has('round.'.$this->id))
-  //     {
-  //         $value = Cache::get('round.'.$this->id);
-  //         return $value;
-  //     }
-  //   else{
-  //     return false;
-  //   }
-  // }
   public function results(){
     $results = array();
     $winner_id = $this->winner();

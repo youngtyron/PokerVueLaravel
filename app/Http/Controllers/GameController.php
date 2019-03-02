@@ -188,6 +188,19 @@ class GameController extends Controller
       }
       if ($round->phase == 'shotdown'){
         $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
+        $winner = Player::find($round->winner());
+        $winner->money = $winner->money + $round->bank;
+        $winner->save();
+        $round->delete();
+        $gameplayers = $game->players;
+        foreach ($gameplayers as $p) {
+          $p->hand->delete();
+          $p->passing = 0;
+          $p->last_bet = Null;
+          $p->save();
+        }
+        $newround = new Round(array('game_id'=>$game->id));
+        $newround->save();
       }
       else{
         $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($player->id, $round->phase),
@@ -231,8 +244,8 @@ class GameController extends Controller
           $p->last_bet = Null;
           $p->save();
         }
-        // $newround = new Round(array('game_id'=>$game->id));
-        // $newround->save();
+        $newround = new Round(array('game_id'=>$game->id));
+        $newround->save();
       }
       return 'true';
     }
