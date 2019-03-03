@@ -133,10 +133,24 @@ class GameController extends Controller
         $next = $round->nextMover($current_index);
         if (is_null($next)){
           $round->nextStep();
-        }
-        else{
           $next = $players->find($round->small_blind_id);
         }
+        else{
+          if ($next->last_bet<$round->max_bet){
+            $minimum = $round->max_bet - $next->last_bet;
+          }
+        }
+        if ($bet>$round->max_bet and $round->max_bet!=0){
+          $message = $player->user->name. ' '.$player->user->last_name. 'raises to '. (string)$bet. '!';
+        }
+        else if ($round->max_bet==0){
+          $message = $player->user->name. ' '.$player->user->last_name. 'bets '. (string)$bet. '!';
+        }
+        else{
+          $message = $player->user->name. ' '.$player->user->last_name. 'calls with '. (string)$bet. '!';
+        }
+        $communityarr = $game->communityArray();
+        $gamearr = $game->gameArray();
       }
     }
     // public function bet(Request $request){
