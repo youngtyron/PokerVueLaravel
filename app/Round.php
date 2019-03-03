@@ -31,7 +31,7 @@ class Round extends Model
     $player->money = $player->money - $bet;
     $player->last_bet = $player->last_bet+$bet;
     $player->save();
-    if ($this->betted < count($this->players)){
+    if ($this->betted < count($this->players())){
       $this->betted += 1;
     }
     if ($player->last_bet > $this->max_bet){

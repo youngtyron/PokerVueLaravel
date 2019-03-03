@@ -124,7 +124,7 @@ class GameController extends Controller
       }
       else{
         $current = $players->find($round->current_player_id);
-        foreach ($extendedPlayers as $index => $p) {
+        foreach ($players as $index => $p) {
           if ($p->id == $current->id){
             $current_index = $index;
             break;
@@ -140,17 +140,36 @@ class GameController extends Controller
             $minimum = $round->max_bet - $next->last_bet;
           }
         }
-        if ($bet>$round->max_bet and $round->max_bet!=0){
-          $message = $player->user->name. ' '.$player->user->last_name. 'raises to '. (string)$bet. '!';
-        }
-        else if ($round->max_bet==0){
-          $message = $player->user->name. ' '.$player->user->last_name. 'bets '. (string)$bet. '!';
+        if ($round->phase=='shutdown'){
+          $round->writeCache();
+          foreach ($game->players as $p){
+            $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
+            event(new DeskCommonEvent($data));
+          }
         }
         else{
-          $message = $player->user->name. ' '.$player->user->last_name. 'calls with '. (string)$bet. '!';
+          if ($bet>$round->max_bet and $round->max_bet!=0){
+            $message = $player->user->name. ' '.$player->user->last_name. ' raises to '. (string)$bet. '!';
+          }
+          else if ($round->max_bet==0){
+            $message = $player->user->name. ' '.$player->user->last_name. ' bets '. (string)$bet. '!';
+          }
+          else{
+            $message = $player->user->name. ' '.$player->user->last_name. ' calls with '. (string)$bet. '!';
+          }
+          $communityarr = $game->communityArray();
+          $gamearr = $game->gameArray();
+          foreach ($game->players as $p){
+              $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($p->id, $round->phase),
+                'opponents'=>$game->playersArray($p->id), 'match_id'=>$game->id, 'community'=>$communityarr, 'message'=>$message, 
+                'gamer'=>$p->id, 'loosers'=>$loosers);
+              if ($p == $next){
+                $data += ['next'=>true, 'minimum'=>$minimum];
+              }
+              event(new DeskCommonEvent($data));
+          }
+          return $data;
         }
-        $communityarr = $game->communityArray();
-        $gamearr = $game->gameArray();
       }
     }
     // public function bet(Request $request){

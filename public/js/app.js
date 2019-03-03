@@ -53889,23 +53889,37 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         document.getElementById('game-row').style.display = 'none';
         document.getElementById('bank-row').style.display = 'none';
       } else {
-        if (data.other == "blinds_done") {
-          alert("Blinds is done!");
-        }
         _this.game = data.game;
         _this.player = data.player;
         _this.opponents = data.opponents;
-        _this.call = data.call;
         _this.community = data.community;
-        if (_this.gamer == data.turn) {
-          if (data.bet_type == 'raise') {
-            alert(data.previous.name + ' raises to ' + data.previous.bet + '!');
-          } else if (data.bet_type == 'bet') {
-            alert(data.previous.name + ' bets ' + data.previous.bet + '!');
-          } else if (data.bet_type == 'call') {
-            alert(data.previous.name + ' calls with ' + data.previous.bet + '!');
-          }
+        alert(data.message);
+        if (data.next) {
+          alert('Your turn! Mininmal bet is ' + data.minimum);
         }
+        if (data.loosers) {
+          console.log('loosers!');
+        }
+
+        // if (data.other == "blinds_done"){
+        //   alert("Blinds is done!")
+        // }
+        // this.game = data.game
+        // this.player = data.player
+        // this.opponents = data.opponents
+        // this.call = data.call
+        // this.community = data.community
+        // if (this.gamer == data.turn){
+        //   if (data.bet_type=='raise'){
+        //     alert(data.previous.name + ' raises to ' + data.previous.bet + '!')
+        //   }
+        //   else if(data.bet_type=='bet'){
+        //     alert(data.previous.name + ' bets ' + data.previous.bet + '!')
+        //   }
+        //   else if(data.bet_type=='call'){
+        //     alert(data.previous.name + ' calls with ' + data.previous.bet + '!')
+        //   }
+        // }
       }
     });
   },
@@ -53970,11 +53984,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             document.getElementById('game-row').style.display = 'none';
             document.getElementById('bank-row').style.display = 'none';
           } else {
+            // this.player = response.data.player
+            // this.opponents = response.data.opponents
+            // this.call = response.data.call
+            // this.game = response.data.game
+            // this.community = response.data.community
+            _this4.game = response.data.game;
             _this4.player = response.data.player;
             _this4.opponents = response.data.opponents;
-            _this4.call = response.data.call;
-            _this4.game = response.data.game;
             _this4.community = response.data.community;
+            if (data.next) {
+              alert('Your turn!');
+            }
+            if (data.loosers) {
+              console.log('loosers!');
+            }
           }
         });
       }

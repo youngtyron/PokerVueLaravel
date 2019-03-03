@@ -91,25 +91,37 @@
                 document.getElementById('bank-row').style.display = 'none';
               }
               else{
-                if (data.other == "blinds_done"){
-                  alert("Blinds is done!")
-                }
                 this.game = data.game
                 this.player = data.player
                 this.opponents = data.opponents
-                this.call = data.call
                 this.community = data.community
-                if (this.gamer == data.turn){
-                  if (data.bet_type=='raise'){
-                    alert(data.previous.name + ' raises to ' + data.previous.bet + '!')
-                  }
-                  else if(data.bet_type=='bet'){
-                    alert(data.previous.name + ' bets ' + data.previous.bet + '!')
-                  }
-                  else if(data.bet_type=='call'){
-                    alert(data.previous.name + ' calls with ' + data.previous.bet + '!')
-                  }
+                alert(data.message)
+                if(data.next){
+                  alert('Your turn! Mininmal bet is '+ data.minimum)
                 }
+                if (data.loosers){
+                  console.log('loosers!')
+                }
+
+                // if (data.other == "blinds_done"){
+                //   alert("Blinds is done!")
+                // }
+                // this.game = data.game
+                // this.player = data.player
+                // this.opponents = data.opponents
+                // this.call = data.call
+                // this.community = data.community
+                // if (this.gamer == data.turn){
+                //   if (data.bet_type=='raise'){
+                //     alert(data.previous.name + ' raises to ' + data.previous.bet + '!')
+                //   }
+                //   else if(data.bet_type=='bet'){
+                //     alert(data.previous.name + ' bets ' + data.previous.bet + '!')
+                //   }
+                //   else if(data.bet_type=='call'){
+                //     alert(data.previous.name + ' calls with ' + data.previous.bet + '!')
+                //   }
+                // }
               }
 
             });
@@ -172,11 +184,21 @@
                   document.getElementById('bank-row').style.display = 'none';
                 }   
                 else{
-                  this.player = response.data.player
-                  this.opponents = response.data.opponents
-                  this.call = response.data.call
-                  this.game = response.data.game
-                  this.community = response.data.community
+                  // this.player = response.data.player
+                  // this.opponents = response.data.opponents
+                  // this.call = response.data.call
+                  // this.game = response.data.game
+                  // this.community = response.data.community
+                    this.game = response.data.game
+                    this.player = response.data.player
+                    this.opponents = response.data.opponents
+                    this.community = response.data.community
+                    if(data.next){
+                      alert('Your turn!')
+                    }
+                    if (data.loosers){
+                      console.log('loosers!')
+                    }
                 }
               });
             }
