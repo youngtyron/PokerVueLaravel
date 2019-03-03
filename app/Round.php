@@ -27,6 +27,19 @@ class Round extends Model
     Cache::put('result.'.$this->game->id, $data, $expiresAt);  
     return true;
   }
+  public function registerBet($player, $bet){
+    $player->money = $player->money - $bet;
+    $player->last_bet = $player->last_bet+$bet;
+    $player->save();
+    if ($this->betted < count($this->players)){
+      $this->betted += 1;
+    }
+    if ($player->last_bet > $this->max_bet){
+      $this->max_bet = $player->last_bet;
+    }
+    $this->bank = $this->bank + $bet;
+    $this->save();
+  }
   public function results(){
     $results = array();
     $winner_id = $this->winner();
@@ -125,6 +138,23 @@ class Round extends Model
     }
     return $deck;
   }
+  public function nextMover($current_index){
+    $players = $this->players();
+    $next = Null;
+    for($i = 1; $i<count($players)+1; ++$i){
+      if ($current_index+$i >= count($players)){
+        $cycle_index = 0;
+      }
+      else{
+        $cycle_index = $current_index+$i;
+      }
+      if ($players[$cycle_index]->last_bet < $this->max_bet){
+        $next = $players[$cycle_index];
+        break;
+      }
+    }
+    return $next;
+  }
   public function whoMustCallNext(){
     $next = null;
     $players = $this->players();
@@ -159,10 +189,10 @@ class Round extends Model
     }
   }
   public function nextStep(){
-    if ($this->phase == 'blind-bets'){
-      $this->dealPreflop();
-    }
-    else if ($this->phase == 'preflop'){
+    // if ($this->phase == 'blind-bets'){
+    //   $this->dealPreflop();
+    // }
+    if ($this->phase == 'preflop'){
       $this->dealFlop();
     }
     else if ($this->phase == 'flop'){
@@ -173,9 +203,12 @@ class Round extends Model
     }
     else if ($this->phase == 'river'){
       $this->phase = 'shotdown';
-      $this->save();
     }
-    return true;
+    $this->current_player_id = $this->small_blind_id;
+    $this->betted = 0;
+    $this->max_bet = 0;
+    $this->save();
+    // return true;
   }
   public function dealPreflop(){
     $players = $this->game->players;
@@ -295,4 +328,5 @@ class Round extends Model
     }
     return true;
   }
+
 }

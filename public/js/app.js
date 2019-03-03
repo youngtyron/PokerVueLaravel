@@ -54311,7 +54311,7 @@ var render = function() {
                     attrs: { type: "button" },
                     on: {
                       click: function($event) {
-                        return _vm.addToken(100)
+                        return _vm.addToken(5000)
                       }
                     }
                   },

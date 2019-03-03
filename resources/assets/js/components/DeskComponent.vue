@@ -22,7 +22,7 @@
                     <button type="button" class="chip-button" @click="addToken(10)">10</button>
                     <button type="button" class="chip-button" @click="addToken(25)">25</button>
                     <button type="button" class="chip-button" @click="addToken(50)">50</button>
-                    <button type="button" class="chip-button" @click="addToken(100)">100</button>
+                    <button type="button" class="chip-button" @click="addToken(5000)">100</button>
                   </p>
                   <p class="player-box-text">Current bet: {{bets}}</p>
                   <button type="button" class="bet-button" @click="makeBet(bets)">Bet</button>
