@@ -53846,6 +53846,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -53861,7 +53866,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       bets: 0,
       winner: [],
       opponents: [],
-      call: '',
+      next: false,
       results: [],
       bank: 0,
       community_cards: [],
@@ -53895,7 +53900,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         _this.community = data.community;
         alert(data.message);
         if (data.next) {
-          alert('Your turn! Mininmal bet is ' + data.minimum);
+          _this.next = true;
+          if (data.minimum) {
+            alert('Your turn! Mininmal bet is ' + data.minimum);
+          } else {
+            alert('Your turn!');
+          }
         }
         if (data.loosers) {
           console.log('loosers!');
@@ -53941,7 +53951,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var _this3 = this;
 
       axios.get('/loadgame').then(function (response) {
-        console.log(response.data);
+        // console.log(response.data)
         if (response.data.end) {
           _this3.roundend = true;
           _this3.results = response.data.results.results;
@@ -53954,6 +53964,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           _this3.opponents = response.data.opponents;
           _this3.game = response.data.game;
           _this3.call = response.data.call;
+          if (_this3.gamer == response.data.turn) {
+            _this3.next = true;
+          }
           _this3.community = response.data.community;
           if (_this3.gamer == response.data.turn) {
             alert("Your turn!");
@@ -53970,11 +53983,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     makeBet: function makeBet(bet) {
       var _this4 = this;
 
+      console.log('start bet');
       if (bet + this.player.last_bet < this.game.max_bet) {
         alert('Your bet is too small');
       } else {
         axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
           _this4.bets = 0;
+          console.log('end bet');
           console.log(response.data);
           if (response.data.end) {
             _this4.roundend = true;
@@ -53993,10 +54008,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             _this4.player = response.data.player;
             _this4.opponents = response.data.opponents;
             _this4.community = response.data.community;
-            if (data.next) {
+            if (response.data.next) {
               alert('Your turn!');
+              _this4.next = true;
+            } else {
+              _this4.next = false;
             }
-            if (data.loosers) {
+            if (response.data.loosers) {
               console.log('loosers!');
             }
           }
@@ -54271,105 +54289,109 @@ var render = function() {
                   : _vm._e()
               ]),
               _vm._v(" "),
-              _c("p", [
-                _c(
-                  "button",
-                  {
-                    staticClass: "chip-button",
-                    attrs: { type: "button" },
-                    on: {
-                      click: function($event) {
-                        return _vm.addToken(5)
-                      }
-                    }
-                  },
-                  [_vm._v("5")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "chip-button",
-                    attrs: { type: "button" },
-                    on: {
-                      click: function($event) {
-                        return _vm.addToken(10)
-                      }
-                    }
-                  },
-                  [_vm._v("10")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "chip-button",
-                    attrs: { type: "button" },
-                    on: {
-                      click: function($event) {
-                        return _vm.addToken(25)
-                      }
-                    }
-                  },
-                  [_vm._v("25")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "chip-button",
-                    attrs: { type: "button" },
-                    on: {
-                      click: function($event) {
-                        return _vm.addToken(50)
-                      }
-                    }
-                  },
-                  [_vm._v("50")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "chip-button",
-                    attrs: { type: "button" },
-                    on: {
-                      click: function($event) {
-                        return _vm.addToken(5000)
-                      }
-                    }
-                  },
-                  [_vm._v("100")]
-                )
-              ]),
-              _vm._v(" "),
-              _c("p", { staticClass: "player-box-text" }, [
-                _vm._v("Current bet: " + _vm._s(_vm.bets))
-              ]),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "bet-button",
-                  attrs: { type: "button" },
-                  on: {
-                    click: function($event) {
-                      return _vm.makeBet(_vm.bets)
-                    }
-                  }
-                },
-                [_vm._v("Bet")]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "clear-button",
-                  attrs: { type: "button" },
-                  on: { click: _vm.clearBets }
-                },
-                [_vm._v("Clear")]
-              )
+              _vm.next
+                ? _c("div", [
+                    _c("p", [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "chip-button",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.addToken(5)
+                            }
+                          }
+                        },
+                        [_vm._v("5")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "chip-button",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.addToken(10)
+                            }
+                          }
+                        },
+                        [_vm._v("10")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "chip-button",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.addToken(25)
+                            }
+                          }
+                        },
+                        [_vm._v("25")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "chip-button",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.addToken(50)
+                            }
+                          }
+                        },
+                        [_vm._v("50")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "chip-button",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.addToken(5000)
+                            }
+                          }
+                        },
+                        [_vm._v("100")]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("p", { staticClass: "player-box-text" }, [
+                      _vm._v("Current bet: " + _vm._s(_vm.bets))
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "bet-button",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.makeBet(_vm.bets)
+                          }
+                        }
+                      },
+                      [_vm._v("Bet")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "clear-button",
+                        attrs: { type: "button" },
+                        on: { click: _vm.clearBets }
+                      },
+                      [_vm._v("Clear")]
+                    )
+                  ])
+                : _c("div", [_c("p", [_vm._v("DISABLED")])])
             ]
           )
         ]),

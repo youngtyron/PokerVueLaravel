@@ -134,11 +134,17 @@ class GameController extends Controller
         if (is_null($next)){
           $round->nextStep();
           $next = $players->find($round->small_blind_id);
+          $minimum = false;
         }
         else{
+          $round->current_player_id = $next->id;
+          $round->save();
           if ($next->last_bet<$round->max_bet){
             $minimum = $round->max_bet - $next->last_bet;
           }
+          // else{
+          //   $minimum = false;
+          // }
         }
         if ($round->phase=='shutdown'){
           $round->writeCache();
@@ -168,6 +174,9 @@ class GameController extends Controller
               }
               event(new DeskCommonEvent($data));
           }
+          $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($player->id, $round->phase),
+                'opponents'=>$game->playersArray($player->id), 'match_id'=>$game->id, 'community'=>$communityarr, 'message'=>$message, 
+                'gamer'=>$player->id, 'loosers'=>$loosers);
           return $data;
         }
       }

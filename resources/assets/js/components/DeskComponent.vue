@@ -17,16 +17,21 @@
                     <img v-if="player.first_card" class="my-mini-card" :src="player.first_card" />
                     <img v-if="player.second_card" class="my-mini-card" :src="player.second_card" />
                   </p>
-                  <p>
-                    <button type="button" class="chip-button" @click="addToken(5)">5</button>
-                    <button type="button" class="chip-button" @click="addToken(10)">10</button>
-                    <button type="button" class="chip-button" @click="addToken(25)">25</button>
-                    <button type="button" class="chip-button" @click="addToken(50)">50</button>
-                    <button type="button" class="chip-button" @click="addToken(5000)">100</button>
-                  </p>
-                  <p class="player-box-text">Current bet: {{bets}}</p>
-                  <button type="button" class="bet-button" @click="makeBet(bets)">Bet</button>
-                  <button type="button" class="clear-button" @click="clearBets">Clear</button>
+                  <div v-if='next'>
+                    <p>
+                      <button type="button" class="chip-button" @click="addToken(5)">5</button>
+                      <button type="button" class="chip-button" @click="addToken(10)">10</button>
+                      <button type="button" class="chip-button" @click="addToken(25)">25</button>
+                      <button type="button" class="chip-button" @click="addToken(50)">50</button>
+                      <button type="button" class="chip-button" @click="addToken(5000)">100</button>
+                    </p>
+                    <p class="player-box-text">Current bet: {{bets}}</p>
+                    <button type="button" class="bet-button" @click="makeBet(bets)">Bet</button>
+                    <button type="button" class="clear-button" @click="clearBets">Clear</button>
+                  </div>
+                  <div v-else>
+                    <p>DISABLED</p>
+                  </div>
                 </div>
               </div>
                <div class="col-md-6">
@@ -66,7 +71,7 @@
             bets: 0,
             winner: [],
             opponents: [],
-            call: '',
+            next: false,
             results: [],
             bank: 0,
             community_cards: [],
@@ -97,7 +102,13 @@
                 this.community = data.community
                 alert(data.message)
                 if(data.next){
-                  alert('Your turn! Mininmal bet is '+ data.minimum)
+                  this.next = true;
+                  if (data.minimum){
+                    alert('Your turn! Mininmal bet is '+ data.minimum)
+                  }
+                  else{
+                    alert('Your turn!')
+                  }
                 }
                 if (data.loosers){
                   console.log('loosers!')
@@ -138,7 +149,7 @@
           },
           loadGame: function(){
               axios.get('/loadgame').then((response)=> {
-              console.log(response.data)
+              // console.log(response.data)
               if (response.data.end){
                 this.roundend = true
                 this.results = response.data.results.results 
@@ -152,6 +163,9 @@
                 this.opponents = response.data.opponents
                 this.game = response.data.game
                 this.call = response.data.call
+                if (this.gamer == response.data.turn){
+                  this.next = true;
+                }
                 this.community = response.data.community
                 if (this.gamer == response.data.turn){
                   alert("Your turn!")
@@ -167,6 +181,7 @@
             this.bets = this.bets + token;
           },
           makeBet: function(bet){
+            console.log('start bet')
             if (bet + this.player.last_bet < this.game.max_bet){
               alert('Your bet is too small')
             }
@@ -174,6 +189,7 @@
               axios.post('/bet', {bet: bet, match: this.match})
                 .then((response)=> {
                 this.bets = 0;
+                console.log('end bet')
                 console.log(response.data)   
                 if (response.data.end){
                   this.roundend = true
@@ -193,10 +209,14 @@
                     this.player = response.data.player
                     this.opponents = response.data.opponents
                     this.community = response.data.community
-                    if(data.next){
+                    if(response.data.next){
                       alert('Your turn!')
+                      this.next = true;
                     }
-                    if (data.loosers){
+                    else{
+                      this.next = false;
+                    }
+                    if (response.data.loosers){
                       console.log('loosers!')
                     }
                 }

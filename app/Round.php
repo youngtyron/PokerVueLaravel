@@ -105,17 +105,6 @@ class Round extends Model
     $this->dealPreflop();
     return true;
   }
-  public function zeroRound(){
-     $this->current_player_id = $this->small_blind_id;
-     $this->betted = 0;
-     $this->max_bet = 0;
-     $this->save();
-     foreach ($this->players() as $p){
-       $p->last_bet = null;
-       $p->save();
-     }
-     return true;
-  }
   public function generateDeck(){
     $deck = array();
     for ($r = 1; $r<14; $r++){
@@ -208,7 +197,10 @@ class Round extends Model
     $this->betted = 0;
     $this->max_bet = 0;
     $this->save();
-    // return true;
+    foreach ($this->players() as $p){
+      $p->last_bet = null;
+      $p->save();
+    }
   }
   public function dealPreflop(){
     $players = $this->game->players;
@@ -226,7 +218,6 @@ class Round extends Model
       };
     };
     $this->phase = 'preflop';
-    $this->zeroRound();
     $this->save();
     return true;
   }
@@ -250,7 +241,6 @@ class Round extends Model
     $this->second_card = $second;
     $this->third_card = $third;
     $this->phase = 'flop';
-    $this->zeroRound();
     $this->save();
     return true;
   }
@@ -270,7 +260,6 @@ class Round extends Model
     $fourth = $turn[array_rand($turn, 1)];
     $this->fourth_card = $fourth;
     $this->phase = 'turn';
-    $this->zeroRound();
     $this->save();
     return true;
   }
@@ -291,7 +280,6 @@ class Round extends Model
     $fifth = $river[array_rand($river, 1)];
     $this->fifth_card = $fifth;
     $this->phase = 'river';
-    $this->zeroRound();
     $this->save();
     return true;
   }
