@@ -19,18 +19,26 @@
                   </p>
                   <div v-if='next'>
                     <p>
-                      <button type="button" class="chip-button" @click="addToken(5)">5</button>
-                      <button type="button" class="chip-button" @click="addToken(10)">10</button>
-                      <button type="button" class="chip-button" @click="addToken(25)">25</button>
-                      <button type="button" class="chip-button" @click="addToken(50)">50</button>
-                      <button type="button" class="chip-button" @click="addToken(5000)">100</button>
+                      <i class="fas fa-coins fa-2x" style="color: black;" @click="addToken(5)">5</i>
+                      <i class="fas fa-coins fa-2x" style="color: black;" @click="addToken(10)">10</i>
+                      <i class="fas fa-coins fa-2x" style="color: black;" @click="addToken(25)">25</i>
+                      <i class="fas fa-coins fa-2x" style="color: black;" @click="addToken(50)">50</i>
+                      <i class="fas fa-coins fa-2x" style="color: black;" @click="addToken(100)">100</i>
                     </p>
                     <p class="player-box-text">Current bet: {{bets}}</p>
                     <button type="button" class="bet-button" @click="makeBet(bets)">Bet</button>
                     <button type="button" class="clear-button" @click="clearBets">Clear</button>
                   </div>
                   <div v-else>
-                    <p>DISABLED</p>
+                    <!-- <p>DISABLED</p>
+ -->              
+                    <p>
+                      <i class="fas fa-coins fa-2x" style="color: black; opacity: 0.3;">5</i>
+                      <i class="fas fa-coins fa-2x" style="color: black; opacity: 0.3;">10</i>
+                      <i class="fas fa-coins fa-2x" style="color: black; opacity: 0.3;">25</i>
+                      <i class="fas fa-coins fa-2x" style="color: black; opacity: 0.3;">50</i>
+                      <i class="fas fa-coins fa-2x" style="color: black; opacity: 0.3;">100</i>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -182,6 +190,7 @@
           },
           makeBet: function(bet){
             console.log('start bet')
+            this.next = false;
             if (bet + this.player.last_bet < this.game.max_bet){
               alert('Your bet is too small')
             }

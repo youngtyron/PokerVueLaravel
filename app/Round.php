@@ -144,39 +144,39 @@ class Round extends Model
     }
     return $next;
   }
-  public function whoMustCallNext(){
-    $next = null;
-    $players = $this->players();
-    $extendedPlayers = $this->game->players;
-    $current = Player::find($this->current_player_id);
-    foreach ($extendedPlayers as $index => $p) {
-      if ($p->id == $current->id){
-        $current_index = $index;
-      }
-    }
-    for($i = 1; $i<count($players)+1; ++$i){
-      if ($current_index+$i >= count($players)){
-        $cycle_index = 0;
-        if ($players[$cycle_index]->last_bet < $this->max_bet){
-          $next = $players[$cycle_index];
-          break;
-        }
-      }
-      else{
-        $cycle_index = $current_index+$i;
-        if ($players[$cycle_index]->last_bet < $this->max_bet){
-          $next = $players[$cycle_index];
-          break;
-        }
-      }
-    }
-    if ($next){
-      return $next;
-    }
-    else {
-      return null;
-    }
-  }
+  // public function whoMustCallNext(){
+  //   $next = null;
+  //   $players = $this->players();
+  //   $extendedPlayers = $this->game->players;
+  //   $current = Player::find($this->current_player_id);
+  //   foreach ($extendedPlayers as $index => $p) {
+  //     if ($p->id == $current->id){
+  //       $current_index = $index;
+  //     }
+  //   }
+  //   for($i = 1; $i<count($players)+1; ++$i){
+  //     if ($current_index+$i >= count($players)){
+  //       $cycle_index = 0;
+  //       if ($players[$cycle_index]->last_bet < $this->max_bet){
+  //         $next = $players[$cycle_index];
+  //         break;
+  //       }
+  //     }
+  //     else{
+  //       $cycle_index = $current_index+$i;
+  //       if ($players[$cycle_index]->last_bet < $this->max_bet){
+  //         $next = $players[$cycle_index];
+  //         break;
+  //       }
+  //     }
+  //   }
+  //   if ($next){
+  //     return $next;
+  //   }
+  //   else {
+  //     return null;
+  //   }
+  // }
   public function nextStep(){
     // if ($this->phase == 'blind-bets'){
     //   $this->dealPreflop();
