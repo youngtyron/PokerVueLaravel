@@ -22,7 +22,7 @@ Route::get('/loadgame', 'GameController@loadgame')->middleware('auth');
 Route::post('/nextround', 'GameController@nextround')->middleware('auth');
 Route::post('/blinds', 'GameController@blinds')->middleware('auth');
 Route::post('/bet', 'GameController@bet')->middleware('auth');
-Route::post('/pass', 'GameController@pass')->middleware('auth');
+Route::post('/fold', 'GameController@fold')->middleware('auth');
 Route::post('/search', 'GameController@search_game')->middleware('auth');
 
 

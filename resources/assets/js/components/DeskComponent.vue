@@ -121,26 +121,6 @@
                 if (data.loosers){
                   console.log('loosers!')
                 }
-
-                // if (data.other == "blinds_done"){
-                //   alert("Blinds is done!")
-                // }
-                // this.game = data.game
-                // this.player = data.player
-                // this.opponents = data.opponents
-                // this.call = data.call
-                // this.community = data.community
-                // if (this.gamer == data.turn){
-                //   if (data.bet_type=='raise'){
-                //     alert(data.previous.name + ' raises to ' + data.previous.bet + '!')
-                //   }
-                //   else if(data.bet_type=='bet'){
-                //     alert(data.previous.name + ' bets ' + data.previous.bet + '!')
-                //   }
-                //   else if(data.bet_type=='call'){
-                //     alert(data.previous.name + ' calls with ' + data.previous.bet + '!')
-                //   }
-                // }
               }
 
             });
@@ -157,7 +137,7 @@
           },
           loadGame: function(){
               axios.get('/loadgame').then((response)=> {
-              // console.log(response.data)
+              console.log(response.data)
               if (response.data.end){
                 this.roundend = true
                 this.results = response.data.results.results 
@@ -240,9 +220,9 @@
           clearBets(){
             this.bets = 0;
           },
-          passRound(){
+          fold(){
             console.log("I'm passing")
-              axios.post('/pass', {match: this.match})
+              axios.post('/fold', {match: this.match})
                 .then((response)=> {
                 // console.log(response.data)      
                 this.game = response.data.game

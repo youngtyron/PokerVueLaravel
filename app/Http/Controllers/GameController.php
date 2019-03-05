@@ -58,11 +58,9 @@ class GameController extends Controller
         $gameArr = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$player->id, 'match_id'=>$game->id);
       }
       else{
-        $round->playersArrangement();
         if ($round->phase == 'blind-bets'){
-          $round->blinds();
+          $round->settleQueue();
         }
-        // $playersArr = $game->playersArray($player->id, $round->phase);
         $playersArr = $game->playersArray($player->id);
         $gameArr = array('game' => $game->gameArray(),
                          'opponents'=>$playersArr,
@@ -74,41 +72,65 @@ class GameController extends Controller
 
       return $gameArr;
     }
-    public function pass(Request $request){
+    public function fold(Request $request){
       $player = $request->user()->player;
       $game = $player->game;
       $player->passing = 1;
       $player->save();
       $round = $game->round;
-      $players = $round->players();
-      if ($round->betted>= count($players)){
-        $winner = $round->winner();
-        if ($winner){
-          $answer = 'Winner is: ' . $winner->user->name;
-        }
-        else{
-          ////WhoMustCAllNEXT больше не существует, заменить
-          $turn_player = $round->whoMustCallNext();
-          if (is_null($turn_player)){
-            $answer = 'Game continues, next round';
-          }
-          else {
-            $turn = $turn_player->id;
-            $round->current_player_id = $turn_player->id;
-            $call = $round->max_bet - $turn_player->last_bet;
-            $answer = 'Game continues, '.$turn_player->user->name . ' should bet ' . $call;
-          }
-        }
-      }
-      else{
-        $answer = 'Game continues, this round';
-      }
-      //УВЕЛИЧИТЬ BETTED
       if ($player->last_bet==Null){
         $round->betted +=1;
       }
       $round->save();
-      return $answer;
+      $players = $round->players();
+      if (count($players)==1){
+        $round->writeCache();
+        foreach ($game->players as $p){
+          $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
+          event(new DeskCommonEvent($data));
+        }
+        return $data;
+      }
+      else{
+        $next = $round->nextMover($current_index);
+        if (is_null($next)){
+          $round->nextStep();
+          $next = $players->find($round->small_blind_id);
+          $minimum = false;
+        }
+        else{
+          $round->current_player_id = $next->id;
+          $round->save();
+          if ($next->last_bet<$round->max_bet){
+            $minimum = $round->max_bet - $next->last_bet;
+          }
+          if ($round->phase=='shutdown'){
+            $round->writeCache();
+            foreach ($game->players as $p){
+              $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
+              event(new DeskCommonEvent($data));
+            }
+          }
+          else{
+            $message = $player->user->name. ' '. $player->user->last_name. ' folds!';
+            $communityarr = $game->communityArray();
+            $gamearr = $game->gameArray();
+            foreach ($game->players as $p){
+              $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($p->id, $round->phase),
+                'opponents'=>$game->playersArray($p->id), 'match_id'=>$game->id, 'community'=>$communityarr, 'message'=>$message, 
+                'gamer'=>$p->id, 'loosers'=>$loosers);
+              if ($p == $next){
+                $data += ['next'=>true, 'minimum'=>$minimum];
+              }
+              event(new DeskCommonEvent($data));
+            }
+            $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($player->id, $round->phase),
+                'opponents'=>$game->playersArray($player->id), 'match_id'=>$game->id, 'community'=>$communityarr, 'message'=>$message, 
+                'gamer'=>$player->id, 'loosers'=>$loosers);
+            return $data;
+          }
+        }
+      }
     }
     public function bet(Request $request){
       $bet = $request->input('bet');
@@ -128,13 +150,7 @@ class GameController extends Controller
       }
       else{
         $current = $players->find($round->current_player_id);
-        foreach ($players as $index => $p) {
-          if ($p->id == $current->id){
-            $current_index = $index;
-            break;
-          }
-        }
-        $next = $round->nextMover($current_index);
+        $next = $round->nextMover($current);
         if (is_null($next)){
           $round->nextStep();
           $next = $players->find($round->small_blind_id);
@@ -146,11 +162,11 @@ class GameController extends Controller
           if ($next->last_bet<$round->max_bet){
             $minimum = $round->max_bet - $next->last_bet;
           }
-          // else{
-          //   $minimum = false;
-          // }
+          else{
+            $minimum = false;
+          }
         }
-        if ($round->phase=='shutdown'){
+        if ($round->phase=='shotdown'){
           $round->writeCache();
           foreach ($game->players as $p){
             $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);

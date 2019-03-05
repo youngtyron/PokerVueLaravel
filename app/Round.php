@@ -64,12 +64,13 @@ class Round extends Model
     $combinations = array();
     $rates = array();
     foreach ($this->players() as $player) {
-      array_push($combinations, array('player'=>$player->user->id, 'rate'=>$player->hand->combination()));
+      array_push($combinations, array('player'=>$player->id, 'rate'=>$player->hand->combination()));
       array_push($rates, $player->hand->combination());
     }
     $combinations += ['rates'=>$rates];
     return $combinations;
   }
+  // public function compare
   public function winner(){
     if (count($this->players())==1){
       return $this->players()[0];
@@ -81,6 +82,7 @@ class Round extends Model
         $max = max($rates);
         foreach ($combinations as $combination) {
           if ($combination['rate']==$max){
+            ///ЗДЕСЬ НАДО ЗАПИСЫВАТЬ ВСЕХ С ВЫСШИМ РЕЙТИНГОМ В МАССИВ КОТОРЫЙ БУДЕТ СРАВНИВАТЬСЯ ПО ВЫСШЕЙ КАРТЕ
             $winner = $combination['player'];
             break;
           }
@@ -127,60 +129,35 @@ class Round extends Model
     }
     return $deck;
   }
-  public function nextMover($current_index){
-    $players = $this->players();
+  public function nextMover($current){
+    $players = $this->game->players;
+    $ex_turn = $current->turn;
     $next = Null;
-    for($i = 1; $i<count($players)+1; ++$i){
-      if ($current_index+$i >= count($players)){
-        $cycle_index = 0;
+    if ($ex_turn==count($players)){
+      $turn = 1;
+    }
+    else{
+      $turn = $ex_turn + 1;
+    }
+    for ($i=0; $i < count($players); $i++) { 
+      $player = Player::where('game_id', $this->game_id)->where('turn', $turn)->first();
+      if ($player->passing == 0 and ($player->last_bet == Null or $player->last_bet<$this->max_bet)){
+        $next = $player;
+        break;
       }
       else{
-        $cycle_index = $current_index+$i;
-      }
-      if ($players[$cycle_index]->last_bet < $this->max_bet){
-        $next = $players[$cycle_index];
-        break;
+        if ($turn+1==count($players)){
+          $turn = 1;
+        }
+        else{
+          $turn +=1;
+        }
       }
     }
     return $next;
   }
-  // public function whoMustCallNext(){
-  //   $next = null;
-  //   $players = $this->players();
-  //   $extendedPlayers = $this->game->players;
-  //   $current = Player::find($this->current_player_id);
-  //   foreach ($extendedPlayers as $index => $p) {
-  //     if ($p->id == $current->id){
-  //       $current_index = $index;
-  //     }
-  //   }
-  //   for($i = 1; $i<count($players)+1; ++$i){
-  //     if ($current_index+$i >= count($players)){
-  //       $cycle_index = 0;
-  //       if ($players[$cycle_index]->last_bet < $this->max_bet){
-  //         $next = $players[$cycle_index];
-  //         break;
-  //       }
-  //     }
-  //     else{
-  //       $cycle_index = $current_index+$i;
-  //       if ($players[$cycle_index]->last_bet < $this->max_bet){
-  //         $next = $players[$cycle_index];
-  //         break;
-  //       }
-  //     }
-  //   }
-  //   if ($next){
-  //     return $next;
-  //   }
-  //   else {
-  //     return null;
-  //   }
-  // }
+
   public function nextStep(){
-    // if ($this->phase == 'blind-bets'){
-    //   $this->dealPreflop();
-    // }
     if ($this->phase == 'preflop'){
       $this->dealFlop();
     }
@@ -283,38 +260,31 @@ class Round extends Model
     $this->save();
     return true;
   }
-  public function playersArrangement(){
-    if ($this->phase == 'blind-bets' and !$this->button_id){
-      $players = $this->game->players;
-      $button = $players[array_rand($players->toArray(), 1)];
-      $button_index = array_search($button, $players->all());
-      if ($button_index+1 == count($players)){
-        $small_blind_index = 0;
+  public function settleQueue(){
+    $players = $this->game->players;
+    $button = $players[array_rand($players->toArray(), 1)];
+    $index = array_search($button, $players->all());
+    $this->button_id = $button->id;
+    $this->save();
+    $turn = 1;
+    while ($turn <= count($players)){
+      if ($index+1 == count($players)){
+        $index = 0;
       }
       else{
-        $small_blind_index = $button_index + 1;
+        $index = $index+1;
       }
-      if ($small_blind_index+1 == count($players)){
-        $big_blind_index = 0;
+      $player = $players[$index];
+      $player->turn = $turn;
+      $player->save();
+      if($turn == 1){
+        $this->small_blind_id = $player->id;
       }
-      else{
-        $big_blind_index = $small_blind_index + 1;
+      else if ($turn == 2){
+        $this->big_blind_id = $player->id;
       }
-      $small_blind = $players[$small_blind_index];
-      $big_blind = $players[$big_blind_index];
-      $this->small_blind_id = $small_blind->id;
-      $this->big_blind_id = $big_blind->id;
-      $this->button_id = $button->id;
-      if ($big_blind_index+1 == count($players)){
-        $current_player_index = 0;
-      }
-      else{
-        $current_player_index = $big_blind_index + 1;
-      }
-      $this->current_player_id = $players[$current_player_index]->id;
       $this->save();
+      $turn +=1;
     }
-    return true;
   }
-
 }
