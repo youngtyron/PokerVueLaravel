@@ -19,6 +19,7 @@ class Round extends Model
     $players = Player::where('game_id', $this->game_id)->where('passing', 0)->get();
     return $players;
   }
+
   public function writeCache(){
     $expiresAt = Carbon::now()->addMinutes(100);
     $data = array('bank'=>$this->bank, 
@@ -52,6 +53,93 @@ class Round extends Model
     }
     return $results;
   }
+  // public function prepareToCompare($id_array){
+  //   $array = array();
+  //   foreach ($id_array as $id) {
+  //     $player = Player::find($id);
+  //     array_push($array, array('player' => $id, 'hand'=>$player->hand));
+  //   }
+  //   return $array;
+  // }
+  // public function maxCardOwners($handsarray){
+  //   $max_array = array();
+  //   $extendedArray = array();
+  //   foreach ($handsarray as $hand) {
+  //     $cards = $player->hand->allcards_array();
+  //     $ranks = $hand['hand'];
+  //     $max = $hand['hand']->highestCard($ranks);
+  //     array_push($extendedArray, array('player'=>$hand['player'], 'max'=>$max, 'hand'=>$hand['hand']));
+  //     array_push($max_array, $max);
+  //   }
+  //   $max = max($max_array);
+  //   $search_array = array();
+  //   foreach ($extendedArray as $hand) {
+  //     if ($hand['max']==$max){
+  //       array_push($search_array, $hand);
+  //     }
+  //   }
+  //   return $search_array;
+  // }
+  // public function compareHands($compareArr){
+  //   $preps = $this->prepareToCompare($compareArr);
+  //   while (true) {
+  //     $compared = $this->maxCardOwners($preps);
+  //     if (count($compared)==1){
+  //       $winner = $compared[0]['player'];
+  //       break;
+  //     }
+  //     else{
+  //       foreach ($preps as $prep) {
+  //         $max = max($prep['hand']);
+  //         $hand = $prep['hand'];
+  //         $index = array_search($max, $hand);
+  //         array_slice($hand, $index, 1);
+  //         $prep['hand']=$hand;
+  //       }
+  //     }
+  //   }
+
+  //   return $winner;
+  // }
+  public function maxHands($handsArr){
+    $i = 0;
+    while ($i<7){
+      $max = 0;
+      $maxers = array();
+      foreach ($handsArr as $hand) {
+        $highest = $hand->highestCard($i);
+        if ($highest>$max){
+          $max  = $highest;
+          $maxers = array();
+          array_push($maxers, $hand);
+        }
+        else if ($highest==$max){
+          array_push($maxers, $hand);
+        }
+      }
+      if (count($maxers)==1){
+        break;
+      }
+      else{
+        $handsArr = $maxers;
+        $i += 1;
+      }
+    }
+    return $maxers;
+  }
+  public function compareHands($compareArr){
+    $handsArr = array();
+    foreach ($compareArr as $item) {
+      $player = $this->players()->find($item);
+      array_push($handsArr, $player->hand);
+    }
+    $maxHands = $this->maxHands($handsArr);
+    $winners = array();
+    foreach ($maxHands as $h) {
+      array_push($winners, $h->player_id);
+    }
+    return $winners;
+  }
   public function community_cards(){
     $array = array('first_card'=>'/cards/'.$this->first_card.'.png',
                   'second_card'=>'/cards/'.$this->second_card.'.png',
@@ -70,7 +158,6 @@ class Round extends Model
     $combinations += ['rates'=>$rates];
     return $combinations;
   }
-  // public function compare
   public function winner(){
     if (count($this->players())==1){
       return $this->players()[0];
@@ -80,12 +167,18 @@ class Round extends Model
         $combinations = $this->combinations();
         $rates = $combinations['rates'];
         $max = max($rates);
-        foreach ($combinations as $combination) {
-          if ($combination['rate']==$max){
-            ///ЗДЕСЬ НАДО ЗАПИСЫВАТЬ ВСЕХ С ВЫСШИМ РЕЙТИНГОМ В МАССИВ КОТОРЫЙ БУДЕТ СРАВНИВАТЬСЯ ПО ВЫСШЕЙ КАРТЕ
-            $winner = $combination['player'];
-            break;
+        array_slice($combinations, 2, 1);
+        $compareArr = array();
+        for ($i=0; $i < count($combinations)-1; $i++) { 
+          if ($combinations[$i]['rate']==$max){
+            array_push($compareArr, $combinations[$i]['player']);
           }
+        }
+        if (count($compareArr)==1){
+          $winner = $compareArr[0];
+        }
+        else{
+          $winner = $this->compareHands($compareArr);
         }
         return $winner;
       }
@@ -262,29 +355,68 @@ class Round extends Model
   }
   public function settleQueue(){
     $players = $this->game->players;
-    $button = $players[array_rand($players->toArray(), 1)];
-    $index = array_search($button, $players->all());
-    $this->button_id = $button->id;
-    $this->save();
-    $turn = 1;
-    while ($turn <= count($players)){
-      if ($index+1 == count($players)){
-        $index = 0;
+    if ($players[0]->turn == Null){
+      $button = $players[array_rand($players->toArray(), 1)];
+      $index = array_search($button, $players->all());
+      $this->button_id = $button->id;
+      $this->save();
+      $turn = 1;
+      while ($turn <= count($players)){
+        if ($index+1 == count($players)){
+          $index = 0;
+        }
+        else{
+          $index = $index+1;
+        }
+        $player = $players[$index];
+        $player->turn = $turn;
+        $player->save();
+        if($turn == 1){
+          $this->small_blind_id = $player->id;
+        }
+        else if ($turn == 2){
+          $this->big_blind_id = $player->id;
+        }
+        if (count($players)>2){
+          $third = $players->where('turn', 3)->first();
+          $this->current_player_id = $third->id;
+        }
+        else{
+          $this->current_player_id = $this->small_blind_id;
+        }
+        $this->save();
+        $turn +=1;
       }
-      else{
-        $index = $index+1;
-      }
-      $player = $players[$index];
-      $player->turn = $turn;
-      $player->save();
-      if($turn == 1){
+    }
+    else{
+      $this->shiftQueue($players);
+    }
+  }  
+  public function shiftQueue($players){
+    foreach ($players as $player) {
+      if ($player->turn == count($players)){
+        $player->turn = 1;
+        $player->save();
         $this->small_blind_id = $player->id;
       }
-      else if ($turn == 2){
-        $this->big_blind_id = $player->id;
+      else{
+        $player->turn = $player->turn + 1;
+        $player->save();
+        if ($player->turn==2){
+          $this->big_blind_id = $player->id;
+        }
+        else if ($player->turn == count($players)){
+          $this->button_id = $player->id;
+        }
       }
-      $this->save();
-      $turn +=1;
     }
+    if (count($players)>2){
+      $third = $players->where('turn', 3)->first();
+      $this->current_player_id = $third->id;
+    }
+    else{
+      $this->current_player_id = $this->small_blind_id;
+    }
+    $this->save();
   }
 }

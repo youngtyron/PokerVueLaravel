@@ -15,8 +15,14 @@ class GameController extends Controller
     {
        $this->middleware('auth');
     }
-    public function findgame(){
-      return view('findgame');
+    public function findgame(Request $request){
+      $player = $request->user()->player;
+      if ($player->game_id == Null){
+        return view('findgame');
+      }
+      else{
+        return redirect()->route('game');
+      }
     }
     public function search_game(Request $request){
       $player = $request->user()->player;
@@ -44,12 +50,36 @@ class GameController extends Controller
       }
     }
     public function index(Request $request){
-      return view('desk', ['match_id'=>$request->user()->player->game->id, 'gamer_id'=>$request->user()->player->id]);
+      $player = $request->user()->player;
+      if ($player->game_id != Null){
+        return view('desk', ['match_id'=>$request->user()->player->game->id, 'gamer_id'=>$request->user()->player->id]);
+      }
+      else{
+        return redirect()->route('findgame');
+      }
+    }
+    public function blinds(Request $request){
+      $player = $request->user()->player;
+      $game = $player->game;
+      $small_blind = Player::find($game->round->small_blind_id);
+      $small_blind->money = $small_blind->money - 5;
+      $small_blind->save();
+      $big_blind = Player::find($game->round->big_blind_id);
+      $big_blind->money = $big_blind->money - 10;
+      $big_blind->save();
+      $game->round->bank = 15;
+      $game->round->save();
+      $game->round->dealPreflop();
+      foreach ($game->players as $p) {
+        $data = array('game'=>$gamearr, 'players'=>$game->playersArray($p->id, $game->round->phase), 'match_id'=>$game->id, 'gamer'=>$p->id);
+        event(new DeskCommonEvent($data));
+      }
+      return $data;
     }
     public function loadgame(Request $request){
       $player = $request->user()->player;
       $game = $player->game;
-
+      $start = false;
       $loosers = $game->excludeLoosers();
 
 
@@ -60,6 +90,18 @@ class GameController extends Controller
       else{
         if ($round->phase == 'blind-bets'){
           $round->settleQueue();
+          $small_blind = Player::find($game->round->small_blind_id);
+          $small_blind->money = $small_blind->money - 5;
+          $small_blind->save();
+          $big_blind = Player::find($game->round->big_blind_id);
+          $big_blind->money = $big_blind->money - 10;
+          $big_blind->save();
+          $game->round->bank = 15;
+          $game->round->save();
+          $game->round->dealPreflop();
+          $start = true;
+          $round->current_player_id = $game->players->where('turn', 3)[0]->id;
+          $round->save();
         }
         $playersArr = $game->playersArray($player->id);
         $gameArr = array('game' => $game->gameArray(),
@@ -67,7 +109,8 @@ class GameController extends Controller
                          'turn'=>$game->round->current_player_id,
                          'community'=>$game->communityArray(),
                          'player'=>$game->my_playerArray($player->id, $round->phase),
-                         'loosers'=>$loosers);
+                         'loosers'=>$loosers,
+                          'start'=>$start);
       }
 
       return $gameArr;
@@ -201,24 +244,7 @@ class GameController extends Controller
         }
       }
     }
-    public function blinds(Request $request){
-      $player = $request->user()->player;
-      $game = $player->game;
-      $small_blind = Player::find($game->round->small_blind_id);
-      $small_blind->money = $small_blind->money - 5;
-      $small_blind->save();
-      $big_blind = Player::find($game->round->big_blind_id);
-      $big_blind->money = $big_blind->money - 10;
-      $big_blind->save();
-      $game->round->bank = 15;
-      $game->round->save();
-      $game->round->dealPreflop();
-      foreach ($game->players as $p) {
-        $data = array('game'=>$gamearr, 'players'=>$game->playersArray($p->id, $game->round->phase), 'match_id'=>$game->id, 'gamer'=>$p->id);
-        event(new DeskCommonEvent($data));
-      }
-      return $data;
-    }
+
     public function nextround(Request $request){
       $player = $request->user()->player;
       $game = $player->game;
@@ -228,7 +254,7 @@ class GameController extends Controller
         $winner->money = $winner->money + $round->bank;
         $winner->save();
         $round->delete();
-        $players = $game->players();
+        $players = $game->players;
         foreach ($players as $p) {
           $p->hand->delete();
           $p->passing = 0;
@@ -238,6 +264,5 @@ class GameController extends Controller
         $newround = new Round(array('game_id'=>$game->id));
         $newround->save();
       }
-      return 'true';
     }
 }

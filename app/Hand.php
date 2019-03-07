@@ -17,6 +17,15 @@ class Hand extends Model
   	$cards = array($this->first_card, $this->second_card, $round->first_card, $round->second_card, $round->third_card, $round->fourth_card, $round->fifth_card);
   	return $cards;
   }
+  public function highestCard($N){
+    $cards = $this->allcards_array();
+    $ranks = $this->ranks($cards);
+    sort($ranks);
+    $end_point = count($ranks) - $N;
+    $ranks = array_slice($ranks, 0, $end_point);
+    $highestCard = max($ranks);
+    return $highestCard;
+  }
   public function allcards_array(){
   	$cards = $this->allcards();
   	$array = array();
@@ -32,7 +41,7 @@ class Hand extends Model
   public function ranks($cards){
   	$ranks = array();
   	foreach ($cards as $card){
-		array_push($ranks , $card['rank']);
+		  array_push($ranks , $card['rank']);
   	}
   	return $ranks;
   }

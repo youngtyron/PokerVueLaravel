@@ -4,8 +4,9 @@
         <button v-if="roundend" type="button" class="btn btn-info" @click = 'nextRound'>Next Round</button>
         <div class="row" id="bank-row">
           <div class="col-md-4 col-centered">
-              <span class="text-center" v-if="game.bank">Bank: {{game.bank}}</span>
-              <span class="text-center" v-else>Bank is empty</span>
+              <p class="text-center" v-if="game.bank">Bank: {{game.bank}}</p>
+              <p class="text-center" v-else>Bank is empty</p>
+              <p class="text-center" v-if="game.bank">Current bet is {{game.max_bet}}</p>
           </div>
         </div>
         <div class="row" id='game-row'>
@@ -13,6 +14,8 @@
                 <div class="player-box" v-model='player'>
                   <h4 class="player-box-text">{{player.name}} {{player.last_name}}</h4>
                   <h4 class="player-box-text">Money: {{player.money}}</h4>
+                  <h5 v-if="player.last_bet" class="player-box-text">My bet in this act is {{player.last_bet}}</h5>
+                  <h5 v-else class="player-box-text">I've not made any bet</h5>
                   <p>
                     <img v-if="player.first_card" class="my-mini-card" :src="player.first_card" />
                     <img v-if="player.second_card" class="my-mini-card" :src="player.second_card" />
@@ -30,8 +33,6 @@
                     <button type="button" class="clear-button" @click="clearBets">Clear</button>
                   </div>
                   <div v-else>
-                    <!-- <p>DISABLED</p>
- -->              
                     <p>
                       <i class="fas fa-coins fa-2x" style="color: black; opacity: 0.3;">5</i>
                       <i class="fas fa-coins fa-2x" style="color: black; opacity: 0.3;">10</i>
@@ -65,6 +66,8 @@
 </template>
 
 <script>
+    import Swal from 'sweetalert2/dist/sweetalert2.js'
+    import 'sweetalert2/src/sweetalert2.scss'
     import RoundResultsSlot from './RoundResults.vue'
     export default {
         props: ['match', 'gamer'],
@@ -108,14 +111,27 @@
                 this.player = data.player
                 this.opponents = data.opponents
                 this.community = data.community
-                alert(data.message)
+                console.log(data.message)
+                Swal.fire({ 
+                    title: data.message,
+                    text: data.message,
+                    confirmButtonText: 'Close'
+                })
                 if(data.next){
                   this.next = true;
                   if (data.minimum){
-                    alert('Your turn! Mininmal bet is '+ data.minimum)
+                    Swal.fire({ 
+                      title: 'Your turn!',
+                      text: 'Mininmal bet is '+ data.minimum,
+                      confirmButtonText: 'Close'
+                    })
                   }
                   else{
-                    alert('Your turn!')
+                    Swal.fire({ 
+                      title: 'Your turn!',
+                      text: 'Now you can make your bet',
+                      confirmButtonText: 'Close'
+                    })
                   }
                 }
                 if (data.loosers){
@@ -138,6 +154,13 @@
           loadGame: function(){
               axios.get('/loadgame').then((response)=> {
               console.log(response.data)
+              if (response.data.start){
+                Swal.fire({ 
+                  title: 'New round!',
+                  text: 'Blinds done!',
+                  confirmButtonText: 'Ok'
+                })
+              }
               if (response.data.end){
                 this.roundend = true
                 this.results = response.data.results.results 
@@ -156,7 +179,11 @@
                 }
                 this.community = response.data.community
                 if (this.gamer == response.data.turn){
-                  alert("Your turn!")
+                  Swal.fire({ 
+                    title: 'Your turn!',
+                    text: 'Now you can make your bet',
+                    confirmButtonText: 'Close'
+                  })
                 }
               }
 
@@ -189,11 +216,6 @@
                   document.getElementById('bank-row').style.display = 'none';
                 }   
                 else{
-                  // this.player = response.data.player
-                  // this.opponents = response.data.opponents
-                  // this.call = response.data.call
-                  // this.game = response.data.game
-                  // this.community = response.data.community
                     this.game = response.data.game
                     this.player = response.data.player
                     this.opponents = response.data.opponents
