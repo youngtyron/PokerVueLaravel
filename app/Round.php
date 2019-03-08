@@ -43,64 +43,16 @@ class Round extends Model
   }
   public function results(){
     $results = array();
-    $winner_id = $this->winner();
+    $winner = $this->winner();
     foreach ($this->players() as $player){
       $player_info = $player->infoArray();
-      if ($player->id == $winner_id){
+      if (in_array($player->id, $winner)){
         $player_info += ['winner'=>true];
       }
       array_push($results, $player_info);
     }
     return $results;
   }
-  // public function prepareToCompare($id_array){
-  //   $array = array();
-  //   foreach ($id_array as $id) {
-  //     $player = Player::find($id);
-  //     array_push($array, array('player' => $id, 'hand'=>$player->hand));
-  //   }
-  //   return $array;
-  // }
-  // public function maxCardOwners($handsarray){
-  //   $max_array = array();
-  //   $extendedArray = array();
-  //   foreach ($handsarray as $hand) {
-  //     $cards = $player->hand->allcards_array();
-  //     $ranks = $hand['hand'];
-  //     $max = $hand['hand']->highestCard($ranks);
-  //     array_push($extendedArray, array('player'=>$hand['player'], 'max'=>$max, 'hand'=>$hand['hand']));
-  //     array_push($max_array, $max);
-  //   }
-  //   $max = max($max_array);
-  //   $search_array = array();
-  //   foreach ($extendedArray as $hand) {
-  //     if ($hand['max']==$max){
-  //       array_push($search_array, $hand);
-  //     }
-  //   }
-  //   return $search_array;
-  // }
-  // public function compareHands($compareArr){
-  //   $preps = $this->prepareToCompare($compareArr);
-  //   while (true) {
-  //     $compared = $this->maxCardOwners($preps);
-  //     if (count($compared)==1){
-  //       $winner = $compared[0]['player'];
-  //       break;
-  //     }
-  //     else{
-  //       foreach ($preps as $prep) {
-  //         $max = max($prep['hand']);
-  //         $hand = $prep['hand'];
-  //         $index = array_search($max, $hand);
-  //         array_slice($hand, $index, 1);
-  //         $prep['hand']=$hand;
-  //       }
-  //     }
-  //   }
-
-  //   return $winner;
-  // }
   public function maxHands($handsArr){
     $i = 0;
     while ($i<7){
@@ -160,7 +112,7 @@ class Round extends Model
   }
   public function winner(){
     if (count($this->players())==1){
-      return $this->players()[0];
+      return $this->players();
     }
     else {
       if ($this->phase == 'shotdown'){
@@ -175,7 +127,7 @@ class Round extends Model
           }
         }
         if (count($compareArr)==1){
-          $winner = $compareArr[0];
+          $winner = $compareArr;
         }
         else{
           $winner = $this->compareHands($compareArr);

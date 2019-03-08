@@ -98,6 +98,7 @@
           this.loadGame();
           this.channel
             .listen('DeskCommonEvent', ({data})=>{
+              console.log(data)
               if (data.end){
                 this.roundend = true
                 this.results = data.results.results 
@@ -111,28 +112,36 @@
                 this.player = data.player
                 this.opponents = data.opponents
                 this.community = data.community
-                console.log(data.message)
-                Swal.fire({ 
-                    title: data.message,
-                    text: data.message,
-                    confirmButtonText: 'Close'
-                })
                 if(data.next){
                   this.next = true;
-                  if (data.minimum){
+                  if (data.minimum && data.message){
                     Swal.fire({ 
-                      title: 'Your turn!',
-                      text: 'Mininmal bet is '+ data.minimum,
+                      title: data.message,
+                      text: 'Your turn! Mininmal bet is '+ data.minimum,
+                      confirmButtonText: 'Close'
+                    })
+                  }
+                  else if (data.message){
+                    Swal.fire({ 
+                      title: data.message,
+                      text: 'Your turn!',
                       confirmButtonText: 'Close'
                     })
                   }
                   else{
                     Swal.fire({ 
-                      title: 'Your turn!',
-                      text: 'Now you can make your bet',
+                      title: data.message,
+                      text: 'Your turn! Now you can make your bet',
                       confirmButtonText: 'Close'
                     })
                   }
+                }
+                else{
+                  Swal.fire({ 
+                      title: data.message,
+                      // text: 'Your turn! Now you can make your bet',
+                      confirmButtonText: 'Close'
+                  })
                 }
                 if (data.loosers){
                   console.log('loosers!')

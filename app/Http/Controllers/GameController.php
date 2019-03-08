@@ -100,8 +100,6 @@ class GameController extends Controller
           $game->round->save();
           $game->round->dealPreflop();
           $start = true;
-          $round->current_player_id = $game->players->where('turn', 3)[0]->id;
-          $round->save();
         }
         $playersArr = $game->playersArray($player->id);
         $gameArr = array('game' => $game->gameArray(),
@@ -250,9 +248,19 @@ class GameController extends Controller
       $game = $player->game;
       $round = $game->round;
       if ($round->phase == 'shotdown'){
-        $winner = Player::find($round->winner());
-        $winner->money = $winner->money + $round->bank;
-        $winner->save();
+        $winners = Player::find($round->winner());
+        if (count($winners)==1){
+          $winner = $winners[0];
+          $winner->money = $winner->money + $round->bank;
+          $winner->save();
+        }
+        else{
+          $share = (int)($round->bank/count($winners));
+          foreach ($winners as $winner) {
+            $winner->money = $winner->money+$share;
+            $winner->save();
+          }
+        }
         $round->delete();
         $players = $game->players;
         foreach ($players as $p) {
