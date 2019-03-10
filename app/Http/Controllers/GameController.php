@@ -7,6 +7,7 @@ use App\Events\DeskCommonEvent;
 use App\Player;
 use App\Game;
 use App\Round;
+use Cache;
 
 
 class GameController extends Controller
@@ -42,6 +43,7 @@ class GameController extends Controller
           $partner->save();
         }
         $round=Round::create(['game_id'=>$game->id]);
+        $round->active = 1;
         $round->save();
         return response()->json(['message' => 'ok'], 200);
       }
@@ -84,31 +86,36 @@ class GameController extends Controller
 
 
       $round = $game->round;
-      if ($round->phase ==  'shotdown'){
-        $gameArr = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$player->id, 'match_id'=>$game->id);
+      if ($round->active==1){
+        if ($round->phase ==  'shotdown'){
+          $gameArr = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$player->id, 'match_id'=>$game->id);
+        }
+        else{
+          if ($round->phase == 'blind-bets'){
+            $round->settleQueue();
+            $small_blind = Player::find($game->round->small_blind_id);
+            $small_blind->money = $small_blind->money - 5;
+            $small_blind->save();
+            $big_blind = Player::find($game->round->big_blind_id);
+            $big_blind->money = $big_blind->money - 10;
+            $big_blind->save();
+            $game->round->bank = 15;
+            $game->round->save();
+            $game->round->dealPreflop();
+            $start = true;
+          }
+          $playersArr = $game->playersArray($player->id);
+          $gameArr = array('game' => $game->gameArray(),
+                           'opponents'=>$playersArr,
+                           'turn'=>$game->round->current_player_id,
+                           'community'=>$game->communityArray(),
+                           'player'=>$game->my_playerArray($player->id, $round->phase),
+                           'loosers'=>$loosers,
+                            'start'=>$start);
+        }
       }
       else{
-        if ($round->phase == 'blind-bets'){
-          $round->settleQueue();
-          $small_blind = Player::find($game->round->small_blind_id);
-          $small_blind->money = $small_blind->money - 5;
-          $small_blind->save();
-          $big_blind = Player::find($game->round->big_blind_id);
-          $big_blind->money = $big_blind->money - 10;
-          $big_blind->save();
-          $game->round->bank = 15;
-          $game->round->save();
-          $game->round->dealPreflop();
-          $start = true;
-        }
-        $playersArr = $game->playersArray($player->id);
-        $gameArr = array('game' => $game->gameArray(),
-                         'opponents'=>$playersArr,
-                         'turn'=>$game->round->current_player_id,
-                         'community'=>$game->communityArray(),
-                         'player'=>$game->my_playerArray($player->id, $round->phase),
-                         'loosers'=>$loosers,
-                          'start'=>$start);
+        $gameArr = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$player->id, 'match_id'=>$game->id);
       }
 
       return $gameArr;
@@ -131,6 +138,9 @@ class GameController extends Controller
           $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id, 'message'=>$message);
           event(new DeskCommonEvent($data));
         }
+        //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
+        $game->moneyToWinner();
+        $game->deleteRound();
         return $data;
       }
       else{
@@ -152,6 +162,10 @@ class GameController extends Controller
               $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
               event(new DeskCommonEvent($data));
             }
+            //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
+            $game->moneyToWinner();
+            $game->deleteRound();
+            return $data;
           }
           else{
             $communityarr = $game->communityArray();
@@ -187,6 +201,10 @@ class GameController extends Controller
           $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
           event(new DeskCommonEvent($data));
         }
+
+        //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
+        $game->moneyToWinner();
+        $game->deleteRound();
         return $data;
       }
       else{
@@ -213,6 +231,10 @@ class GameController extends Controller
             $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
             event(new DeskCommonEvent($data));
           }
+          //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
+          $game->moneyToWinner();
+          $game->deleteRound();
+          return $data;
         }
         else{
           if ($bet>$round->max_bet and $round->max_bet!=0){
@@ -246,32 +268,9 @@ class GameController extends Controller
     public function nextround(Request $request){
       $player = $request->user()->player;
       $game = $player->game;
-      $round = $game->round;
-      if ($round->phase == 'shotdown'){
-        $winners = Player::find($round->winner());
-        if (count($winners)==1){
-          $winner = $winners[0];
-          $winner->money = $winner->money + $round->bank;
-          $winner->save();
-        }
-        else{
-          $share = (int)($round->bank/count($winners));
-          foreach ($winners as $winner) {
-            $winner->money = $winner->money+$share;
-            $winner->save();
-          }
-        }
-        $round->delete();
-        $players = $game->players;
-        foreach ($players as $p) {
-          $p->hand->delete();
-          $p->passing = 0;
-          $p->last_bet = Null;
-          $p->save();
-        }
-        $newround = new Round(array('game_id'=>$game->id));
-        $newround->save();
-      }
+      $game->round->active = 1;
+      $game->round->save();
+      Cache::forget('result.'.$game->id);
     }
     public function leaveGame(Request $request){
       $player = $request->user()->player;

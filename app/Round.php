@@ -43,7 +43,12 @@ class Round extends Model
   }
   public function results(){
     $results = array();
-    $winner = $this->winner()->toArray();
+    if (gettype($this->winner())!='array'){
+      $winner = $this->winner()->toArray();
+    }
+    else {
+      $winner = $this->winner();
+    }
     foreach ($this->game->players as $player){
       $player_info = $player->infoArray();
       if (in_array($player->id, $winner)){

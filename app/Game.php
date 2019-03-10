@@ -3,6 +3,7 @@
 namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Player;
+use App\Round;
 use Cache;
 
 
@@ -19,6 +20,34 @@ class Game extends Model
   public function round()
   {
     return $this->hasOne('App\Round');
+  }
+  public function moneyToWinner(){
+    $round=$this->round;
+    $winners = Player::find($round->winner());
+    if (count($winners)==1){
+      $winner = $winners[0];
+      $winner->money = $winner->money + $round->bank;
+      $winner->save();
+    }
+    else{
+      $share = (int)($round->bank/count($winners));
+      foreach ($winners as $winner) {
+        $winner->money = $winner->money+$share;
+        $winner->save();
+      }
+    }
+  }
+  public function deleteRound(){
+    $this->round->delete();
+    $players = $this->players;
+    foreach ($players as $p) {
+      $p->hand->delete();
+      $p->passing = 0;
+      $p->last_bet = Null;
+      $p->save();
+    }
+    $newround = new Round(array('game_id'=>$this->id));
+    $newround->save();
   }
   public function loosers(){
     $loosers = array();
