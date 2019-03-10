@@ -23,6 +23,7 @@ class Player extends Model
                   'name'=>$this->user->name,
                   'last_name'=>$this->user->last_name,
                   'money'=>$this->money,
+                  'passing'=>$this->passing,
                   'first_card'=>'/cards/'.$this->hand->first_card.'.png',
                   'second_card'=>'/cards/'.$this->hand->second_card.'.png',
                   'combination'=>$this->hand->name_of_combination($this->hand->combination()));

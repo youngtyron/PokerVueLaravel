@@ -31,6 +31,7 @@
                     <p class="player-box-text">Current bet: {{bets}}</p>
                     <button type="button" class="bet-button" @click="makeBet(bets)">Bet</button>
                     <button type="button" class="clear-button" @click="clearBets">Clear</button>
+                    <button type="button" class='btn btn-info' @click="foldRound">Fold</button>
                   </div>
                   <div v-else>
                     <p>
@@ -108,33 +109,29 @@
                 document.getElementById('bank-row').style.display = 'none';
               }
               else{
-                this.game = data.game
-                this.player = data.player
-                this.opponents = data.opponents
-                this.community = data.community
-                if(data.next){
-                  this.next = true;
-                  if (data.minimum && data.message){
-                    Swal.fire({ 
-                      title: data.message,
-                      text: 'Your turn! Mininmal bet is '+ data.minimum,
-                      confirmButtonText: 'Close'
-                    })
-                  }
-                  else if (data.message){
-                    Swal.fire({ 
-                      title: data.message,
-                      text: 'Your turn!',
-                      confirmButtonText: 'Close'
-                    })
-                  }
-                  else{
-                    Swal.fire({ 
-                      title: data.message,
-                      text: 'Your turn! Now you can make your bet',
-                      confirmButtonText: 'Close'
-                    })
-                  }
+                  if(data.next){
+                    this.next = true;
+                    if (data.minimum && data.message){
+                      Swal.fire({ 
+                        title: data.message,
+                        text: 'Your turn! Mininmal bet is '+ data.minimum,
+                        confirmButtonText: 'Close'
+                      })
+                    }
+                    else if (data.message){
+                      Swal.fire({ 
+                        title: data.message,
+                        text: 'Your turn!',
+                        confirmButtonText: 'Close'
+                      })
+                    }
+                    else{
+                      Swal.fire({ 
+                        title: data.message,
+                        text: 'Your turn! Now you can make your bet',
+                        confirmButtonText: 'Close'
+                      })
+                    }
                 }
                 else{
                   Swal.fire({ 
@@ -143,6 +140,11 @@
                       confirmButtonText: 'Close'
                   })
                 }
+                this.game = data.game
+                this.player = data.player
+                this.opponents = data.opponents
+                this.community = data.community
+
                 if (data.loosers){
                   console.log('loosers!')
                 }
@@ -206,42 +208,45 @@
           },
           makeBet: function(bet){
             console.log('start bet')
-            this.next = false;
-            if (bet + this.player.last_bet < this.game.max_bet){
-              alert('Your bet is too small')
+            if (bet>0){
+              this.next = false;
+              if (bet + this.player.last_bet < this.game.max_bet){
+                alert('Your bet is too small')
+              }
+              else{
+                axios.post('/bet', {bet: bet, match: this.match})
+                  .then((response)=> {
+                  this.bets = 0;
+                  console.log('end bet')
+                  console.log(response.data)   
+                  if (response.data.end){
+                    this.roundend = true
+                    this.results = response.data.results.results 
+                    this.bank = response.data.results.bank 
+                    this.community_cards = response.data.results.community 
+                    document.getElementById('game-row').style.display = 'none';
+                    document.getElementById('bank-row').style.display = 'none';
+                  }   
+                  else{
+                      this.game = response.data.game
+                      this.player = response.data.player
+                      this.opponents = response.data.opponents
+                      this.community = response.data.community
+                      if(response.data.next){
+                        alert('Your turn!')
+                        this.next = true;
+                      }
+                      else{
+                        this.next = false;
+                      }
+                      if (response.data.loosers){
+                        console.log('loosers!')
+                      }
+                  }
+                });
+              } 
             }
-            else{
-              axios.post('/bet', {bet: bet, match: this.match})
-                .then((response)=> {
-                this.bets = 0;
-                console.log('end bet')
-                console.log(response.data)   
-                if (response.data.end){
-                  this.roundend = true
-                  this.results = response.data.results.results 
-                  this.bank = response.data.results.bank 
-                  this.community_cards = response.data.results.community 
-                  document.getElementById('game-row').style.display = 'none';
-                  document.getElementById('bank-row').style.display = 'none';
-                }   
-                else{
-                    this.game = response.data.game
-                    this.player = response.data.player
-                    this.opponents = response.data.opponents
-                    this.community = response.data.community
-                    if(response.data.next){
-                      alert('Your turn!')
-                      this.next = true;
-                    }
-                    else{
-                      this.next = false;
-                    }
-                    if (response.data.loosers){
-                      console.log('loosers!')
-                    }
-                }
-              });
-            }
+
           },
           dealPreflop(){
             axios.get('/dealpreflop').then((response)=> {
@@ -251,17 +256,25 @@
           clearBets(){
             this.bets = 0;
           },
-          fold(){
+          foldRound(){
             console.log("I'm passing")
-              axios.post('/fold', {match: this.match})
-                .then((response)=> {
-                // console.log(response.data)      
+            Swal.fire({
+              text: 'Are you sure you want to fold?',
+              showLoaderOnConfirm: true,
+              showCancelButton: true,
+            }).then(result => {
+              if (result.value) {
+                axios.post('/fold', {match: this.match})
+              .then((response)=> {
                 this.game = response.data.game
                 this.community = response.data.community
                 this.call = response.data.call
                 this.player = response.data.player
                 this.opponents = response.data.opponents
               });
+              }
+            });      
+
           },
           nextRound(){
             axios.post('/nextround').then((response)=> {

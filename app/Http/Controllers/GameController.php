@@ -118,6 +118,7 @@ class GameController extends Controller
       $game = $player->game;
       $player->passing = 1;
       $player->save();
+      $message = $player->user()->first()->name. ' '. $player->user()->first()->last_name. ' folded!';
       $round = $game->round;
       if ($player->last_bet==Null){
         $round->betted +=1;
@@ -127,7 +128,7 @@ class GameController extends Controller
       if (count($players)==1){
         $round->writeCache();
         foreach ($game->players as $p){
-          $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
+          $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id, 'message'=>$message);
           event(new DeskCommonEvent($data));
         }
         return $data;
@@ -153,7 +154,6 @@ class GameController extends Controller
             }
           }
           else{
-            $message = $player->user->name. ' '. $player->user->last_name. ' folds!';
             $communityarr = $game->communityArray();
             $gamearr = $game->gameArray();
             foreach ($game->players as $p){
@@ -272,5 +272,10 @@ class GameController extends Controller
         $newround = new Round(array('game_id'=>$game->id));
         $newround->save();
       }
+    }
+    public function leaveGame(Request $request){
+      $player = $request->user()->player;
+      $player->game_id = Null;
+      $player->save();
     }
 }

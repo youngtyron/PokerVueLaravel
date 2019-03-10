@@ -17,6 +17,7 @@
                     <img class="my-mini-card" :src="result.first_card" />
                     <img class="my-mini-card" :src="result.second_card" />
                    <i class="fas fa-star fa-2x" v-if='result.winner' style="color: #F4EE1F;"></i>
+                   <i class="fas fa-hand-paper fa-2x" v-if='result.passing==1' style="color:#D52A15;"></i>
                </li>
            </ul>           
         </div>

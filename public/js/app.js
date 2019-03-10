@@ -56445,6 +56445,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 
@@ -56491,10 +56492,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         document.getElementById('game-row').style.display = 'none';
         document.getElementById('bank-row').style.display = 'none';
       } else {
-        _this.game = data.game;
-        _this.player = data.player;
-        _this.opponents = data.opponents;
-        _this.community = data.community;
         if (data.next) {
           _this.next = true;
           if (data.minimum && data.message) {
@@ -56523,6 +56520,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             confirmButtonText: 'Close'
           });
         }
+        _this.game = data.game;
+        _this.player = data.player;
+        _this.opponents = data.opponents;
+        _this.community = data.community;
+
         if (data.loosers) {
           console.log('loosers!');
         }
@@ -56591,37 +56593,39 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var _this4 = this;
 
       console.log('start bet');
-      this.next = false;
-      if (bet + this.player.last_bet < this.game.max_bet) {
-        alert('Your bet is too small');
-      } else {
-        axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
-          _this4.bets = 0;
-          console.log('end bet');
-          console.log(response.data);
-          if (response.data.end) {
-            _this4.roundend = true;
-            _this4.results = response.data.results.results;
-            _this4.bank = response.data.results.bank;
-            _this4.community_cards = response.data.results.community;
-            document.getElementById('game-row').style.display = 'none';
-            document.getElementById('bank-row').style.display = 'none';
-          } else {
-            _this4.game = response.data.game;
-            _this4.player = response.data.player;
-            _this4.opponents = response.data.opponents;
-            _this4.community = response.data.community;
-            if (response.data.next) {
-              alert('Your turn!');
-              _this4.next = true;
+      if (bet > 0) {
+        this.next = false;
+        if (bet + this.player.last_bet < this.game.max_bet) {
+          alert('Your bet is too small');
+        } else {
+          axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
+            _this4.bets = 0;
+            console.log('end bet');
+            console.log(response.data);
+            if (response.data.end) {
+              _this4.roundend = true;
+              _this4.results = response.data.results.results;
+              _this4.bank = response.data.results.bank;
+              _this4.community_cards = response.data.results.community;
+              document.getElementById('game-row').style.display = 'none';
+              document.getElementById('bank-row').style.display = 'none';
             } else {
-              _this4.next = false;
+              _this4.game = response.data.game;
+              _this4.player = response.data.player;
+              _this4.opponents = response.data.opponents;
+              _this4.community = response.data.community;
+              if (response.data.next) {
+                alert('Your turn!');
+                _this4.next = true;
+              } else {
+                _this4.next = false;
+              }
+              if (response.data.loosers) {
+                console.log('loosers!');
+              }
             }
-            if (response.data.loosers) {
-              console.log('loosers!');
-            }
-          }
-        });
+          });
+        }
       }
     },
     dealPreflop: function dealPreflop() {
@@ -56634,17 +56638,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     clearBets: function clearBets() {
       this.bets = 0;
     },
-    fold: function fold() {
+    foldRound: function foldRound() {
       var _this6 = this;
 
       console.log("I'm passing");
-      axios.post('/fold', { match: this.match }).then(function (response) {
-        // console.log(response.data)      
-        _this6.game = response.data.game;
-        _this6.community = response.data.community;
-        _this6.call = response.data.call;
-        _this6.player = response.data.player;
-        _this6.opponents = response.data.opponents;
+      __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
+        text: 'Are you sure you want to fold?',
+        showLoaderOnConfirm: true,
+        showCancelButton: true
+      }).then(function (result) {
+        if (result.value) {
+          axios.post('/fold', { match: _this6.match }).then(function (response) {
+            _this6.game = response.data.game;
+            _this6.community = response.data.community;
+            _this6.call = response.data.call;
+            _this6.player = response.data.player;
+            _this6.opponents = response.data.opponents;
+          });
+        }
       });
     },
     nextRound: function nextRound() {
@@ -57239,6 +57250,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -57336,6 +57348,13 @@ var render = function() {
               ? _c("i", {
                   staticClass: "fas fa-star fa-2x",
                   staticStyle: { color: "#F4EE1F" }
+                })
+              : _vm._e(),
+            _vm._v(" "),
+            result.passing == 1
+              ? _c("i", {
+                  staticClass: "fas fa-hand-paper fa-2x",
+                  staticStyle: { color: "#D52A15" }
                 })
               : _vm._e()
           ])
@@ -57558,6 +57577,16 @@ var render = function() {
                         on: { click: _vm.clearBets }
                       },
                       [_vm._v("Clear")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-info",
+                        attrs: { type: "button" },
+                        on: { click: _vm.foldRound }
+                      },
+                      [_vm._v("Fold")]
                     )
                   ])
                 : _c("div", [_vm._m(0)])
