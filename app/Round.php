@@ -21,11 +21,12 @@ class Round extends Model
   }
 
   public function writeCache(){
-    $expiresAt = Carbon::now()->addMinutes(100);
+    // $expiresAt = Carbon::now()->addMinutes(100);
     $data = array('bank'=>$this->bank, 
                   'results'=>$this->results(),
                   'community'=>$this->community_cards());
-    Cache::put('result.'.$this->game->id, $data, $expiresAt);  
+    // Cache::put('result.'.$this->game->id, $data, $expiresAt);  
+    Cache::forever('result.'.$this->game->id,  $data);
     return true;
   }
   public function registerBet($player, $bet){
@@ -98,11 +99,22 @@ class Round extends Model
     return $winners;
   }
   public function community_cards(){
-    $array = array('first_card'=>'/cards/'.$this->first_card.'.png',
-                  'second_card'=>'/cards/'.$this->second_card.'.png',
-                  'third_card'=>'/cards/'.$this->third_card.'.png',
-                  'fourth_card'=>'/cards/'.$this->fourth_card.'.png',
-                  'fifth_card'=>'/cards/'.$this->fifth_card.'.png');
+    $array = array();
+    if ($this->first_card != Null){
+      $combinations += ['first_card'=>'/cards/'.$this->first_card.'.png'];
+    }
+    if ($this->second_card != Null){
+      $combinations += ['second_card'=>'/cards/'.$this->second_card.'.png'];
+    }
+    if ($this->third_card != Null){
+      $combinations += ['third_card'=>'/cards/'.$this->third_card.'.png'];
+    }
+    if ($this->fourth_card != Null){
+      $combinations += ['fourth_card'=>'/cards/'.$this->fourth_card.'.png'];
+    }
+    if ($this->fifth_card != Null){
+      $combinations += ['fifth_card'=>'/cards/'.$this->fifth_card.'.png'];
+    }
     return $array;
   }
   public function combinations(){
@@ -196,7 +208,7 @@ class Round extends Model
         break;
       }
       else{
-        if ($turn+1==count($players)){
+        if ($turn+1>=count($players)){
           $turn = 1;
         }
         else{

@@ -56484,49 +56484,60 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var data = _ref.data;
 
       console.log(data);
-      if (data.end) {
-        _this.roundend = true;
-        _this.results = data.results.results;
-        _this.bank = data.results.bank;
-        _this.community_cards = data.results.community;
-        document.getElementById('game-row').style.display = 'none';
-        document.getElementById('bank-row').style.display = 'none';
+      if (data.you_lose) {
+        __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
+          title: 'You lose!',
+          text: "You have not enough chips for playing",
+          confirmButtonText: 'Close'
+        }).then(function (result) {
+          if (result.value) {
+            location.replace(window.location.origin + '/findgame');
+          }
+        });
       } else {
-        if (data.next) {
-          _this.next = true;
-          if (data.minimum && data.message) {
-            __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
-              title: data.message,
-              text: 'Your turn! Mininmal bet is ' + data.minimum,
-              confirmButtonText: 'Close'
-            });
-          } else if (data.message) {
-            __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
-              title: data.message,
-              text: 'Your turn!',
-              confirmButtonText: 'Close'
-            });
+        if (data.end) {
+          _this.roundend = true;
+          _this.results = data.results.results;
+          _this.bank = data.results.bank;
+          _this.community_cards = data.results.community;
+          document.getElementById('game-row').style.display = 'none';
+          document.getElementById('bank-row').style.display = 'none';
+        } else {
+          if (data.next) {
+            _this.next = true;
+            if (data.minimum && data.message) {
+              __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
+                title: data.message,
+                text: 'Your turn! Mininmal bet is ' + data.minimum,
+                confirmButtonText: 'Close'
+              });
+            } else if (data.message) {
+              __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
+                title: data.message,
+                text: 'Your turn!',
+                confirmButtonText: 'Close'
+              });
+            } else {
+              __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
+                title: data.message,
+                text: 'Your turn! Now you can make your bet',
+                confirmButtonText: 'Close'
+              });
+            }
           } else {
             __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
               title: data.message,
-              text: 'Your turn! Now you can make your bet',
               confirmButtonText: 'Close'
             });
           }
-        } else {
-          __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
-            title: data.message,
-            // text: 'Your turn! Now you can make your bet',
-            confirmButtonText: 'Close'
-          });
-        }
-        _this.game = data.game;
-        _this.player = data.player;
-        _this.opponents = data.opponents;
-        _this.community = data.community;
+          _this.game = data.game;
+          _this.player = data.player;
+          _this.opponents = data.opponents;
+          _this.community = data.community;
 
-        if (data.loosers) {
-          console.log('loosers!');
+          if (data.loosers) {
+            console.log('loosers!');
+          }
         }
       }
     });

@@ -21,6 +21,13 @@ class Game extends Model
   {
     return $this->hasOne('App\Round');
   }
+  // public function writeGameEndCache(){
+  //   $winner = $this->players[0];
+    
+  // }
+  // public function returnGameEndCache(){
+
+  // }
   public function moneyToWinner(){
     $round=$this->round;
     $winners = Player::find($round->winner());

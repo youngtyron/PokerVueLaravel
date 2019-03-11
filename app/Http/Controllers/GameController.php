@@ -195,6 +195,16 @@ class GameController extends Controller
       $round->registerBet($player, $bet);
       $loosers = $game->excludeLoosers();
       $players = $round->players();
+      if ($loosers!=false){
+        foreach ($loosers as $looser) {
+          $data = array('you_lose'=>true, 'gamer'=>$looser->id, 'match_id'=>$game->id);
+          event(new DeskCommonEvent($data));
+        }        
+      }
+
+      if (count($game->players)==1){
+        ///ВЫДАТЬ КОНЕЦ ИГРЫ
+      }
       if (count($players)==1){
         $round->writeCache();
         foreach ($game->players as $p){

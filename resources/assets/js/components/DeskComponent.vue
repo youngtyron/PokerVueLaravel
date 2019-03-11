@@ -100,55 +100,69 @@
           this.channel
             .listen('DeskCommonEvent', ({data})=>{
               console.log(data)
-              if (data.end){
-                this.roundend = true
-                this.results = data.results.results 
-                this.bank = data.results.bank 
-                this.community_cards = data.results.community 
-                document.getElementById('game-row').style.display = 'none';
-                document.getElementById('bank-row').style.display = 'none';
+              if(data.you_lose){
+                Swal.fire({ 
+                  title: 'You lose!',
+                  text: "You have not enough chips for playing",
+                  confirmButtonText: 'Close'
+                }).then(result => {
+              if (result.value) {
+                location.replace(window.location.origin + '/findgame');
+              }
+            });   
+                
               }
               else{
-                  if(data.next){
-                    this.next = true;
-                    if (data.minimum && data.message){
-                      Swal.fire({ 
-                        title: data.message,
-                        text: 'Your turn! Mininmal bet is '+ data.minimum,
-                        confirmButtonText: 'Close'
-                      })
-                    }
-                    else if (data.message){
-                      Swal.fire({ 
-                        title: data.message,
-                        text: 'Your turn!',
-                        confirmButtonText: 'Close'
-                      })
-                    }
-                    else{
-                      Swal.fire({ 
-                        title: data.message,
-                        text: 'Your turn! Now you can make your bet',
-                        confirmButtonText: 'Close'
-                      })
-                    }
+                 if (data.end){
+                  this.roundend = true
+                  this.results = data.results.results 
+                  this.bank = data.results.bank 
+                  this.community_cards = data.results.community 
+                  document.getElementById('game-row').style.display = 'none';
+                  document.getElementById('bank-row').style.display = 'none';
                 }
                 else{
-                  Swal.fire({ 
-                      title: data.message,
-                      // text: 'Your turn! Now you can make your bet',
-                      confirmButtonText: 'Close'
-                  })
-                }
-                this.game = data.game
-                this.player = data.player
-                this.opponents = data.opponents
-                this.community = data.community
+                    if(data.next){
+                      this.next = true;
+                      if (data.minimum && data.message){
+                        Swal.fire({ 
+                          title: data.message,
+                          text: 'Your turn! Mininmal bet is '+ data.minimum,
+                          confirmButtonText: 'Close'
+                        })
+                      }
+                      else if (data.message){
+                        Swal.fire({ 
+                          title: data.message,
+                          text: 'Your turn!',
+                          confirmButtonText: 'Close'
+                        })
+                      }
+                      else{
+                        Swal.fire({ 
+                          title: data.message,
+                          text: 'Your turn! Now you can make your bet',
+                          confirmButtonText: 'Close'
+                        })
+                      }
+                  }
+                  else{
+                    Swal.fire({ 
+                        title: data.message,
+                        confirmButtonText: 'Close'
+                    })
+                  }
+                  this.game = data.game
+                  this.player = data.player
+                  this.opponents = data.opponents
+                  this.community = data.community
 
-                if (data.loosers){
-                  console.log('loosers!')
-                }
+                  if (data.loosers){
+                    console.log('loosers!')
+                  }
+                }               
               }
+
 
             });
         },
