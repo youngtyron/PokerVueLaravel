@@ -18,6 +18,14 @@ class Player extends Model
   public function hand(){
     return $this->hasOne('App\Hand');
   }
+  public function hasSevenCards(){
+    if (count($this->hand->allcards_array())==7){
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
   public function infoArray(){
     $info = array('id' => $this->user->id,
                   'name'=>$this->user->name,
@@ -25,8 +33,10 @@ class Player extends Model
                   'money'=>$this->money,
                   'passing'=>$this->passing,
                   'first_card'=>'/cards/'.$this->hand->first_card.'.png',
-                  'second_card'=>'/cards/'.$this->hand->second_card.'.png',
-                  'combination'=>$this->hand->name_of_combination($this->hand->combination()));
+                  'second_card'=>'/cards/'.$this->hand->second_card.'.png');
+    if ($this->hasSevenCards()==true){
+      $info += ['combination'=>$this->hand->name_of_combination($this->hand->combination())];
+    }
     return $info;
   }
   public function definite_partners_amount($num){

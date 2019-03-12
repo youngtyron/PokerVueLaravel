@@ -101,19 +101,19 @@ class Round extends Model
   public function community_cards(){
     $array = array();
     if ($this->first_card != Null){
-      $combinations += ['first_card'=>'/cards/'.$this->first_card.'.png'];
+      $array += ['first_card'=>'/cards/'.$this->first_card.'.png'];
     }
     if ($this->second_card != Null){
-      $combinations += ['second_card'=>'/cards/'.$this->second_card.'.png'];
+      $array += ['second_card'=>'/cards/'.$this->second_card.'.png'];
     }
     if ($this->third_card != Null){
-      $combinations += ['third_card'=>'/cards/'.$this->third_card.'.png'];
+      $array += ['third_card'=>'/cards/'.$this->third_card.'.png'];
     }
     if ($this->fourth_card != Null){
-      $combinations += ['fourth_card'=>'/cards/'.$this->fourth_card.'.png'];
+      $array += ['fourth_card'=>'/cards/'.$this->fourth_card.'.png'];
     }
     if ($this->fifth_card != Null){
-      $combinations += ['fifth_card'=>'/cards/'.$this->fifth_card.'.png'];
+      $array += ['fifth_card'=>'/cards/'.$this->fifth_card.'.png'];
     }
     return $array;
   }

@@ -17,6 +17,11 @@ html, body {
   width: 64px;
   margin-right: 10px;
 }
+.prise-card{
+  height: 100px;
+  width: 80px;
+  margin-right: 10px;
+}
 .my-mini-card{
   height: 100px;
   width: 80px;

@@ -19,6 +19,7 @@ window.Vue = require('vue');
 Vue.component('desk-component', require('./components/DeskComponent.vue'));
 Vue.component('findgame-component', require('./components/FindGameComponent.vue'));
 Vue.component('roundresults-component', require('./components/RoundResults.vue'));
+Vue.component('gameend-component', require('./components/GameEnd.vue'));
 
 const app = new Vue({
     el: '#app'

@@ -90,6 +90,12 @@ class GameController extends Controller
         if ($round->phase ==  'shotdown'){
           $gameArr = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$player->id, 'match_id'=>$game->id);
         }
+        else if (count($game->players)==1){
+          $game->moneyToWinner();
+          $data = array('game_end'=>true, 'player'=>$game->players[0]->infoArray() ,'gamer'=>$game->players[0]->id, 
+                        'match_id'=>$game->id);
+          return $data;
+        }
         else{
           if ($round->phase == 'blind-bets'){
             $round->settleQueue();
@@ -190,22 +196,33 @@ class GameController extends Controller
     public function bet(Request $request){
       $bet = $request->input('bet');
       $player = $request->user()->player;
-      $game = $player->game;
-      $round = $game->round;
+      $g = $player->game;
+      $round = $g->round;
       $round->registerBet($player, $bet);
-      $loosers = $game->excludeLoosers();
+      $loosers = $g->excludeLoosers();
       $players = $round->players();
+      $game=$round->game;
       if ($loosers!=false){
         foreach ($loosers as $looser) {
           $data = array('you_lose'=>true, 'gamer'=>$looser->id, 'match_id'=>$game->id);
           event(new DeskCommonEvent($data));
-        }        
+        }
       }
 
       if (count($game->players)==1){
-        ///ВЫДАТЬ КОНЕЦ ИГРЫ
+        $game->moneyToWinner();
+        foreach ($game->players as $p){
+          $data = array('game_end'=>true, 'player'=>$p->infoArray() ,'gamer'=>$p->id, 'match_id'=>$game->id);
+          event(new DeskCommonEvent($data));
+        }
+        if ($player == $game->players[0]){
+          return $data;
+        }
+        else{
+          return;
+        }
       }
-      if (count($players)==1){
+      else if (count($players)==1){
         $round->writeCache();
         foreach ($game->players as $p){
           $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
@@ -267,9 +284,16 @@ class GameController extends Controller
               }
               event(new DeskCommonEvent($data));
           }
-          $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($player->id, $round->phase),
+          if ($loosers!=false){
+            if (in_array($player, $loosers)){
+              $data = array('you_lose'=>true, 'gamer'=>$player->id, 'match_id'=>$game->id);
+            }  
+          }
+          else{
+            $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($player->id, $round->phase),
                 'opponents'=>$game->playersArray($player->id), 'match_id'=>$game->id, 'community'=>$communityarr, 'message'=>$message, 
-                'gamer'=>$player->id, 'loosers'=>$loosers);
+                'gamer'=>$player->id, 'loosers'=>$loosers); 
+          }      
           return $data;
         }
       }

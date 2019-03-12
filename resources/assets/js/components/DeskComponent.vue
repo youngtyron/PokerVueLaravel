@@ -1,15 +1,17 @@
 <template>
     <div class="container-fluid">
-        <RoundResultsSlot v-if="roundend" :results='this.results' :bank="this.bank" :community="this.community_cards"></RoundResultsSlot>
+        <RoundResultsSlot v-if="roundend" :results='results' :bank="bank" :community="community_cards"></RoundResultsSlot>
+        <GameEndSlot v-if='gameend' :player='game_end_player'></GameEndSlot>
+
         <button v-if="roundend" type="button" class="btn btn-info" @click = 'nextRound'>Next Round</button>
-        <div class="row" id="bank-row">
+        <div class="row" v-if="!gameend && !roundend" id="bank-row">
           <div class="col-md-4 col-centered">
               <p class="text-center" v-if="game.bank">Bank: {{game.bank}}</p>
               <p class="text-center" v-else>Bank is empty</p>
               <p class="text-center" v-if="game.bank">Current bet is {{game.max_bet}}</p>
           </div>
         </div>
-        <div class="row" id='game-row'>
+        <div class="row" id='game-row' v-if="!gameend && !roundend">
               <div class="col-md-3">
                 <div class="player-box" v-model='player'>
                   <h4 class="player-box-text">{{player.name}} {{player.last_name}}</h4>
@@ -70,10 +72,12 @@
     import Swal from 'sweetalert2/dist/sweetalert2.js'
     import 'sweetalert2/src/sweetalert2.scss'
     import RoundResultsSlot from './RoundResults.vue'
+    import GameEndSlot from './GameEnd.vue'
     export default {
         props: ['match', 'gamer'],
         components: {
           RoundResultsSlot,
+          GameEndSlot,
         },
         data(){
           return {
@@ -87,7 +91,9 @@
             results: [],
             bank: 0,
             community_cards: [],
-            roundend: false
+            roundend: false,
+            gameend: false,
+            game_end_player: [],
           }
         },
         computed: {
@@ -99,7 +105,7 @@
           this.loadGame();
           this.channel
             .listen('DeskCommonEvent', ({data})=>{
-              console.log(data)
+              console.log('data')
               if(data.you_lose){
                 Swal.fire({ 
                   title: 'You lose!',
@@ -113,7 +119,13 @@
                 
               }
               else{
-                 if (data.end){
+                if (data.game_end){
+                  this.gameend = true
+                  this.game_end_player = data.player
+                  document.getElementById('game-row').style.display = 'none';
+                  document.getElementById('bank-row').style.display = 'none';                  
+                }
+                else if (data.end){
                   this.roundend = true
                   this.results = data.results.results 
                   this.bank = data.results.bank 
@@ -186,13 +198,19 @@
                   confirmButtonText: 'Ok'
                 })
               }
-              if (response.data.end){
+              if (response.data.game_end){
+                  this.gameend = true
+                  this.game_end_player = response.data.player
+                  // document.getElementById('game-row').style.display = 'none';
+                  // document.getElementById('bank-row').style.display = 'none';                  
+                }
+              else if (response.data.end){
                 this.roundend = true
                 this.results = response.data.results.results 
                 this.bank = response.data.results.bank 
                 this.community_cards = response.data.results.community 
-                document.getElementById('game-row').style.display = 'none';
-                document.getElementById('bank-row').style.display = 'none';
+                // document.getElementById('game-row').style.display = 'none';
+                // document.getElementById('bank-row').style.display = 'none';
               }
               else{
                 this.player = response.data.player
