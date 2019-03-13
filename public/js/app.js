@@ -56554,15 +56554,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         if (data.game_end) {
           _this.gameend = true;
           _this.game_end_player = data.player;
-          document.getElementById('game-row').style.display = 'none';
-          document.getElementById('bank-row').style.display = 'none';
         } else if (data.end) {
           _this.roundend = true;
           _this.results = data.results.results;
           _this.bank = data.results.bank;
           _this.community_cards = data.results.community;
-          document.getElementById('game-row').style.display = 'none';
-          document.getElementById('bank-row').style.display = 'none';
         } else {
           if (data.next) {
             _this.next = true;
@@ -56632,15 +56628,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         if (response.data.game_end) {
           _this3.gameend = true;
           _this3.game_end_player = response.data.player;
-          // document.getElementById('game-row').style.display = 'none';
-          // document.getElementById('bank-row').style.display = 'none';                  
         } else if (response.data.end) {
           _this3.roundend = true;
           _this3.results = response.data.results.results;
           _this3.bank = response.data.results.bank;
           _this3.community_cards = response.data.results.community;
-          // document.getElementById('game-row').style.display = 'none';
-          // document.getElementById('bank-row').style.display = 'none';
         } else {
           _this3.player = response.data.player;
           _this3.opponents = response.data.opponents;
@@ -56663,7 +56655,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       });
     },
     addToken: function addToken(token) {
-      this.bets = this.bets + token;
+      if (token + this.bets > this.player.money) {
+        __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
+          title: 'You have not enough money to bet it!',
+          text: 'Choose lesser chip',
+          confirmButtonText: 'Close'
+        });
+      } else {
+        this.bets = this.bets + token;
+      }
     },
 
     makeBet: function makeBet(bet) {

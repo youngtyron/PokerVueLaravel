@@ -121,17 +121,13 @@
               else{
                 if (data.game_end){
                   this.gameend = true
-                  this.game_end_player = data.player
-                  document.getElementById('game-row').style.display = 'none';
-                  document.getElementById('bank-row').style.display = 'none';                  
+                  this.game_end_player = data.player            
                 }
                 else if (data.end){
                   this.roundend = true
                   this.results = data.results.results 
                   this.bank = data.results.bank 
                   this.community_cards = data.results.community 
-                  document.getElementById('game-row').style.display = 'none';
-                  document.getElementById('bank-row').style.display = 'none';
                 }
                 else{
                     if(data.next){
@@ -200,17 +196,13 @@
               }
               if (response.data.game_end){
                   this.gameend = true
-                  this.game_end_player = response.data.player
-                  // document.getElementById('game-row').style.display = 'none';
-                  // document.getElementById('bank-row').style.display = 'none';                  
+                  this.game_end_player = response.data.player            
                 }
               else if (response.data.end){
                 this.roundend = true
                 this.results = response.data.results.results 
                 this.bank = response.data.results.bank 
                 this.community_cards = response.data.results.community 
-                // document.getElementById('game-row').style.display = 'none';
-                // document.getElementById('bank-row').style.display = 'none';
               }
               else{
                 this.player = response.data.player
@@ -236,7 +228,16 @@
             });
           },
           addToken(token){
-            this.bets = this.bets + token;
+            if (token+this.bets>this.player.money){
+              Swal.fire({ 
+                title: 'You have not enough money to bet it!',
+                text: 'Choose lesser chip',
+                confirmButtonText: 'Close'
+              });
+            }
+            else{
+              this.bets = this.bets + token;              
+            }
           },
           makeBet: function(bet){
             console.log('start bet')

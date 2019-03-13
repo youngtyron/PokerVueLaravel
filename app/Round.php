@@ -346,16 +346,18 @@ class Round extends Model
         else if ($turn == 2){
           $this->big_blind_id = $player->id;
         }
-        if (count($players)>2){
-          $third = $players->where('turn', 3)->first();
-          $this->current_player_id = $third->id;
-        }
-        else{
-          $this->current_player_id = $this->small_blind_id;
-        }
+
         $this->save();
         $turn +=1;
       }
+      if (count($players)>2){
+        $third = $players->where('turn', 3)->first();
+        $this->current_player_id = $third->id;
+      }
+      else{
+        $this->current_player_id = $this->small_blind_id;
+      }
+      $this->save();
     }
     else{
       $this->shiftQueue($players);
