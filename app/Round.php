@@ -193,6 +193,7 @@ class Round extends Model
   }
   public function nextMover($current){
     $players = $this->game->players;
+    // $players = $this->players();
     $ex_turn = $current->turn;
     $next = Null;
     if ($ex_turn==count($players)){
@@ -218,7 +219,26 @@ class Round extends Model
     }
     return $next;
   }
-
+  public function smallBlindIfHePlays(){
+    $small_blind = $this->game->players->find($this->small_blind_id);
+    if ($small_blind->passing == 0){
+      return $small_blind;
+    }
+    else{
+      $turn = 2;
+      for ($i=0; $i < count($this->game->players); $i++){
+        $player = Player::where('game_id', $this->game_id)->where('turn', $turn)->first();
+        if ($player->passing == 0){
+          $next = $player;
+          break;
+        }
+        else{
+          $turn +=1;
+        }
+      }
+      return $next;
+    }
+  }
   public function nextStep(){
     if ($this->phase == 'preflop'){
       $this->dealFlop();

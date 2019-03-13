@@ -129,6 +129,7 @@ class GameController extends Controller
     public function fold(Request $request){
       $player = $request->user()->player;
       $game = $player->game;
+      $current = $player;
       $player->passing = 1;
       $player->save();
       $message = $player->user()->first()->name. ' '. $player->user()->first()->last_name. ' folded!';
@@ -150,10 +151,13 @@ class GameController extends Controller
         return $data;
       }
       else{
-        $next = $round->nextMover($current_index);
+        $next = $round->nextMover($current);
         if (is_null($next)){
           $round->nextStep();
-          $next = $players->find($round->small_blind_id);
+          // $next = $players->find($round->small_blind_id);
+          $next = $round->smallBlindIfHePlays();
+          $round->current_player_id = $next->id;
+          $round->save();
           $minimum = false;
         }
         else{
@@ -161,6 +165,9 @@ class GameController extends Controller
           $round->save();
           if ($next->last_bet<$round->max_bet){
             $minimum = $round->max_bet - $next->last_bet;
+          }
+          else{
+            $minimum = false;
           }
           if ($round->phase=='shutdown'){
             $round->writeCache();
@@ -179,7 +186,7 @@ class GameController extends Controller
             foreach ($game->players as $p){
               $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($p->id, $round->phase),
                 'opponents'=>$game->playersArray($p->id), 'match_id'=>$game->id, 'community'=>$communityarr, 'message'=>$message, 
-                'gamer'=>$p->id, 'loosers'=>$loosers);
+                'gamer'=>$p->id);
               if ($p == $next){
                 $data += ['next'=>true, 'minimum'=>$minimum];
               }
@@ -187,7 +194,7 @@ class GameController extends Controller
             }
             $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($player->id, $round->phase),
                 'opponents'=>$game->playersArray($player->id), 'match_id'=>$game->id, 'community'=>$communityarr, 'message'=>$message, 
-                'gamer'=>$player->id, 'loosers'=>$loosers);
+                'gamer'=>$player->id);
             return $data;
           }
         }
@@ -235,11 +242,15 @@ class GameController extends Controller
         return $data;
       }
       else{
-        $current = $players->find($round->current_player_id);
+        $current = $player;
+        // $current = $players->find($round->current_player_id);
         $next = $round->nextMover($current);
         if (is_null($next)){
           $round->nextStep();
-          $next = $players->find($round->small_blind_id);
+          // $next = $players->find($round->small_blind_id);
+          $next = $round->smallBlindIfHePlays();
+          $round->current_player_id = $next->id;
+          $round->save();
           $minimum = false;
         }
         else{

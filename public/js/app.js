@@ -56498,6 +56498,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 
 
@@ -57655,6 +57657,13 @@ var render = function() {
                     )
                   ]),
                   _vm._v(" "),
+                  _vm.player.passing == 1
+                    ? _c("i", {
+                        staticClass: "fas fa-hand-paper fa-3x",
+                        staticStyle: { color: "#D52A15" }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
                   _c("h4", { staticClass: "player-box-text" }, [
                     _vm._v("Money: " + _vm._s(_vm.player.money))
                   ]),
@@ -57818,6 +57827,13 @@ var render = function() {
                         _vm._s(opponent.name) + " " + _vm._s(opponent.last_name)
                       )
                     ]),
+                    _vm._v(" "),
+                    opponent.passing == 1
+                      ? _c("i", {
+                          staticClass: "fas fa-hand-paper fa-2x",
+                          staticStyle: { color: "#D52A15" }
+                        })
+                      : _vm._e(),
                     _vm._v(" "),
                     opponent.first_card
                       ? _c("img", {

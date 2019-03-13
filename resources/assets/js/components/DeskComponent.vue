@@ -15,6 +15,7 @@
               <div class="col-md-3">
                 <div class="player-box" v-model='player'>
                   <h4 class="player-box-text">{{player.name}} {{player.last_name}}</h4>
+                  <i class="fas fa-hand-paper fa-3x" v-if='player.passing==1' style="color:#D52A15;"></i>
                   <h4 class="player-box-text">Money: {{player.money}}</h4>
                   <h5 v-if="player.last_bet" class="player-box-text">My bet in this act is {{player.last_bet}}</h5>
                   <h5 v-else class="player-box-text">I've not made any bet</h5>
@@ -49,6 +50,7 @@
                <div class="col-md-6">
                   <div class="list-group-item" v-for="opponent in opponents" :id='opponent.id'>
                     <h4 class="player-box-text">{{opponent.name}} {{opponent.last_name}}</h4>
+                    <i class="fas fa-hand-paper fa-2x" v-if='opponent.passing==1' style="color:#D52A15;"></i>
                     <img v-if="opponent.first_card" class="my-mini-card" src="cards/back.jpg" />
                     <img v-if="opponent.second_card" class="my-mini-card" src="cards/back.jpg" />
                   </div>
