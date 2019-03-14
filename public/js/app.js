@@ -56500,6 +56500,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 
 
@@ -56742,7 +56744,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
       axios.post('/nextround').then(function (response) {
         console.log(response.data);
+        _this7.roundend = false;
         _this7.loadGame();
+      });
+    },
+    leaveGame: function leaveGame() {
+      console.log("I'm leaving");
+      __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
+        title: 'Do you want to leave this game?',
+        text: "You wouldn't be able to join it again",
+        showLoaderOnConfirm: true,
+        showCancelButton: true
+      }).then(function (result) {
+        if (result.value) {
+          console.log('done');
+          axios.post('/leave').then(function (response) {
+            location.replace(window.location.origin + '/findgame');
+          });
+        }
       });
     }
   }
@@ -57804,9 +57823,76 @@ var render = function() {
                             on: { click: _vm.foldRound }
                           },
                           [_vm._v("Fold")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: { type: "button" },
+                            on: { click: _vm.leaveGame }
+                          },
+                          [_vm._v("Leave game")]
                         )
                       ])
-                    : _c("div", [_vm._m(0)])
+                    : _c("div", [
+                        _c("p", [
+                          _c(
+                            "i",
+                            {
+                              staticClass: "fas fa-coins fa-2x",
+                              staticStyle: { color: "black", opacity: "0.3" }
+                            },
+                            [_vm._v("5")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "i",
+                            {
+                              staticClass: "fas fa-coins fa-2x",
+                              staticStyle: { color: "black", opacity: "0.3" }
+                            },
+                            [_vm._v("10")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "i",
+                            {
+                              staticClass: "fas fa-coins fa-2x",
+                              staticStyle: { color: "black", opacity: "0.3" }
+                            },
+                            [_vm._v("25")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "i",
+                            {
+                              staticClass: "fas fa-coins fa-2x",
+                              staticStyle: { color: "black", opacity: "0.3" }
+                            },
+                            [_vm._v("50")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "i",
+                            {
+                              staticClass: "fas fa-coins fa-2x",
+                              staticStyle: { color: "black", opacity: "0.3" }
+                            },
+                            [_vm._v("100")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-primary",
+                              attrs: { type: "button" },
+                              on: { click: _vm.leaveGame }
+                            },
+                            [_vm._v("Leave game")]
+                          )
+                        ])
+                      ])
                 ]
               )
             ]),
@@ -57909,59 +57995,7 @@ var render = function() {
     1
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("p", [
-      _c(
-        "i",
-        {
-          staticClass: "fas fa-coins fa-2x",
-          staticStyle: { color: "black", opacity: "0.3" }
-        },
-        [_vm._v("5")]
-      ),
-      _vm._v(" "),
-      _c(
-        "i",
-        {
-          staticClass: "fas fa-coins fa-2x",
-          staticStyle: { color: "black", opacity: "0.3" }
-        },
-        [_vm._v("10")]
-      ),
-      _vm._v(" "),
-      _c(
-        "i",
-        {
-          staticClass: "fas fa-coins fa-2x",
-          staticStyle: { color: "black", opacity: "0.3" }
-        },
-        [_vm._v("25")]
-      ),
-      _vm._v(" "),
-      _c(
-        "i",
-        {
-          staticClass: "fas fa-coins fa-2x",
-          staticStyle: { color: "black", opacity: "0.3" }
-        },
-        [_vm._v("50")]
-      ),
-      _vm._v(" "),
-      _c(
-        "i",
-        {
-          staticClass: "fas fa-coins fa-2x",
-          staticStyle: { color: "black", opacity: "0.3" }
-        },
-        [_vm._v("100")]
-      )
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {

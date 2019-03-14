@@ -24,7 +24,7 @@ Route::post('/blinds', 'GameController@blinds')->middleware('auth');
 Route::post('/bet', 'GameController@bet')->middleware('auth');
 Route::post('/fold', 'GameController@fold')->middleware('auth');
 Route::post('/search', 'GameController@search_game')->middleware('auth');
-
+Route::post('/leave', 'GameController@leave_game')->middleware('auth');
 
 
 

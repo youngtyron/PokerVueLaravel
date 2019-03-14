@@ -51,6 +51,92 @@ class GameController extends Controller
         return response()->json(['message' => 'not'], 200);
       }
     }
+    public function leave_game(Request $request){
+      $player = $request->user()->player;
+      $game = $player->game;
+      $turn = $player->turn;
+      $player->game_id = Null;
+      $player->last_bet = Null;
+      $player->passing = 0;
+      $player->turn = Null;
+      $player->search_number_players = Null;
+      $player->save();
+      $round=$game->round;
+      $oldplayers = $game->players;
+      $newplayers = $game->players->where('id', '!=', $player->id);
+      if (count($newplayers->where('passing', 0))==1){
+        $message = false;
+        $round->writeCache();
+        foreach ($newplayers as $p){
+          $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id, 'message'=>$message);
+          event(new DeskCommonEvent($data));
+        }
+        //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
+        $game->moneyToWinner();
+        $game->deleteRound();
+        return;
+      }
+      if ($player->id == $round->current_player_id){
+        $next = $round->nextMover($player);
+        if (is_null($next)){
+          $round->nextStep();
+          $next = $round->smallBlindIfHePlays();
+          $round->current_player_id = $next->id;
+          $round->save();
+          $minimum = false;
+        }
+        else{
+          $round->current_player_id = $next->id;
+          $round->save();
+          if ($next->last_bet<$round->max_bet){
+            $minimum = $round->max_bet - $next->last_bet;
+          }
+          else{
+            $minimum = false;
+          }
+        }
+      }
+      else{
+        $next = Null;
+      }
+      if ($turn<count($oldplayers)){
+        $shifted = $newplayers->where('turn', '>', $turn);
+        foreach ($shifted as $sh) {
+          $sh->turn -= 1;
+          $sh->save();
+        }
+      }
+      $message = $player->user->name. ' '. $player->user->last_name. ' left the game!';
+      if ($round->phase=='shutdown'){
+        $round->writeCache();
+        foreach ($newplayers as $p){
+          $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
+          event(new DeskCommonEvent($data));
+        }
+        //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
+        $game->moneyToWinner();
+        $game->deleteRound();
+        return;
+      }
+      else{
+        $communityarr = $game->communityArray();
+        $gamearr = $game->gameArray();
+        foreach ($newplayers as $p){
+          $data = array('game'=>$gamearr, 'player'=> $game->my_playerArray($p->id, $round->phase),
+            'opponents'=>$game->playersArray($p->id), 'match_id'=>$game->id, 'community'=>$communityarr, 'message'=>$message, 
+            'gamer'=>$p->id);
+          if ($p == $next){
+            $data += ['next'=>true, 'minimum'=>$minimum];
+          }
+          event(new DeskCommonEvent($data));
+        }
+        return;
+      }
+    }
+
+
+
+
     public function index(Request $request){
       $player = $request->user()->player;
       if ($player->game_id != Null){

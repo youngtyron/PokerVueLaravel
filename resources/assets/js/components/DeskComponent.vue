@@ -35,6 +35,7 @@
                     <button type="button" class="bet-button" @click="makeBet(bets)">Bet</button>
                     <button type="button" class="clear-button" @click="clearBets">Clear</button>
                     <button type="button" class='btn btn-info' @click="foldRound">Fold</button>
+                    <button type="button" class="btn btn-primary" @click="leaveGame">Leave game</button>
                   </div>
                   <div v-else>
                     <p>
@@ -43,6 +44,7 @@
                       <i class="fas fa-coins fa-2x" style="color: black; opacity: 0.3;">25</i>
                       <i class="fas fa-coins fa-2x" style="color: black; opacity: 0.3;">50</i>
                       <i class="fas fa-coins fa-2x" style="color: black; opacity: 0.3;">100</i>
+                      <button type="button" class="btn btn-primary" @click="leaveGame">Leave game</button>
                     </p>
                   </div>
                 </div>
@@ -314,8 +316,26 @@
           nextRound(){
             axios.post('/nextround').then((response)=> {
               console.log(response.data)
+              this.roundend = false;
               this.loadGame();
             });
+          },
+          leaveGame(){
+            console.log("I'm leaving")
+            Swal.fire({
+              title: 'Do you want to leave this game?',
+              text: "You wouldn't be able to join it again",
+              showLoaderOnConfirm: true,
+              showCancelButton: true,
+            }).then(result => {
+              if (result.value) {
+                console.log('done')
+                axios.post('/leave')
+              .then((response)=> {
+                location.replace(window.location.origin + '/findgame');
+              });
+              }
+            }); 
           }
         }
     }
