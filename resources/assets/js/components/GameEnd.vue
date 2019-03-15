@@ -17,6 +17,9 @@
             		<i class="fas fa-star fa-4x" v-for="item in [1,2,3,4,5]" style="color: #F4EE1F; margin-top:10px; margin-left: 7px; 	margin-right: 25px;"></i>
             	</p>
             </div>
+            <div>
+                <p @click="deleteGame">Find new game?</p>
+            </div>
         </div>
     </div>
 </template>
@@ -32,7 +35,12 @@
         mounted() {
         },
         methods: {
-        
+            deleteGame(){
+              axios.post('/delete_game')
+              .then((response)=> {
+                location.replace(window.location.origin + '/findgame');
+              });
+            }
         },
     }
 </script>

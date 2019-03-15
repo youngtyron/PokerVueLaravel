@@ -21,11 +21,9 @@ class Round extends Model
   }
 
   public function writeCache(){
-    // $expiresAt = Carbon::now()->addMinutes(100);
     $data = array('bank'=>$this->bank, 
                   'results'=>$this->results(),
                   'community'=>$this->community_cards());
-    // Cache::put('result.'.$this->game->id, $data, $expiresAt);  
     Cache::forever('result.'.$this->game->id,  $data);
     return true;
   }
@@ -157,7 +155,6 @@ class Round extends Model
     }
   }
   public function blinds(){
-    // $this->playersArrangement();
     $small_blind = Player::find($this->small_blind_id);
     $small_blind->money = $small_blind->money - 5;
     $small_blind->save();
@@ -193,7 +190,6 @@ class Round extends Model
   }
   public function nextMover($current){
     $players = $this->game->players;
-    // $players = $this->players();
     $ex_turn = $current->turn;
     $next = Null;
     if ($ex_turn==count($players)){

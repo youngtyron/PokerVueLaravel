@@ -56543,7 +56543,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     this.channel.listen('DeskCommonEvent', function (_ref) {
       var data = _ref.data;
 
-      console.log('data');
       if (data.you_lose) {
         __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
           title: 'You lose!',
@@ -56597,7 +56596,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           _this.community = data.community;
 
           if (data.loosers) {
-            console.log('loosers!');
+            //////
           }
         }
       }
@@ -56605,23 +56604,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   },
 
   methods: {
-    startGame: function startGame() {
+    loadGame: function loadGame() {
       var _this2 = this;
 
-      axios.post('/blinds', { match: this.match }).then(function (response) {
-        if (response.data.other == "blinds_done") {
-          alert("Blinds is done!");
-        }
-        _this2.game = response.data.game;
-        _this2.players = response.data.players;
-      });
-    },
-
-    loadGame: function loadGame() {
-      var _this3 = this;
-
       axios.get('/loadgame').then(function (response) {
-        console.log(response.data);
         if (response.data.start) {
           __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
             title: 'New round!',
@@ -56630,23 +56616,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           });
         }
         if (response.data.game_end) {
-          _this3.gameend = true;
-          _this3.game_end_player = response.data.player;
+          _this2.gameend = true;
+          _this2.game_end_player = response.data.player;
         } else if (response.data.end) {
-          _this3.roundend = true;
-          _this3.results = response.data.results.results;
-          _this3.bank = response.data.results.bank;
-          _this3.community_cards = response.data.results.community;
+          _this2.roundend = true;
+          _this2.results = response.data.results.results;
+          _this2.bank = response.data.results.bank;
+          _this2.community_cards = response.data.results.community;
         } else {
-          _this3.player = response.data.player;
-          _this3.opponents = response.data.opponents;
-          _this3.game = response.data.game;
-          _this3.call = response.data.call;
-          if (_this3.gamer == response.data.turn) {
-            _this3.next = true;
+          _this2.player = response.data.player;
+          _this2.opponents = response.data.opponents;
+          _this2.game = response.data.game;
+          _this2.call = response.data.call;
+          if (_this2.gamer == response.data.turn) {
+            _this2.next = true;
           }
-          _this3.community = response.data.community;
-          if (_this3.gamer == response.data.turn) {
+          _this2.community = response.data.community;
+          if (_this2.gamer == response.data.turn) {
             __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
               title: 'Your turn!',
               text: 'Now you can make your bet',
@@ -56671,38 +56657,41 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
     makeBet: function makeBet(bet) {
-      var _this4 = this;
+      var _this3 = this;
 
-      console.log('start bet');
       if (bet > 0) {
         this.next = false;
         if (bet + this.player.last_bet < this.game.max_bet) {
-          alert('Your bet is too small');
+          __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
+            title: 'Your bet is too small!',
+            text: 'Add some more chips',
+            confirmButtonText: 'Close'
+          });
         } else {
           axios.post('/bet', { bet: bet, match: this.match }).then(function (response) {
-            _this4.bets = 0;
-            console.log('end bet');
-            console.log(response.data);
+            _this3.bets = 0;
             if (response.data.end) {
-              _this4.roundend = true;
-              _this4.results = response.data.results.results;
-              _this4.bank = response.data.results.bank;
-              _this4.community_cards = response.data.results.community;
-              document.getElementById('game-row').style.display = 'none';
-              document.getElementById('bank-row').style.display = 'none';
+              _this3.roundend = true;
+              _this3.results = response.data.results.results;
+              _this3.bank = response.data.results.bank;
+              _this3.community_cards = response.data.results.community;
             } else {
-              _this4.game = response.data.game;
-              _this4.player = response.data.player;
-              _this4.opponents = response.data.opponents;
-              _this4.community = response.data.community;
+              _this3.game = response.data.game;
+              _this3.player = response.data.player;
+              _this3.opponents = response.data.opponents;
+              _this3.community = response.data.community;
               if (response.data.next) {
-                alert('Your turn!');
-                _this4.next = true;
+                __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
+                  title: 'Your turn!',
+                  text: 'Now you can make your bet',
+                  confirmButtonText: 'Close'
+                });
+                _this3.next = true;
               } else {
-                _this4.next = false;
+                _this3.next = false;
               }
               if (response.data.loosers) {
-                console.log('loosers!');
+                ////
               }
             }
           });
@@ -56710,46 +56699,43 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       }
     },
     dealPreflop: function dealPreflop() {
-      var _this5 = this;
+      var _this4 = this;
 
       axios.get('/dealpreflop').then(function (response) {
-        _this5.players = response.data;
+        _this4.players = response.data;
       });
     },
     clearBets: function clearBets() {
       this.bets = 0;
     },
     foldRound: function foldRound() {
-      var _this6 = this;
+      var _this5 = this;
 
-      console.log("I'm passing");
       __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
         text: 'Are you sure you want to fold?',
         showLoaderOnConfirm: true,
         showCancelButton: true
       }).then(function (result) {
         if (result.value) {
-          axios.post('/fold', { match: _this6.match }).then(function (response) {
-            _this6.game = response.data.game;
-            _this6.community = response.data.community;
-            _this6.call = response.data.call;
-            _this6.player = response.data.player;
-            _this6.opponents = response.data.opponents;
+          axios.post('/fold', { match: _this5.match }).then(function (response) {
+            _this5.game = response.data.game;
+            _this5.community = response.data.community;
+            _this5.call = response.data.call;
+            _this5.player = response.data.player;
+            _this5.opponents = response.data.opponents;
           });
         }
       });
     },
     nextRound: function nextRound() {
-      var _this7 = this;
+      var _this6 = this;
 
       axios.post('/nextround').then(function (response) {
-        console.log(response.data);
-        _this7.roundend = false;
-        _this7.loadGame();
+        _this6.roundend = false;
+        _this6.loadGame();
       });
     },
     leaveGame: function leaveGame() {
-      console.log("I'm leaving");
       __WEBPACK_IMPORTED_MODULE_0_sweetalert2_dist_sweetalert2_js___default.a.fire({
         title: 'Do you want to leave this game?',
         text: "You wouldn't be able to join it again",
@@ -56757,7 +56743,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         showCancelButton: true
       }).then(function (result) {
         if (result.value) {
-          console.log('done');
           axios.post('/leave').then(function (response) {
             location.replace(window.location.origin + '/findgame');
           });
@@ -57501,6 +57486,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -57510,7 +57498,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
     mounted: function mounted() {},
 
-    methods: {}
+    methods: {
+        deleteGame: function deleteGame() {
+            axios.post('/delete_game').then(function (response) {
+                location.replace(window.location.origin + '/findgame');
+            });
+        }
+    }
 });
 
 /***/ }),
@@ -57546,6 +57540,10 @@ var render = function() {
           }),
           0
         )
+      ]),
+      _vm._v(" "),
+      _c("div", [
+        _c("p", { on: { click: _vm.deleteGame } }, [_vm._v("Find new game?")])
       ])
     ])
   ])

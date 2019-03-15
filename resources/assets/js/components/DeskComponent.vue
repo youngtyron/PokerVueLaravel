@@ -109,7 +109,6 @@
           this.loadGame();
           this.channel
             .listen('DeskCommonEvent', ({data})=>{
-              console.log('data')
               if(data.you_lose){
                 Swal.fire({ 
                   title: 'You lose!',
@@ -170,7 +169,7 @@
                   this.community = data.community
 
                   if (data.loosers){
-                    console.log('loosers!')
+                    //////
                   }
                 }               
               }
@@ -179,18 +178,8 @@
             });
         },
         methods: {
-          startGame(){
-            axios.post('/blinds', {match: this.match}).then((response)=> {
-              if (response.data.other == "blinds_done"){
-                alert("Blinds is done!")
-              }
-              this.game = response.data.game
-              this.players = response.data.players
-            });
-          },
           loadGame: function(){
               axios.get('/loadgame').then((response)=> {
-              console.log(response.data)
               if (response.data.start){
                 Swal.fire({ 
                   title: 'New round!',
@@ -244,25 +233,24 @@
             }
           },
           makeBet: function(bet){
-            console.log('start bet')
             if (bet>0){
               this.next = false;
               if (bet + this.player.last_bet < this.game.max_bet){
-                alert('Your bet is too small')
+                Swal.fire({ 
+                  title: 'Your bet is too small!',
+                  text: 'Add some more chips',
+                  confirmButtonText: 'Close'
+                });
               }
               else{
                 axios.post('/bet', {bet: bet, match: this.match})
                   .then((response)=> {
                   this.bets = 0;
-                  console.log('end bet')
-                  console.log(response.data)   
                   if (response.data.end){
                     this.roundend = true
                     this.results = response.data.results.results 
                     this.bank = response.data.results.bank 
                     this.community_cards = response.data.results.community 
-                    document.getElementById('game-row').style.display = 'none';
-                    document.getElementById('bank-row').style.display = 'none';
                   }   
                   else{
                       this.game = response.data.game
@@ -270,15 +258,19 @@
                       this.opponents = response.data.opponents
                       this.community = response.data.community
                       if(response.data.next){
-                        alert('Your turn!')
+                        Swal.fire({ 
+                          title: 'Your turn!',
+                          text: 'Now you can make your bet',
+                          confirmButtonText: 'Close'
+                        })
                         this.next = true;
                       }
                       else{
                         this.next = false;
                       }
                       if (response.data.loosers){
-                        console.log('loosers!')
-                      }
+                          ////
+                        }
                   }
                 });
               } 
@@ -294,7 +286,6 @@
             this.bets = 0;
           },
           foldRound(){
-            console.log("I'm passing")
             Swal.fire({
               text: 'Are you sure you want to fold?',
               showLoaderOnConfirm: true,
@@ -315,13 +306,11 @@
           },
           nextRound(){
             axios.post('/nextround').then((response)=> {
-              console.log(response.data)
               this.roundend = false;
               this.loadGame();
             });
           },
           leaveGame(){
-            console.log("I'm leaving")
             Swal.fire({
               title: 'Do you want to leave this game?',
               text: "You wouldn't be able to join it again",
@@ -329,7 +318,6 @@
               showCancelButton: true,
             }).then(result => {
               if (result.value) {
-                console.log('done')
                 axios.post('/leave')
               .then((response)=> {
                 location.replace(window.location.origin + '/findgame');

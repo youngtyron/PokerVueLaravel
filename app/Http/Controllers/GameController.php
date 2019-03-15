@@ -64,18 +64,23 @@ class GameController extends Controller
       $round=$game->round;
       $oldplayers = $game->players;
       $newplayers = $game->players->where('id', '!=', $player->id);
-      if (count($newplayers->where('passing', 0))==1){
+      if (count($newplayers)==1){
+        $data = array('game_end'=>true, 'player'=>$newplayers[0]->infoArray() ,'gamer'=>$newplayers[0]->id, 'match_id'=>$game->id);
+        event(new DeskCommonEvent($data));
+        return;
+      }
+      else if (count($newplayers->where('passing', 0))==1){
         $message = false;
         $round->writeCache();
         foreach ($newplayers as $p){
           $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id, 'message'=>$message);
           event(new DeskCommonEvent($data));
         }
-        //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
         $game->moneyToWinner();
         $game->deleteRound();
         return;
       }
+
       if ($player->id == $round->current_player_id){
         $next = $round->nextMover($player);
         if (is_null($next)){
@@ -107,13 +112,12 @@ class GameController extends Controller
         }
       }
       $message = $player->user->name. ' '. $player->user->last_name. ' left the game!';
-      if ($round->phase=='shutdown'){
+      if ($round->phase=='shutdown' and count($newplayers)>1){
         $round->writeCache();
         foreach ($newplayers as $p){
           $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
           event(new DeskCommonEvent($data));
         }
-        //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
         $game->moneyToWinner();
         $game->deleteRound();
         return;
@@ -133,10 +137,20 @@ class GameController extends Controller
         return;
       }
     }
-
-
-
-
+    public function delete_game(Request $request){
+      $player = $request->user()->player;
+      $game = $player->game;
+      $player->game_id = Null;
+      $player->last_bet = Null;
+      $player->passing = 0;
+      $player->turn = Null;
+      $player->search_number_players = Null;
+      $player->save();
+      $round = $game->round;
+      $round->delete();
+      $game->delete();
+      return;
+    }
     public function index(Request $request){
       $player = $request->user()->player;
       if ($player->game_id != Null){
@@ -231,7 +245,6 @@ class GameController extends Controller
           $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id, 'message'=>$message);
           event(new DeskCommonEvent($data));
         }
-        //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
         $game->moneyToWinner();
         $game->deleteRound();
         return $data;
@@ -240,7 +253,6 @@ class GameController extends Controller
         $next = $round->nextMover($current);
         if (is_null($next)){
           $round->nextStep();
-          // $next = $players->find($round->small_blind_id);
           $next = $round->smallBlindIfHePlays();
           $round->current_player_id = $next->id;
           $round->save();
@@ -261,7 +273,6 @@ class GameController extends Controller
               $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
               event(new DeskCommonEvent($data));
             }
-            //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
             $game->moneyToWinner();
             $game->deleteRound();
             return $data;
@@ -322,18 +333,15 @@ class GameController extends Controller
           event(new DeskCommonEvent($data));
         }
 
-        //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
         $game->moneyToWinner();
         $game->deleteRound();
         return $data;
       }
       else{
         $current = $player;
-        // $current = $players->find($round->current_player_id);
         $next = $round->nextMover($current);
         if (is_null($next)){
           $round->nextStep();
-          // $next = $players->find($round->small_blind_id);
           $next = $round->smallBlindIfHePlays();
           $round->current_player_id = $next->id;
           $round->save();
@@ -355,7 +363,6 @@ class GameController extends Controller
             $data = array('end'=>true, 'results'=>$game->returnCache(), 'gamer'=>$p->id, 'match_id'=>$game->id);
             event(new DeskCommonEvent($data));
           }
-          //ОЧИСТКА РАУНДА ПОСЛЕ ДЕЙСТВИЯ ИГРОКА И ПОДСЧЕТА РЕЗУЛЬТАТА
           $game->moneyToWinner();
           $game->deleteRound();
           return $data;
@@ -402,10 +409,5 @@ class GameController extends Controller
       $game->round->active = 1;
       $game->round->save();
       Cache::forget('result.'.$game->id);
-    }
-    public function leaveGame(Request $request){
-      $player = $request->user()->player;
-      $player->game_id = Null;
-      $player->save();
     }
 }

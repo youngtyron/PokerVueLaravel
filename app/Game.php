@@ -132,36 +132,6 @@ class Game extends Model
     }
     return $arr;
   }
-  // public function playersArray($id, $phase){
-  //   $players = $this->opponents($id);
-  //   $arr = array();
-  //   foreach ($players as $player) {
-  //     $exemplar = array('id' => $player->user->id,
-  //                       'name'=>$player->user->name,
-  //                       'last_name'=>$player->user->last_name,
-  //                       'money'=>$player->money,
-  //                       'passing'=>$player->passing);
-  //     if ($player->hand){
-  //       if ($player->hand->first_card){$exemplar += ['first_card'=>true];};
-  //       if ($player->hand->second_card){$exemplar += ['second_card'=>true];};
-  //     } 
-  //     if ($phase=='shotdown'){
-  //       $exemplar += ['combination'=>$player->hand->name_of_combination($player->hand->combination())];
-  //     };
-  //     if ($player->id == $this->round->button_id){$exemplar += ['button'=>true];};
-  //     if ($player->id == $this->round->small_blind_id){$exemplar += ['small_blind'=>true];};
-  //     if ($player->id == $this->round->big_blind_id){$exemplar += ['big_blind'=>true];};
-  //     if ($player->id == $this->round->current_player_id){$exemplar += ['current'=>true];};
-  //     if ($player->last_bet){
-  //       $exemplar += ['last_bet'=>$player->last_bet];
-  //     }
-  //     else {
-  //       $exemplar += ['last_bet'=>0];
-  //     }
-  //     array_push($arr, $exemplar);
-  //   }
-  //   return $arr;
-  // }
   public function gameArray(){
     $gamearr = array('phase' => $this->round->phase,
                      'bank' => $this->round->bank,
