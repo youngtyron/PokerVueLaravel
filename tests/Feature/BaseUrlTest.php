@@ -32,4 +32,14 @@ class BaseUrlTest extends TestCase
     	$response = $this->get('/game');
     	$response->assertRedirect('login');
     }
+    public function testFindGamePageAutorized(){
+    	$user = factory(\App\User::class)->create();
+    	$player = \App\Player::create(['user_id'=>$user->id]);
+    	$response = $this->actingAs($user)
+    					 ->get('/findgame');
+    	$response->assertStatus(200);
+    }
 }
+
+
+
