@@ -17,7 +17,7 @@ class CirculationTest extends TestCase
      *
      * @return void
      */
-    public function testPlayersArrangementBlindBets()
+    public function testFivePlayersArrangementBlindBets()
     {
         $users = factory(\App\User::class, 5)->create();
         $game = Game::create();
