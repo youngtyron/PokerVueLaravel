@@ -58156,6 +58156,7 @@ var render = function() {
             "li",
             {
               staticClass: "list-group-item",
+              attrs: { id: "two" },
               on: {
                 click: function($event) {
                   return _vm.findGame(2)
@@ -58169,6 +58170,7 @@ var render = function() {
             "li",
             {
               staticClass: "list-group-item",
+              attrs: { id: "three" },
               on: {
                 click: function($event) {
                   return _vm.findGame(3)
@@ -58182,6 +58184,7 @@ var render = function() {
             "li",
             {
               staticClass: "list-group-item",
+              attrs: { id: "five" },
               on: {
                 click: function($event) {
                   return _vm.findGame(5)
@@ -58195,6 +58198,7 @@ var render = function() {
             "li",
             {
               staticClass: "list-group-item",
+              attrs: { id: "seven" },
               on: {
                 click: function($event) {
                   return _vm.findGame(7)
@@ -58208,6 +58212,7 @@ var render = function() {
             "li",
             {
               staticClass: "list-group-item",
+              attrs: { id: "zero" },
               on: {
                 click: function($event) {
                   return _vm.findGame(0)

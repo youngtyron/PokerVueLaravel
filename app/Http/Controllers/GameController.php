@@ -39,6 +39,7 @@ class GameController extends Controller
         $game->save();
         foreach ($partners as $partner) {
           $partner->game_id = $game->id;
+          $partner->money = 5000;
           $partner->search_number_players = Null;
           $partner->save();
         }

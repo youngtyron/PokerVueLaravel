@@ -10,6 +10,7 @@ use Faker;
 
 class RegisterTest extends DuskTestCase
 {
+
     /**
      * A Dusk test example.
      *
