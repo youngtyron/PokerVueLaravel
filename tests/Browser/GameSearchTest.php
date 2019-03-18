@@ -20,7 +20,6 @@ class GameSearchTest extends DuskTestCase
     public function testTwoGameSearchers(){
         $user = factory(\App\User::class)->create();
         $player = Player::create(['user_id'=>$user->id, 'search_number_players'=>2]);
-        $player->save();
         $second_user = factory(\App\User::class)->create();
         $second_player = Player::create(['user_id'=>$second_user->id]);
 
@@ -36,7 +35,6 @@ class GameSearchTest extends DuskTestCase
         $users = factory(\App\User::class, 2)->create();
         foreach ($users as $user) {
             $player = Player::create(['user_id'=>$user->id, 'search_number_players'=>3]);
-            $player->save();
         }
         $third_user = factory(\App\User::class)->create();
         $third_player = Player::create(['user_id'=>$third_user->id]);
@@ -53,7 +51,6 @@ class GameSearchTest extends DuskTestCase
         $users = factory(\App\User::class, 4)->create();
         foreach ($users as $user) {
             $player = Player::create(['user_id'=>$user->id, 'search_number_players'=>5]);
-            $player->save();
         }
         $fifth_user = factory(\App\User::class)->create();
         $fifth_player = Player::create(['user_id'=>$fifth_user->id]);
@@ -70,7 +67,6 @@ class GameSearchTest extends DuskTestCase
         $users = factory(\App\User::class, 6)->create();
         foreach ($users as $user) {
             $player = Player::create(['user_id'=>$user->id, 'search_number_players'=>7]);
-            $player->save();
         }
         $seventh_user = factory(\App\User::class)->create();
         $seventh_player = Player::create(['user_id'=>$seventh_user->id]);
