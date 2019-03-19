@@ -119,7 +119,7 @@ class Hand extends Model
   	$freq = array_count_values ($suits);
   	$combo_siut = false;
   	foreach ($freq as $key => $value){
-  		if ($value == 5){
+  		if ($value >= 5){
   			$combo_siut = $key;
   			break;
   		}
@@ -135,17 +135,24 @@ class Hand extends Model
   			}
   		}
 		sort($rank_row);
-  		if ($rank_row == array(1, 10, 11, 12, 13)){
+      $intersect = array_intersect($rank_row, [1, 10, 11, 12, 13]);
+      if (in_array(1, $intersect) and in_array(10, $intersect) and in_array(11, $intersect) and in_array(12, $intersect) 
+                                  and in_array(13, $intersect)){
   			return 'R';
   		}
   		else {
-  			$min = min($rank_row);	
-  			if ($rank_row == array($min, $min+1, $min+2, $min+3, $min+4)){
-  				return 'S';
-  			}
-  			else {
-  				return false;
-  			}
+        $counter = 0;
+        foreach ($rank_row as $rank) {
+          if(in_array($rank+1, $rank_row)){
+            $counter += 1;
+          }
+        }
+        if ($counter>=4){
+          return 'S';
+        }
+        else {
+         return false;
+        }
   		}
   	}
   }
@@ -177,6 +184,12 @@ class Hand extends Model
   	else if ($pairs == 1 and $triples == 1){
   		return 7;
   	}
+    else if ($triples == 2 and $pairs == 0){
+      return 7;
+    }
+    else if ($triples == 1 and $pairs == 2){
+      return 7;
+    }
   	else if ($pairs == 0 and $triples == 1){
   		return 4;
   	}
