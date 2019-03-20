@@ -52,6 +52,43 @@ class Hand extends Model
   	}
   	return $suits;
   }
+  public function test_cards_array($cards){
+    $arr = array();
+    foreach ($cards as $c) {
+      $ex = explode('-', $c);
+      array_push($arr, ['suit'=>$ex[0], 'rank'=>$ex[1]]);
+    }
+    return $arr;
+  }
+  public function test_combination($cards){
+    $cards = $this->test_cards_array($cards);
+    $equals = $this->equal_ranks_combination($this->ranks($cards));
+    if ($this->straight($this->ranks($cards))){
+      if ($this->royal_and_straight_flush($cards)=='R'){
+        $combination = 10;
+      }
+      else if ($this->royal_and_straight_flush($cards)=='S'){
+        $combination = 9;
+      }
+      else {
+      if ($this->flush($this->suits($cards))){
+          $combination = 6;
+        }
+        else {
+          $combination = 5;
+        }
+      }
+    }
+    else {
+      if ($this->flush($this->suits($cards))){
+      $combination = 6;
+      }
+      else {
+        $combination = $equals;
+      }
+    }
+    return $combination;    
+  }
   public function combination(){
   	$cards = $this->allcards_array();
   	$equals = $this->equal_ranks_combination($this->ranks($cards));
