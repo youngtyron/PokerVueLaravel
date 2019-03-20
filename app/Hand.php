@@ -224,7 +224,7 @@ class Hand extends Model
   	$freq = array_count_values ($suits);
   	$flush = false;
   	foreach ($freq as $key => $value){
-  		if ($value == 5){
+  		if ($value >= 5){
   			$flush = true;
   			break;
   		}

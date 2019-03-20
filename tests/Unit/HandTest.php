@@ -261,5 +261,120 @@ class HandTest extends TestCase
 		$round->save();
 		$this->assertEquals($hand->combination(), 7);   
     }
-
+    public function testFlushOnHand(){
+    	$game = Game::create();
+    	$round = Round::create(['game_id'=>$game->id]);
+    	$user = factory(\App\User::class)->create();
+    	$player = Player::create(['game_id'=>$game->id, 'user_id'=>$user->id]);
+    	$hand = Hand::create(['player_id'=>$player->id]);
+    	$suit_array = ['spades', 'diamonds', 'hearts', 'clubs'];  
+    	$numbers_array = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+    	$flush_suit = $suit_array[array_rand($suit_array)];
+    	$flush_preranks_indexes = array_rand($numbers_array, 5);
+    	$flush_preranks = array();
+    	foreach ($flush_preranks_indexes as $ind) {
+    		array_push($flush_preranks, $numbers_array[$ind]);	
+    		unset($numbers_array[$ind]);
+    	}
+    	$first = $flush_preranks[0];
+    	$x = true;
+    	while ($x) {
+	    	if (count(array_intersect($flush_preranks, [$first, $first+1, $first+2, $first+3, $first+4]))==5){
+		    	$numbers_array = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+		     	$flush_preranks_indexes = array_rand($numbers_array, 5);
+		    	$flush_preranks = array();   		
+	    	}
+	    	else {
+	    		$x = false;
+	    	}
+    	}
+    	$cards = array();
+    	foreach ($flush_preranks as $f) {
+    		array_push($cards, $flush_suit.'-'.(string)$f);
+    	}
+    	$sixth_card_suit = $suit_array[array_rand($suit_array)];
+    	if ($sixth_card_suit == $flush_suit){
+    		$sixth_card_rank = $numbers_array[array_rand($numbers_array)];
+    		while (true){
+    			$arr = $flush_preranks;
+    			array_push($arr, $sixth_card_rank);
+	    		if (count(array_intersect($arr, [$sixth_card_rank, $sixth_card_rank+1, $sixth_card_rank+2, 
+	    			$sixth_card_rank+3, $sixth_card_rank+4]))==5){
+	    			$sixth_card_rank = $numbers_array[array_rand($numbers_array)];
+	    		}
+	    		else if (count(array_intersect($arr, [$sixth_card_rank, $sixth_card_rank+1, $sixth_card_rank+2, 
+	    			$sixth_card_rank+3, $sixth_card_rank-1]))==5){
+	    			$sixth_card_rank = $numbers_array[array_rand($numbers_array)];
+	    		}
+	    		else if (count(array_intersect($arr, [$sixth_card_rank, $sixth_card_rank+1, $sixth_card_rank+2, 
+	    			$sixth_card_rank-2, $sixth_card_rank-1]))==5){
+	    			$sixth_card_rank = $numbers_array[array_rand($numbers_array)];
+	    		}
+	    		else if (count(array_intersect($arr, [$sixth_card_rank, $sixth_card_rank+1, $sixth_card_rank-3, 
+	    			$sixth_card_rank-2, $sixth_card_rank-1]))==5){
+	    			$sixth_card_rank = $numbers_array[array_rand($numbers_array)];
+	    		}
+	    		else if (count(array_intersect($arr, [$sixth_card_rank, $sixth_card_rank-4, $sixth_card_rank-3, 
+	    			$sixth_card_rank-2, $sixth_card_rank-1]))==5){
+	    			$sixth_card_rank = $numbers_array[array_rand($numbers_array)];
+	    		}
+	    		else{
+	    			break;
+	    		}
+    		}
+    	}
+    	else{
+    		$numbers_array = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+    		$sixth_card_rank = $numbers_array[array_rand($numbers_array)];
+    	}
+    	array_push($cards, $sixth_card_suit.'-'.(string)$sixth_card_rank);
+    	$seventh_card_suit = $suit_array[array_rand($suit_array)];
+    	if ($seventh_card_suit == $flush_suit){
+    		$seventh_card_rank = $numbers_array[array_rand($numbers_array)];
+    		while (true){
+    			$arr = $flush_preranks;
+    			array_push($arr, $sixth_card_rank);
+    			array_push($arr, $seventh_card_rank);
+	    		if (count(array_intersect($arr, [$seventh_card_rank, $seventh_card_rank+1, $seventh_card_rank+2, 
+	    			$seventh_card_rank+3, $seventh_card_rank+4]))==5){
+	    			$seventh_card_rank = $numbers_array[array_rand($numbers_array)];
+	    		}
+	    		else if (count(array_intersect($arr, [$seventh_card_rank, $seventh_card_rank+1, $seventh_card_rank+2, 
+	    			$seventh_card_rank+3, $seventh_card_rank-1]))==5){
+	    			$seventh_card_rank = $numbers_array[array_rand($numbers_array)];
+	    		}
+	    		else if (count(array_intersect($arr, [$seventh_card_rank, $seventh_card_rank+1, $seventh_card_rank+2, 
+	    			$seventh_card_rank-2, $seventh_card_rank-1]))==5){
+	    			$seventh_card_rank = $numbers_array[array_rand($numbers_array)];
+	    		}
+	    		else if (count(array_intersect($arr, [$seventh_card_rank, $seventh_card_rank+1, $seventh_card_rank-3, 
+	    			$seventh_card_rank-2, $seventh_card_rank-1]))==5){
+	    			$seventh_card_rank = $numbers_array[array_rand($numbers_array)];
+	    		}
+	    		else if (count(array_intersect($arr, [$seventh_card_rank, $seventh_card_rank-4, $seventh_card_rank-3, 
+	    			$seventh_card_rank-2, $seventh_card_rank-1]))==5){
+	    			$seventh_card_rank = $numbers_array[array_rand($numbers_array)];
+	    		}
+	    		else{
+	    			break;
+	    		}
+    		}
+    	}    	
+    	else{
+    		$numbers_array = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+    		$seventh_card_rank = $numbers_array[array_rand($numbers_array)];    		
+    	}
+    	array_push($cards, $seventh_card_suit.'-'.(string)$seventh_card_rank);
+    	print_r($cards);
+    	$hand->first_card = $cards[0];
+    	$hand->second_card = $cards[1];
+    	$hand->save();
+    	$round->first_card = $cards[2];
+		$round->second_card = $cards[3];
+		$round->third_card = $cards[4];
+		$round->fourth_card = $cards[5];
+		$round->fifth_card = $cards[6];
+		$round->save();
+		$this->assertEquals($hand->combination(), 6);   							
+    }
 }
