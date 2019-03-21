@@ -397,8 +397,8 @@ class HandTest extends TestCase
 			$round->fifth_card = $cards[6];
 			$round->save();		
     	}   	
-	    while($hand->test_combination($cards)==6 and
-			  $hand->test_combination($cards)==9 and
+	    while($hand->test_combination($cards)==6 or
+			  $hand->test_combination($cards)==9 or
 			  $hand->test_combination($cards)==10){
     		$cards = CombHelper::giveStraight();
 		    $hand->first_card = $cards[0];
@@ -448,5 +448,108 @@ class HandTest extends TestCase
 		$hand = $player->hand;
 		print_r($cards);
 		$this->assertEquals($hand->combination(), 4); 
+    }
+    public function testTwoOnHand(){
+    	$game = Game::create();
+    	$round = Round::create(['game_id'=>$game->id]);
+    	$user = factory(\App\User::class)->create();
+    	$player = Player::create(['game_id'=>$game->id, 'user_id'=>$user->id]);
+    	$hand = Hand::create(['player_id'=>$player->id]);    	
+    	if (count($hand->allcards_array())==0){
+    		$cards = CombHelper::giveTwo();
+    		$hand->first_card = $cards[0];
+	    	$hand->second_card = $cards[1];
+	    	$hand->save();
+	    	$round->first_card = $cards[2];
+			$round->second_card = $cards[3];
+			$round->third_card = $cards[4];
+			$round->fourth_card = $cards[5];
+			$round->fifth_card = $cards[6];
+			$round->save();		
+    	}   	
+	    while($hand->test_combination($cards)==5){
+    		$cards = CombHelper::giveTwo();
+		    $hand->first_card = $cards[0];
+	    	$hand->second_card = $cards[1];
+	    	$hand->save();
+	    	$round->first_card = $cards[2];
+			$round->second_card = $cards[3];
+			$round->third_card = $cards[4];
+			$round->fourth_card = $cards[5];
+			$round->fifth_card = $cards[6];
+			$round->save();	
+    	}
+		$hand = $player->hand;
+		print_r($cards);
+		$this->assertEquals($hand->combination(), 3); 
+    }
+    public function testOneOnHand(){
+    	$game = Game::create();
+    	$round = Round::create(['game_id'=>$game->id]);
+    	$user = factory(\App\User::class)->create();
+    	$player = Player::create(['game_id'=>$game->id, 'user_id'=>$user->id]);
+    	$hand = Hand::create(['player_id'=>$player->id]);    	
+    	if (count($hand->allcards_array())==0){
+    		$cards = CombHelper::giveOne();
+    		$hand->first_card = $cards[0];
+	    	$hand->second_card = $cards[1];
+	    	$hand->save();
+	    	$round->first_card = $cards[2];
+			$round->second_card = $cards[3];
+			$round->third_card = $cards[4];
+			$round->fourth_card = $cards[5];
+			$round->fifth_card = $cards[6];
+			$round->save();		
+    	}   	
+	    while($hand->test_combination($cards)==5){
+    		$cards = CombHelper::giveOne();
+		    $hand->first_card = $cards[0];
+	    	$hand->second_card = $cards[1];
+	    	$hand->save();
+	    	$round->first_card = $cards[2];
+			$round->second_card = $cards[3];
+			$round->third_card = $cards[4];
+			$round->fourth_card = $cards[5];
+			$round->fifth_card = $cards[6];
+			$round->save();	
+    	}
+		$hand = $player->hand;
+		print_r($cards);
+		$this->assertEquals($hand->combination(), 2); 
+    }
+    public function testHighOnHand(){
+    	$game = Game::create();
+    	$round = Round::create(['game_id'=>$game->id]);
+    	$user = factory(\App\User::class)->create();
+    	$player = Player::create(['game_id'=>$game->id, 'user_id'=>$user->id]);
+    	$hand = Hand::create(['player_id'=>$player->id]);    	
+    	if (count($hand->allcards_array())==0){
+    		$cards = CombHelper::giveKicker();
+    		$hand->first_card = $cards[0];
+	    	$hand->second_card = $cards[1];
+	    	$hand->save();
+	    	$round->first_card = $cards[2];
+			$round->second_card = $cards[3];
+			$round->third_card = $cards[4];
+			$round->fourth_card = $cards[5];
+			$round->fifth_card = $cards[6];
+			$round->save();		
+    	}   	
+	    while($hand->test_combination($cards)==5 or 
+			 $hand->test_combination($cards)==6	){
+    		$cards = CombHelper::giveKicker();
+		    $hand->first_card = $cards[0];
+	    	$hand->second_card = $cards[1];
+	    	$hand->save();
+	    	$round->first_card = $cards[2];
+			$round->second_card = $cards[3];
+			$round->third_card = $cards[4];
+			$round->fourth_card = $cards[5];
+			$round->fifth_card = $cards[6];
+			$round->save();	
+    	}
+		$hand = $player->hand;
+		print_r($cards);
+		$this->assertEquals($hand->combination(), 1); 
     }
 }
