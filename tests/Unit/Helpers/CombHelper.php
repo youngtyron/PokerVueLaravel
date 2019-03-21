@@ -31,5 +31,38 @@ class CombHelper{
 		array_push($cards, $seventh_card_suit.'-'.(string)$seventh_card_rank);	
 		return $cards;
 	}
+	static function giveThree(){
+		$suit_array = ['spades', 'diamonds', 'hearts', 'clubs'];  
+		$numbers_array = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+		$cards = array();
+		$used_suits = array();
+		$three_rank_index = array_rand($numbers_array);
+		$three_rank = $numbers_array[$three_rank_index];
+		unset($numbers_array[$three_rank_index]);
+		$three_suit_indexes = array_rand($suit_array, 3);
+		foreach ($three_suit_indexes as $index) {
+				array_push($cards, $suit_array[$index].'-'.(string)$three_rank);
+				array_push($used_suits, $index);
+			}	
+		for ($i=0; $i < 4; $i++) { 
+			$rank_index = array_rand($numbers_array);
+			$suit_index = array_rand($suit_array);
+			array_push($used_suits, $suit_index);
+			$suit = $suit_array[$suit_index];
+			array_push($cards, $suit.'-'.$numbers_array[$rank_index]);
+			unset($numbers_array[$rank_index]);
+			foreach (array_count_values($used_suits) as $key => $value) {
+				if ($value>3){
+					$ind = array_search($key, $used_suits);
+					foreach ($used_suits as $suit) {
+						if ($suit == $key){
+							unset($used_suits[array_search($suit, $used_suits)]);
+						}
+					}
+				}
+			}
+		}
+		return $cards;
+	}
 }
 ?>

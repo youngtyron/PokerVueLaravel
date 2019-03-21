@@ -379,15 +379,12 @@ class HandTest extends TestCase
 		$round->save();
 		$this->assertEquals($hand->combination(), 6);   							
     }
-    public function testStaightOnHand(){
+    public function testStraightOnHand(){
     	$game = Game::create();
     	$round = Round::create(['game_id'=>$game->id]);
     	$user = factory(\App\User::class)->create();
     	$player = Player::create(['game_id'=>$game->id, 'user_id'=>$user->id]);
     	$hand = Hand::create(['player_id'=>$player->id]);
-    	$suit_array = ['spades', 'diamonds', 'hearts', 'clubs'];  
-    	$numbers_array = [1,2,3,4,5,6,7,8,9,10,11,12,13];
-    	$cards = array();
     	if (count($hand->allcards_array())==0){
     		$cards = CombHelper::giveStraight();
     		$hand->first_card = $cards[0];
@@ -417,5 +414,39 @@ class HandTest extends TestCase
 		$hand = $player->hand;
 		print_r($cards);
 		$this->assertEquals($hand->combination(), 5); 
+    }
+    public function testThreeOnHand(){
+    	$game = Game::create();
+    	$round = Round::create(['game_id'=>$game->id]);
+    	$user = factory(\App\User::class)->create();
+    	$player = Player::create(['game_id'=>$game->id, 'user_id'=>$user->id]);
+    	$hand = Hand::create(['player_id'=>$player->id]);    	
+    	if (count($hand->allcards_array())==0){
+    		$cards = CombHelper::giveThree();
+    		$hand->first_card = $cards[0];
+	    	$hand->second_card = $cards[1];
+	    	$hand->save();
+	    	$round->first_card = $cards[2];
+			$round->second_card = $cards[3];
+			$round->third_card = $cards[4];
+			$round->fourth_card = $cards[5];
+			$round->fifth_card = $cards[6];
+			$round->save();		
+    	}   	
+	    while($hand->test_combination($cards)==5){
+    		$cards = CombHelper::giveThree();
+		    $hand->first_card = $cards[0];
+	    	$hand->second_card = $cards[1];
+	    	$hand->save();
+	    	$round->first_card = $cards[2];
+			$round->second_card = $cards[3];
+			$round->third_card = $cards[4];
+			$round->fourth_card = $cards[5];
+			$round->fifth_card = $cards[6];
+			$round->save();	
+    	}
+		$hand = $player->hand;
+		print_r($cards);
+		$this->assertEquals($hand->combination(), 4); 
     }
 }
